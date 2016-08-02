@@ -1,0 +1,163 @@
+<div><div>		<table class="draggable dropzone" draggable="true"><tbody>
+			<tr>
+				<td><input class="copyBtn" type="button" value="複製"></td>
+				<td>ドラッグアンカー</td>
+			</tr>
+		</tbody></table><table class="draggable dropzone" draggable="true"><tbody>
+			<tr>
+				<td><input class="copyBtn" type="button" value="複製"></td>
+				<td>ドラッグアンカー</td>
+			</tr>
+		</tbody></table></div></div><table class="draggable dropzone" draggable="true"><tbody>
+			<tr>
+				<td><input class="copyBtn" type="button" value="複製"></td>
+				<td colspan="3">【<span class="editable">スキルコレクター</span>】</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>消費:</th><td class="editable">-</td>
+			</tr><tr>
+				<th>時機:</th><td class="editable">常時</td>
+				<th>対象:</th><td class="editable">自身</td>
+				<th>射程:</th><td class="editable">-</td>
+			</tr><tr>
+				<th>前提:</th><td class="editable" colspan="3">-</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>Lv.上限:</th><td class="editable">6</td>
+			</tr><tr>
+				<td colspan="6"><strong>説明:</strong>
+				<span class="editable textarea">特殊能力の習得可能数が「S.Lv.+1」増える。</span>
+				</td>
+			</tr>
+		</tbody></table><table class="draggable dropzone" draggable="true"><tbody>
+			<tr>
+				<td><input class="copyBtn" type="button" value="複製"></td>
+				<td colspan="3">【<span class="editable">お宝発見</span>】</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>消費:</th><td class="editable">-</td>
+			</tr><tr>
+				<th>時機:</th><td class="editable">常時</td>
+				<th>対象:</th><td class="editable">自身</td>
+				<th>射程:</th><td class="editable">-</td>
+			</tr><tr>
+				<th>前提:</th><td class="editable" colspan="3">-</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>Lv.上限:</th><td class="editable">6</td>
+			</tr><tr>
+				<td colspan="6"><strong>説明:</strong>
+				<span class="editable textarea">敵NPC撃破時のアイテムドロップロールで振るさいころの出目を「+S.Lv.」する。</span>
+				</td>
+			</tr>
+		</tbody></table><table class="draggable dropzone" draggable="true"><tbody>
+			<tr>
+				<td><input class="copyBtn" type="button" value="複製"></td>
+				<td colspan="3">【<span class="editable">威圧</span>】</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>消費:</th><td class="editable">-</td>
+			</tr><tr>
+				<th>時機:</th><td class="editable">常時</td>
+				<th>対象:</th><td class="editable">自身</td>
+				<th>射程:</th><td class="editable">-</td>
+			</tr><tr>
+				<th>前提:</th><td class="editable" colspan="3">-</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>Lv.上限:</th><td class="editable">6</td>
+			</tr><tr>
+				<td colspan="6"><strong>説明:</strong>
+				<span class="editable textarea">ZOCを展開する（詳細未定）</span>
+				</td>
+			</tr>
+		</tbody></table><table class="draggable dropzone" draggable="true"><tbody>
+			<tr>
+				<td><input class="copyBtn" type="button" value="複製"></td>
+				<td colspan="3">【<span class="editable">勇猛果敢</span>】</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>消費:</th><td class="editable">-</td>
+			</tr><tr>
+				<th>時機:</th><td class="editable">常時</td>
+				<th>対象:</th><td class="editable">自身</td>
+				<th>射程:</th><td class="editable">-</td>
+			</tr><tr>
+				<th>前提:</th><td class="editable" colspan="3">-</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>Lv.上限:</th><td class="editable">1</td>
+			</tr><tr>
+				<td colspan="6"><strong>説明:</strong>
+				<span class="editable textarea">ZOCに影響を受けずに移動できるようになる。</span>
+				</td>
+			</tr>
+		</tbody></table><table class="draggable dropzone" draggable="true"><tbody>
+			<tr>
+				<td><input class="copyBtn" type="button" value="複製"></td>
+				<td colspan="3">【<span class="editable">挑発</span>】</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>消費:</th><td class="editable">5</td>
+			</tr><tr>
+				<th>時機:</th><td class="editable">ターン開始時</td>
+				<th>対象:</th><td class="editable">単体</td>
+				<th>射程:</th><td class="editable">10m</td>
+			</tr><tr>
+				<th>前提:</th><td class="editable" colspan="3">-</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>Lv.上限:</th><td class="editable">6</td>
+			</tr><tr>
+				<td colspan="6"><strong>説明:</strong>
+				<span class="editable textarea">対象とINTにより対決を行う。対決に勝利したとき、対象に状態異常「狂化」を与える。</span>
+				</td>
+			</tr>
+		</tbody></table><table class="draggable dropzone" draggable="true"><tbody>
+			<tr>
+				<td><input class="copyBtn" type="button" value="複製"></td>
+				<td colspan="3">【<span class="editable">チャージ</span>】</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>消費:</th><td class="editable">5</td>
+			</tr><tr>
+				<th>時機:</th><td class="editable">主動作</td>
+				<th>対象:</th><td class="editable">自身</td>
+				<th>射程:</th><td class="editable">-</td>
+			</tr><tr>
+				<th>前提:</th><td class="editable" colspan="3">-</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>Lv.上限:</th><td class="editable">3</td>
+			</tr><tr>
+				<td colspan="6"><strong>説明:</strong>
+				<span class="editable textarea">自身にS.Lv.と同レベルの状態異常「チャージ」を与える。</span>
+				</td>
+			</tr>
+		</tbody></table><table class="draggable dropzone" draggable="true"><tbody>
+			<tr>
+				<td><input class="copyBtn" type="button" value="複製"></td>
+				<td colspan="3">【<span class="editable">大声</span>】</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>消費:</th><td class="editable">-</td>
+			</tr><tr>
+				<th>時機:</th><td class="editable">主動作</td>
+				<th>対象:</th><td class="editable">範囲</td>
+				<th>射程:</th><td class="editable">0m</td>
+			</tr><tr>
+				<th>前提:</th><td class="editable" colspan="3">-</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>Lv.上限:</th><td class="editable">1</td>
+			</tr><tr>
+				<td colspan="6"><strong>説明:</strong>
+				<span class="editable textarea">自身を中心とした半径10m以内の範囲内に居るキャラクターの状態異常「眠り」を解除する。さらに自身が隠密状態にあった場合、それも解除される。</span>
+				</td>
+			</tr>
+		</tbody></table><table class="draggable dropzone" draggable="true"><tbody>
+			<tr>
+				<td><input class="copyBtn" type="button" value="複製"></td>
+				<td colspan="3">【<span class="editable">雄叫び</span>】</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>消費:</th><td class="editable">5</td>
+			</tr><tr>
+				<th>時機:</th><td class="editable">補助動作</td>
+				<th>対象:</th><td class="editable">自身</td>
+				<th>射程:</th><td class="editable">-</td>
+			</tr><tr>
+				<th>前提:</th><td class="editable" colspan="3">【チャージ】Lv.1</td>
+				<!-- <th>ダミー:</th><td></td> -->
+				<th>Lv.上限:</th><td class="editable">3</td>
+			</tr><tr>
+				<td colspan="6"><strong>説明:</strong>
+				<span class="editable textarea">自身にS.Lv.と同レベルの状態異常「狂化」を与える。</span>
+				</td>
+			</tr>
+		</tbody></table>

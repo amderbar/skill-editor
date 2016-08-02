@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css"
+	href="stylesheet.css">
+<title>Editor on Browser</title>
+</head>
+<body>
+	<a id="download" href="#" download="save.txt" onclick="handleDownload()">名前をつけて保存</a>
+	<div id="file_drop_zone">
+		<output id="fileName">ここにファイルをドラッグ	&amp;ドロップ</output><br>
+		または<input type="file" id="file_select" onchange="handleFileSelect(this)">
+	</div>
+	<div id="editorArea"></div>
+	<!-- 
+		<h3>draggableな要素とeditableな要素</h3>
+		<p>draggableな要素は子要素としてeditableな要素を持つことができる。その逆はない。</p>
+		<p>draggableな要素とeditableな要素は互いに兄弟関係となることもできる。</p>
+		<h3>dropzone要素</h3>
+		<p>dropzone要素はdropイベントを受け付けることのできる要素。dropzone要素はdraggableな要素の親子どちらにもなれるし、また自身がdraggableにもなれる。</p>
+	 -->
+	<script src="editorClient.js"></script>
+</body>
+</html>
