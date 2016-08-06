@@ -189,13 +189,13 @@ function handleDownload() {
 }
 
 // ファイルをドロップして開く
-function handleFileDrop(e) {
-	e.stopPropagation(); // Stops some browsers from redirecting.
-	e.preventDefault();
-	// files is a FileList of File objects. List some properties.
-	fileLoder(e.dataTransfer.files);
-	putHandlers();
-}
+// function handleFileDrop(e) {
+// 	e.stopPropagation(); // Stops some browsers from redirecting.
+// 	e.preventDefault();
+// 	// files is a FileList of File objects. List some properties.
+// 	fileLoder(e.dataTransfer.files);
+// 	putHandlers();
+// }
 // ファイル選択フォームから選ぶ
 function handleFileSelect(input) {
 	console.log("onchange")
@@ -226,7 +226,7 @@ function fileLoder (files) {
 		// Read in the source file as a Text.
 		reader.readAsText(f);
 	}
-	document.getElementById('fileName').innerHTML = '<ul>' + output.join('') + '</ul>';	
+	// document.getElementById('fileName').innerHTML = '<ul>' + output.join('') + '</ul>';	
 }
 function handleFileDragOver(evt) {
 	evt.stopPropagation();
@@ -262,6 +262,6 @@ putHandlers();
 // ファイル保存関連
 document.getElementById("download").addEventListener('click', handleDownload,false);
 // ドラッグアンドドロップでファイルを開くイベントリスナー設置.
-document.getElementById('file_drop_zone').addEventListener('dragover',handleFileDragOver, false);
-document.getElementById('file_drop_zone').addEventListener('drop', handleFileDrop,false);
-document.getElementById('file_select').addEventListener('onchange', handleFileSelect,false);
+// document.getElementById('file_drop_zone').addEventListener('dragover',handleFileDragOver, false);
+// document.getElementById('file_drop_zone').addEventListener('drop', handleFileDrop,false);
+// document.getElementById('file_select').addEventListener('onchange', handleFileSelect,false);
