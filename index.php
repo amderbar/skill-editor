@@ -2,6 +2,7 @@
 /**
 * 
 */
+define('ROOT_DB', 'project_manager.db');
 require_once(full_path('controllers/servlet.php'));
 session_start();
 if($_SERVER["REQUEST_METHOD"] === 'GET'){
@@ -22,4 +23,5 @@ if($_SERVER["REQUEST_METHOD"] === 'GET'){
         $path = realpath($path);
         return str_replace(DIRECTORY_SEPARATOR, '/', $path);
     }
+
 ?>

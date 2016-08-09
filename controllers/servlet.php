@@ -1,17 +1,17 @@
 <?php
+require_once(full_path('models/db_editor.php'));
+
 /**
  * 
  */
-require_once(full_path('models/db_manager.php'));
-
 class Servlet {
     
     /**
     * 
     */
     public static function doGet($req='') {
-        $root_db = new SQLiteHandler();
-        $proj_list = $root_db->ls_db();
+        $db_editor = new DBEditor();
+        $proj_list = $db_editor->listDB();
         $current_proj = null;
         if (isset($_SESSION['current_proj'])) {
             $current_proj = $_SESSION['current_proj'];

@@ -8,7 +8,7 @@ class SQLiteHandler {
     /**
     * 
     */
-    function __construct($db_name = 'project_manager.db') {
+    function __construct($db_name) {
         $this->connect($db_name);
     }
 
@@ -16,21 +16,14 @@ class SQLiteHandler {
     * 
     */
     public function connect($db_name) {
-        $dsn = '/../resources/' . $db_name;
-        $dsn = 'sqlite:' . str_replace(DIRECTORY_SEPARATOR, '/', __DIR__) . $dsn;
+        $dsn = 'resources/' . $db_name;
+        $dsn = 'sqlite:' . full_path($dsn);
         try {
             $this->pdo = new PDO($dsn);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->pdo->exec('PRAGMA foreign_keys = true;');
         } catch (PDOException $e){
             die('Connection failed:'. $e->getMessage());
-        }
-        try {
-            $this->pdo->exec('PRAGMA foreign_keys = true;');
-            if ($db_name === 'project_manager.db') {
-                $this->setupManagerDB($db_name);
-            }
-        } catch (PDOException $e){
-            die('PDOException throwen:'. $e->getMessage());
         }
     }
 
@@ -44,9 +37,17 @@ class SQLiteHandler {
     /**
     * 
     */
-    public function ls_db() {
-        $stmt = $this->pdo->prepare(
-            "SELECT file_name FROM projects;");
+    public function fetchAll($table,$column='') {
+        // $tableと$columnのエスケープ処理が必要
+        if (! $column) {
+            $stmt = $this->pdo->query('PRAGMA table_info('.$table.')');
+            $names = array();
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $names[] = $row['name'];
+            }
+            $column = implode(',',$names);
+        }
+        $stmt = $this->pdo->prepare('SELECT '.$column.' FROM '.$table.';');
         $stmt->execute();
         return $stmt->fetchAll();
     }
@@ -54,23 +55,12 @@ class SQLiteHandler {
     /**
     * 
     */
-    private function setupManagerDB($db_name) {
-        $sql = <<< _SQL_
-CREATE TABLE IF NOT EXISTS projects (
-    id integer PRIMARY KEY AUTOINCREMENT,
-    file_name text NOT NULL
-);
-_SQL_;
-        $this->pdo->exec($sql);
-        $sql = <<< _SQL_
-CREATE TABLE IF NOT EXISTS templates (
-    id integer PRIMARY KEY AUTOINCREMENT,
-    proj_id integer REFERENCES projects(id) on DELETE SET NULL,
-    file_name text NOT NULL,
-    UNIQUE(proj_id, file_name)
-);
-_SQL_;
-        $this->pdo->exec($sql);
+    public function execSQL($sql) {
+        try {
+            $this->pdo->exec($sql);
+        } catch (PDOException $e){
+            die('PDOException throwen:'. $e->getMessage());
+        }
     }
 }
 ?>
