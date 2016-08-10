@@ -21,6 +21,7 @@ class SQLiteHandler {
         try {
             $this->pdo = new PDO($dsn);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
             $this->pdo->exec('PRAGMA foreign_keys = true;');
         } catch (PDOException $e){
             die('Connection failed:'. $e->getMessage());
@@ -42,14 +43,21 @@ class SQLiteHandler {
         if (! $column) {
             $stmt = $this->pdo->query('PRAGMA table_info('.$table.')');
             $names = array();
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            while ($row = $stmt->fetch()) {
                 $names[] = $row['name'];
             }
             $column = implode(',',$names);
         }
         $stmt = $this->pdo->prepare('SELECT '.$column.' FROM '.$table.';');
         $stmt->execute();
-        return $stmt->fetchAll();
+        $rows = $stmt->fetchAll();
+        return $rows;
+    }
+
+    public function insert($dto) {
+        $stmt = $this->pdo->prepare($dto->getInsertSQL());
+        $data_array = $dto->getDataArray();
+        $stmt->execute($data_array);
     }
 
     /**
@@ -63,4 +71,25 @@ class SQLiteHandler {
         }
     }
 }
+
+/**
+ * 
+ */
+abstract class DTO {
+    /**  */
+    protected $data_array = array();
+
+    /**
+    * 
+    */
+    public function getInsertSQL() {}
+
+    /**
+    * 
+    */
+    public function getDataArray() {
+        return $this->data_array;
+    }
+}
+
 ?>

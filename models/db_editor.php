@@ -44,6 +44,17 @@ class DBEditor {
     /**
     * 
     */
+    public function registerDB($file_name) {
+        try {
+            $this->con[ROOT_DB]->insert(new Project($file_name));
+        } catch (PDOException $e){
+            die('PDOException throwen:'. $e->getMessage());
+        }
+    }
+
+    /**
+    * 
+    */
     private function setupRootDB() {
         $sql = <<< _SQL_
 CREATE TABLE IF NOT EXISTS projects (
@@ -62,6 +73,28 @@ CREATE TABLE IF NOT EXISTS templates (
 _SQL_;
         $this->con[ROOT_DB]->execSQL($sql);
     }
-
 }
+
+/**
+ * DTO
+ */
+class Project extends DTO {
+    /**  */
+    private $table = 'projects';
+
+    /**
+    * 
+    */
+    function __construct($file_name) {
+        $this->data_array[':file_name'] = $file_name;
+    }
+
+    /**
+    * 
+    */
+    public function getInsertSQL() {
+        return 'INSERT INTO '.$this->table.'(file_name) VALUES (:file_name)';
+    }
+}
+
 ?>

@@ -1,17 +1,20 @@
 <?php
 require_once(full_path('models/db_editor.php'));
 
+Servlet::setup();
+
 /**
  * 
  */
 class Servlet {
-    
+    /**  */
+    private static $db_editor = null;
+
     /**
     * 
     */
     public static function doGet($req='') {
-        $db_editor = new DBEditor();
-        $proj_list = $db_editor->listDB();
+        $proj_list = self::$db_editor->listDB();
         $current_proj = null;
         if (isset($_SESSION['current_proj'])) {
             $current_proj = $_SESSION['current_proj'];
@@ -23,7 +26,19 @@ class Servlet {
     * 
     */
     public static function doPost($req='') {
-        return '';
+        if (isset($_POST['proj_name'])&&($_POST['proj_name']!='')) {
+            self::$db_editor->registerDB($_POST['proj_name']);
+        }
+        return self::doGet($req);
+    }
+
+    /**
+    * 
+    */
+    public static function setup($arg='') {
+        if (! self::$db_editor) {
+            self::$db_editor = new DBEditor();
+        }
     }
 }
 
