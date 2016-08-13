@@ -24,7 +24,7 @@
 		</div>
 		<ul class="side_menu">
 			<?php foreach ($proj_list as $row) {
-				echo '<li>'.htmlentities($row['file_name']).'</li>';
+				echo '<li><a href="'.'#">'.htmlentities($row['proj_name']).'</a></li>'."\n";
 			} ?>
 			<li><input type="file" id="file_select" onchange="handleFileSelect(this)"></li>
 		</ul>
@@ -39,7 +39,7 @@
 	</div>
 	<footer>ver 1.0.0</footer>
 	<div id="modal-content">
-		<form action="<?=$_SERVER['PHP_SELF']?>" method="POST">
+		<form action="<?=$_SERVER["REQUEST_URI"]?>" method="POST">
 			<fieldset>
 				<legend>新規プロジェクト作成</legend>
 				<table>

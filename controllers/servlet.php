@@ -29,7 +29,7 @@ class Servlet {
         if (isset($_POST['proj_name'])&&($_POST['proj_name']!='')) {
             self::$db_editor->registerDB($_POST['proj_name']);
         }
-        return self::doGet($req);
+        header('Location: ' . (empty($_SERVER["HTTPS"]) ? "http://" : "https://") . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
     }
 
     /**

@@ -8,16 +8,16 @@ class SQLiteHandler {
     /**
     * 
     */
-    function __construct($db_name) {
-        $this->connect($db_name);
+    function __construct($db_name,$newfile=false) {
+        $this->connect($db_name,$newfile);
     }
 
     /**
     * 
     */
-    public function connect($db_name) {
+    public function connect($db_name,$newfile=false) {
         $dsn = 'resources/' . $db_name;
-        $dsn = 'sqlite:' . full_path($dsn);
+        $dsn = 'sqlite:' . full_path($dsn,$newfile);
         try {
             $this->pdo = new PDO($dsn);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -49,23 +49,63 @@ class SQLiteHandler {
             $column = implode(',',$names);
         }
         $stmt = $this->pdo->prepare('SELECT '.$column.' FROM '.$table.';');
-        $stmt->execute();
-        $rows = $stmt->fetchAll();
-        return $rows;
-    }
-
-    public function insert($dto) {
-        $stmt = $this->pdo->prepare($dto->getInsertSQL());
-        $data_array = $dto->getDataArray();
-        $stmt->execute($data_array);
+        if ($stmt->execute()) {
+            return $stmt->fetchAll();
+        }
+        return false;
     }
 
     /**
     * 
     */
-    public function execSQL($sql) {
+    public function findByUniqueKey($table,$key_col,$value) {
+        // $tableと$columnのエスケープ処理が必要
+        $stmt = $this->pdo->query('PRAGMA table_info('.$table.')');
+        $names = array();
+        while ($row = $stmt->fetch()) {
+            $names[] = $row['name'];
+        }
+        $column = implode(',',$names);
+        $stmt = $this->pdo->prepare(
+            'SELECT '.$column.' FROM '.$table.' WHERE '.$key_col.'= ?;');
+        if ($stmt->execute(array($value))) {
+            return $stmt->fetch();
+        }
+        return false;
+    }
+
+    /**
+    * 
+    */
+    public function insert($dto) {
         try {
-            $this->pdo->exec($sql);
+            $stmt = $this->pdo->prepare($dto->getInsertSQL());
+            $parms = $dto->getParms();
+            $result = $stmt->execute($parms);
+            return $result;
+        } catch (PDOException $e){
+            if (strpos($e->getMessage(),'19 UNIQUE constraint failed')>0) {
+                error_log($e->getMessage() . "\n");
+                return false;
+            } else {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+    * 
+    */
+    public function execSQL($sql, $parms = array()) {
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            foreach ($parms as $key => $value) {
+                $stmt->bindParam($key, $value);
+            }
+            if ($stmt->execute()) {
+                return $stmt->fetchAll();
+            }
+            return false;
         } catch (PDOException $e){
             die('PDOException throwen:'. $e->getMessage());
         }
@@ -77,7 +117,7 @@ class SQLiteHandler {
  */
 abstract class DTO {
     /**  */
-    protected $data_array = array();
+    private $parms = array();
 
     /**
     * 
@@ -87,8 +127,15 @@ abstract class DTO {
     /**
     * 
     */
-    public function getDataArray() {
-        return $this->data_array;
+    public function getParms() {
+        return $this->parms;
+    }
+
+    /**
+    * 
+    */
+    public function setParm($parm,$value) {
+        $this->parms[$parm] = $value;
     }
 }
 

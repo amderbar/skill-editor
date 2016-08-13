@@ -15,12 +15,14 @@ if($_SERVER["REQUEST_METHOD"] === 'GET'){
     * return file full path of argument string
     * if null arg, return the full path of directory.
     */
-    function full_path($path='') {
+    function full_path($path='',$newfile=false) {
         if ($path and strpos($path,'/') != 0) {
             $path = '/' . $path;
         }
         $path = str_replace('/', DIRECTORY_SEPARATOR, __DIR__ . $path);
-        $path = realpath($path);
+        if ((! $newfile) || (realpath($path))) {
+            $path = realpath($path);
+        }
         return str_replace(DIRECTORY_SEPARATOR, '/', $path);
     }
 
