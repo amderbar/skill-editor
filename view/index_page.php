@@ -24,7 +24,8 @@
 		</div>
 		<ul class="side_menu">
 			<?php foreach ($proj_list as $proj_id => $proj_name) {
-				echo '<li><a href="'.parse_url($_SERVER["REQUEST_URI"],PHP_URL_HOST).'?id='.htmlentities($proj_id).'">'.htmlentities($proj_name).'</a></li>'."\n";
+				$url = parse_url($_SERVER["REQUEST_URI"],PHP_URL_HOST).'?id='.htmlentities($proj_id);
+				echo '<li><a href="'.$url.'">'.htmlentities($proj_name).'</a><input class="deleteBtn" value="削除" type="button"/></li>'."\n";
 			} ?>
 			<li><input type="file" id="file_select" onchange="handleFileSelect(this)"></li>
 		</ul>
@@ -58,8 +59,11 @@
 				<legend>新規プロジェクト作成</legend>
 				<table>
 				<tr><td>新規プロジェクト名</td><td><input type="text" name="proj_name"></td></tr>
-				<tr><td><input type="submit" value="作成" onclick="hideModal()"></td>
-				<td><input type="button" value="キャンセル" onclick="hideModal()"></td></tr>
+				<tr>
+				<!--<td><input type="submit" value="作成" onclick="hideModal()"></td>-->
+				<td><input type="button" value="キャンセル" onclick="hideModal()"></td>
+				<td>現在新規プロジェクトの作成はできません</td>
+				</tr>
 				</table>
 			</fieldset>
 		</form>

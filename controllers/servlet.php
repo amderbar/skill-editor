@@ -20,6 +20,7 @@ class Servlet {
             $proj_id = intval($_GET['id']);
             $proj_name = $proj_list[$proj_id];
             self::$db_editor->open(sprintf('proj%03d.db',$proj_id),$proj_name);
+            // テーブル名がマジックナンバーになっている。ここもSNTRPG_Skills専用
             $data_list = self::$db_editor->listData($proj_name,'skills_view');
             $proj_template = self::$db_editor->getTemplates($proj_id);
         }

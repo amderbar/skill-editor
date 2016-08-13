@@ -1,5 +1,6 @@
 #modal-content{
 	width:50%;
+	min-width: 580px;
 	margin: 0;
 	padding: 20px;
 	border: 1px solid LightGrey;
