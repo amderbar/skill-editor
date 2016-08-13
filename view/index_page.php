@@ -17,21 +17,35 @@
 	<div id="main">
 		<nav id="side_menu">
 		<div class="header">
-		<h4>Projects</h4>
-		<ul>
-			<li><input type="button" id="now_proj" onclick="openModal(this)" value="新規作成"></li>
-		</ul>
+			<h4>Projects</h4>
+			<ul>
+				<li><input type="button" id="now_proj" onclick="openModal(this)" value="新規作成"></li>
+			</ul>
 		</div>
 		<ul class="side_menu">
-			<?php foreach ($proj_list as $row) {
-				echo '<li><a href="'.'#">'.htmlentities($row['proj_name']).'</a></li>'."\n";
+			<?php foreach ($proj_list as $proj_id => $proj_name) {
+				echo '<li><a href="'.parse_url($_SERVER["REQUEST_URI"],PHP_URL_HOST).'?id='.htmlentities($proj_id).'">'.htmlentities($proj_name).'</a></li>'."\n";
 			} ?>
 			<li><input type="file" id="file_select" onchange="handleFileSelect(this)"></li>
 		</ul>
 		</nav>
 		<div id="editorArea">
-			<?php if ($current_proj) {
-				echo '<p>' . htmlentities($current_proj) . '</p>';
+		<div class="header">
+			<h4>Editor Area</h4>
+			<ul>
+				<li><input type="button" onclick="" value="ボタン"></li>
+			</ul>
+		</div>
+			<?php if ($proj_template !== null) {
+				$tmpl_name = 'view/templates/';
+				if (count($proj_template)) {
+					$tmpl_name .= $proj_template[0];
+				} else {
+					// $proj_template[] = 'default_template.php';
+					$tmpl_name .= 'default_template.php';
+				}
+				// echo '<p>' . htmlentities(implode(',',$proj_template)) . '</p>';
+				include(full_path($tmpl_name));
 			} else {
 				echo '<p>プロジェクトを選択してください。</p>';
 			} ?>

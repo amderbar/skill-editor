@@ -34,7 +34,11 @@ class DBEditor {
     */
     public function listDB() {
         try {
-            return $this->con[ROOT_DB]->fetchAll('projects');
+            $proj_list = array();
+            foreach ($this->con[ROOT_DB]->fetchAll('projects') as $row) {
+                $proj_list[$row['id']] = $row['proj_name'];
+            }
+            return $proj_list;
         } catch (PDOException $e){
             die('PDOException throwen:'. $e->getMessage());
         }
@@ -58,9 +62,9 @@ class DBEditor {
                 $newid = $this->con[ROOT_DB]->execSQL('select last_insert_rowid() AS id');
                 $id = $newid[0]['id'];
             } else {
-                $row = $this->con[ROOT_DB]->findByUniqueKey(
+                $row = $this->con[ROOT_DB]->findByKey(
                     'projects','proj_name',$proj_name);
-                $id = $row['id'];
+                $id = $row[0]['id'];
             }
             $tmpl_dir = full_path(sprintf('view/templates/proj%03d',$id),true);
             if(! file_exists($tmpl_dir)){
@@ -68,6 +72,7 @@ class DBEditor {
             }
             $db_file = sprintf('proj%03d.db',$id);
             $this->open($db_file,$proj_name);
+            return $id;
         } catch (PDOException $e){
             die('PDOException throwen:'. $e->getMessage());
         }
@@ -79,6 +84,21 @@ class DBEditor {
     public function dropRoot() {
         $this->con[ROOT_DB]->execSQL('drop table templates;');
         $this->con[ROOT_DB]->execSQL('drop table projects;');
+    }
+
+    /**
+    * 
+    */
+    public function getTemplates($proj_id) {
+        try {
+            $tmpl_list = array();
+            foreach ($this->con[ROOT_DB]->findByKey('templates','proj_id',$proj_id) as $row) {
+                $tmpl_list[] = $row['tmpl_name'];
+            }
+            return $tmpl_list;
+        } catch (PDOException $e){
+            die('PDOException throwen:'. $e->getMessage());
+        }
     }
 
     /**
@@ -126,9 +146,9 @@ class DBEditor {
                     $newid = $this->con[$proj_name]->execSQL('select last_insert_rowid() AS id');
                     $id = $newid[0]['id'];
                 } else {
-                    $row = $this->con[$proj_name]->findByUniqueKey(
+                    $row = $this->con[$proj_name]->findByKey(
                         $dto->getTableName(),$colname,$parms[$key]);
-                    $id = $row['id'];
+                    $id = $row[0]['id'];
                 }
                 $parms[$key] = $id;
             }
@@ -157,9 +177,9 @@ class DBEditor {
                 $newid = $this->con[$proj_name]->execSQL('select last_insert_rowid() AS id');
                 $skill_id = $newid[0]['id'];
             } else {
-                $row = $this->con[$proj_name]->findByUniqueKey(
+                $row = $this->con[$proj_name]->findByKey(
                     'skills','name',$parms['name']);
-                $skill_id = $row['id'];
+                $skill_id = $row[0]['id'];
             }
             // 習得前提条件が存在する場合
             if ($parms['has_preconditions']) {
@@ -179,9 +199,9 @@ class DBEditor {
                         $newid = $this->con[$proj_name]->execSQL('select last_insert_rowid() AS id');
                         $id = $newid[0]['id'];
                     } else {
-                        $row = $this->con[$proj_name]->findByUniqueKey(
+                        $row = $this->con[$proj_name]->findByKey(
                             'conditions','condition',$condition);
-                        $id = $row['id'];
+                        $id = $row[0]['id'];
                     }
                     $preconditions[] = array($skill_id,$id);
                 }

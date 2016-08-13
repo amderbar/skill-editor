@@ -58,7 +58,7 @@ class SQLiteHandler {
     /**
     * 
     */
-    public function findByUniqueKey($table,$key_col,$value) {
+    public function findByKey($table,$key_col,$value) {
         // $tableと$columnのエスケープ処理が必要
         $stmt = $this->pdo->query('PRAGMA table_info('.$table.')');
         $names = array();
@@ -69,7 +69,7 @@ class SQLiteHandler {
         $stmt = $this->pdo->prepare(
             'SELECT '.$column.' FROM '.$table.' WHERE '.$key_col.'= ?;');
         if ($stmt->execute(array($value))) {
-            return $stmt->fetch();
+            return $stmt->fetchAll();
         }
         return false;
     }
