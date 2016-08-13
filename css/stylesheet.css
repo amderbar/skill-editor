@@ -21,8 +21,8 @@ header {
 .header, #main {
 	display: flex;
 }
-.header > h3 {margin-right: auto;}
-.header > h4 {margin: 10px auto .5em 10px;}
+.header > h3 {margin: 10px auto 10px 0;}
+.header > h4 {margin: 10px auto 10px 10px;}
 .header > ul {
 	display: flex;
 	margin: auto 0 0;
@@ -40,9 +40,8 @@ footer {
 	bottom: 0;
 	text-align: right;
 }
-
 #main {
-	top: 60px;
+	top: 42px;
 	bottom: 15px;
 }
 #main > nav, #editorArea, ul.side_menu li {
@@ -79,6 +78,7 @@ footer {
 */
 
 #editorArea {
+	padding: 0 10px;
 	flex: 3;
 } 
 
