@@ -78,6 +78,28 @@ class DBEditor {
         }
     }
 
+    public function registerTemplate($proj_id,$tmpl_name) {
+        try {
+            $dto = new class($proj_id,$tmpl_name) extends DTO {
+                function __construct($proj_id,$tmpl_name) {
+                    $this->setParm(':proj_id',$proj_id);
+                    $this->setParm(':tmpl_name',$tmpl_name);
+                }
+                public function getInsertSQL() {
+                    return 'INSERT INTO templates(proj_id,tmpl_name) VALUES (:proj_id,:tmpl_name);';
+                }
+            };
+            if ($this->con[ROOT_DB]->insert($dto)) {
+                $newid = $this->con[ROOT_DB]->execSQL('select last_insert_rowid() AS id');
+                $id = $newid[0]['id'];
+                return $id;
+            }
+            return false;
+        } catch (PDOException $e){
+            die('PDOException throwen:'. $e->getMessage());
+        }
+    }
+
     /**
     * 
     */
@@ -240,8 +262,8 @@ _SQL_;
 CREATE TABLE IF NOT EXISTS templates (
     id integer PRIMARY KEY AUTOINCREMENT,
     proj_id integer REFERENCES projects(id) on DELETE SET NULL,
-    proj_name text NOT NULL,
-    UNIQUE(proj_id, proj_name)
+    tmpl_name text NOT NULL,
+    UNIQUE(proj_id, tmpl_name)
 );
 _SQL_;
         $this->con[ROOT_DB]->execSQL($sql);

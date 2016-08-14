@@ -1,0 +1,27 @@
+<form action="localhost/skill_editor" method="POST">
+<feildset>
+<table class="draggable dropzone" draggable="true">
+    <tbody>
+    <tr>
+        <td><img src="skill_editor/img/dummy.png"></td>
+        <td colspan="3">【<input type="text" name="name" value="{skills.name}" readonly class="editable">】</td>
+        <th>消費:</th><td><input type="text" name="cost" value="{skills.cost}" readonly class="editable"></td>
+    </tr><tr>
+        <th>時機:</th><td><input type="text" name="timing" value="{skills.timing}" readonly class="editable"></td>
+        <th>対象:</th><td><input type="text" name="target" value="{skills.target}" readonly class="editable"></td>
+        <th>射程:</th><td><input type="text" name="renge" value="{skills.renge}" readonly class="editable"></td>
+    </tr><tr>
+        <th>前提:</th><td colspan="3"><input type="text" name="preconditions" value="{skills.preconditions}" readonly class="editable"></td>
+        <th>Lv.上限:</th><td><input type="text" name="lv_limit" value="{skills.lv_limit}" readonly class="editable"></td>
+    </tr><tr>
+        <th>説明:</th>
+        <td colspan="5"><textarea name="description" readonly class="editable">{skills.description}</textarea></td>
+    </tr><tr>
+        <td></td><td></td>
+        <td></td><td><input class="copyBtn" value="複製" type="button"/></td>
+        <td></td><td><input class="deleteBtn" value="削除" type="button"/></td>
+    </tr>
+    </tbody>
+</table>
+</feildset>
+</form>

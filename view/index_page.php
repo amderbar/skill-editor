@@ -19,7 +19,7 @@
 		<div class="header">
 			<h4>Projects</h4>
 			<ul>
-				<li><input type="button" id="now_proj" onclick="openModal(this)" value="新規作成"></li>
+				<li><input type="button" id="proj-Btn" onclick="openModal(this)" value="新規作成"></li>
 			</ul>
 		</div>
 		<ul class="side_menu">
@@ -33,14 +33,16 @@
 		<div id="editorArea">
 		<div class="header">
 			<h4>Editor Area</h4>
+			<?php if ($proj_template !== null) { // プロジェクトを開いている時だけボタンを表示 ?>
 			<ul>
-				<li><input type="button" onclick="" value="ボタン"></li>
+				<li><input id="tmpl-Btn" value="テンプレート登録" type="button" onclick="openModal(this)"/></li>
 			</ul>
+			<?php } ?>
 		</div>
 			<?php if ($proj_template !== null) {
 				$tmpl_name = 'view/templates/';
 				if (count($proj_template)) {
-					$tmpl_name .= $proj_template[0];
+					$tmpl_name .= sprintf('proj%03d/',$current_proj_id).$proj_template[0];
 				} else {
 					// $proj_template[] = 'default_template.php';
 					$tmpl_name .= 'default_template.php';
@@ -53,16 +55,32 @@
 		</div>
 	</div>
 	<footer>ver 1.0.0</footer>
-	<div id="modal-content">
+	<div class="modal-content" id="new-proj">
 		<form action="<?=$_SERVER["REQUEST_URI"]?>" method="POST">
 			<fieldset>
 				<legend>新規プロジェクト作成</legend>
 				<table>
-				<tr><td>新規プロジェクト名</td><td><input type="text" name="proj_name"></td></tr>
+				<tr><td>新規プロジェクト名</td><td><input type="text" name="proj-name"></td></tr>
 				<tr>
 				<!--<td><input type="submit" value="作成" onclick="hideModal()"></td>-->
 				<td><input type="button" value="キャンセル" onclick="hideModal()"></td>
 				<td>現在新規プロジェクトの作成はできません</td>
+				</tr>
+				</table>
+			</fieldset>
+		</form>
+	</div>
+	<div class="modal-content" id="new-tmpl">
+		<form action="<?=$_SERVER["REQUEST_URI"]?>" method="POST" enctype="multipart/form-data">
+			<fieldset>
+				<legend>テンプレート登録</legend>
+				<table>
+				<tr><td>ファイルアップロード</td>
+				<td><input type="hidden" name="MAX_FILE_SIZE" value="30000">
+				<input type="file" name="tmpl-file"></td></tr>
+				<tr>
+				<td><input type="submit" value="登録" onclick="hideModal()"></td>
+				<td><input type="button" value="キャンセル" onclick="hideModal()"></td>
 				</tr>
 				</table>
 			</fieldset>

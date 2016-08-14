@@ -17,12 +17,12 @@ class Servlet {
         $proj_list = self::$db_editor->listDB();
         $proj_template = null;
         if (isset($_GET['id'])&&$_GET['id']!='') {
-            $proj_id = intval($_GET['id']);
-            $proj_name = $proj_list[$proj_id];
-            self::$db_editor->open(sprintf('proj%03d.db',$proj_id),$proj_name);
+            $current_proj_id = intval($_GET['id']);
+            $proj_name = $proj_list[$current_proj_id];
+            self::$db_editor->open(sprintf('proj%03d.db',$current_proj_id),$proj_name);
             // テーブル名がマジックナンバーになっている。ここもSNTRPG_Skills専用
             $data_list = self::$db_editor->listData($proj_name,'skills_view');
-            $proj_template = self::$db_editor->getTemplates($proj_id);
+            $proj_template = self::$db_editor->getTemplates($current_proj_id);
         }
         return include(full_path('view/index_page.php'));
     }
@@ -31,12 +31,17 @@ class Servlet {
     * 
     */
     public static function doPost($req='') {
-        if (isset($_POST['proj_name'])&&($_POST['proj_name']!='')) {
-            $proj_id = self::$db_editor->registerDB($_POST['proj_name']);
+        if (isset($_POST['proj-name']) && ($_POST['proj-name'] != '')) {
+            $proj_id = self::$db_editor->registerDB($_POST['proj-name']);
+        } elseif (isset($_FILES['tmpl-file'])) {
+            $proj_id = intval($_GET['id']);
+            $tmpl_name = self::fileUpLoad($proj_id);
+            self::$db_editor->registerTemplate($proj_id,$tmpl_name);
         }
         $redirect_uri = empty($_SERVER["HTTPS"]) ? "http://" : "https://";
         $redirect_uri .= $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"];
         header('Location: ' . $redirect_uri);
+        // return self::doGet();
     }
 
     /**
@@ -45,6 +50,29 @@ class Servlet {
     public static function setup($arg='') {
         if (self::$db_editor == null) {
             self::$db_editor = new DBEditor();
+            // self::$db_editor->dropRoot();
+        }
+    }
+
+    /**
+    * 
+    */
+    private static function fileUpLoad($proj_id) {
+        // ファイル名についてのその他のバリデーションが必要
+        switch ($_FILES['tmpl-file']['error']) {
+            case UPLOAD_ERR_OK:
+                $uploaddir = sprintf('view/templates/proj%03d',$proj_id);
+                $file_name = basename($_FILES['tmpl-file']['name']);
+                $uploadfile = full_path($uploaddir) .'/'. $file_name;
+                if (move_uploaded_file($_FILES['tmpl-file']['tmp_name'], $uploadfile)) {
+                    return $file_name;
+                } else {
+                    die("Possible file upload attack!\n");
+                }
+                break;
+            default:
+                echo 'File Upload Failed'.PHP_EOL;
+                break;
         }
     }
 }
