@@ -1,3 +1,6 @@
+<?php
+	$url = parse_url($_SERVER["REQUEST_URI"],PHP_URL_HOST);
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,7 +13,7 @@
 	<header class="header">		 
 		<h3 id="page_title">Data Editor on Browser</h3>
 		<ul id="system_menu">
-			<li><a id="download" href="#" download="save.txt" onclick="handleDownload()">名前をつけて保存</a></li>
+			<li><a id="download" href="#" download="save.txt" onclick="handleDownload()">データダウンロード</a></li>
 			<li><a href="#">システム設定</a></li>
 		</ul>
 	</header>
@@ -24,17 +27,26 @@
 		</div>
 		<ul class="side_menu">
 			<?php foreach ($proj_list as $proj_id => $proj_name) {
-				$url = parse_url($_SERVER["REQUEST_URI"],PHP_URL_HOST).'?id='.htmlentities($proj_id);
-				echo '<li><a href="'.$url.'">'.htmlentities($proj_name).'</a><input class="deleteBtn" value="削除" type="button"/></li>'."\n";
+				$href = $url .'?id='.htmlentities($proj_id);
+				echo '<li><a href="'.$href.'">'.htmlentities($proj_name).'</a><input class="deleteBtn" value="削除" type="button"/></li>'."\n";
 			} ?>
 			<li><input type="file" id="file_select" onchange="handleFileSelect(this)"></li>
 		</ul>
 		</nav>
-		<div id="editorArea">
+		<div>
 		<div class="header">
 			<h4>Editor Area</h4>
 			<?php if ($proj_template !== null) { // プロジェクトを開いている時だけボタンを表示 ?>
 			<ul>
+				<li><?php if (count($proj_template)) {
+					echo '<select name="aplied_templete">'.PHP_EOL;
+					foreach ($proj_template as $tmpl) {
+						echo '<option value="en">'.htmlentities($tmpl).'</option>'.PHP_EOL;
+					}
+					echo '</select>'.PHP_EOL;
+				} else {
+					echo 'デフォルトテンプレート'.PHP_EOL;
+				} ?></li>
 				<li><input id="tmpl-Btn" value="テンプレート登録" type="button" onclick="openModal(this)"/></li>
 			</ul>
 			<?php } ?>
@@ -48,7 +60,19 @@
 					$tmpl_name .= 'default_template.php';
 				}
 				// echo '<p>' . htmlentities(implode(',',$proj_template)) . '</p>';
-				include(full_path($tmpl_name));
+				echo '<form action="'.$url .'?id='.htmlentities($current_proj_id).'" method="POST" id="editorArea">'.PHP_EOL;
+				$tmpl = file_get_contents(full_path($tmpl_name));
+				foreach ($data_list as $data_row) {
+					$tmpl_row = $tmpl;
+					foreach ($data_row as $key => $value) {
+						if ($key == 'icon') {
+							$value = 'img/'.$value;
+						}
+						$tmpl_row = str_replace('{'.$key.'}',htmlentities($value),$tmpl_row);
+					}
+					echo $tmpl_row.PHP_EOL;
+				}
+				echo '</form>'.PHP_EOL;
 			} else {
 				echo '<p>プロジェクトを選択してください。</p>';
 			} ?>
