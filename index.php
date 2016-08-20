@@ -26,4 +26,12 @@ if($_SERVER["REQUEST_METHOD"] === 'GET'){
         return str_replace(DIRECTORY_SEPARATOR, '/', $path);
     }
 
+    /**
+    * 
+    */
+    function pre_dump($var) {
+        echo '<pre>';
+        var_dump($var);
+        echo '</pre>';
+    }
 ?>
