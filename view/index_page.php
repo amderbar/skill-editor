@@ -1,5 +1,14 @@
 <?php
 	$url = parse_url($_SERVER["REQUEST_URI"],PHP_URL_HOST);
+	function makeDatalist($id_name,$data_arr) {
+		$data_arr = call_user_func_array('array_map',array_merge(array(null),$data_arr));
+		echo '<datalist id="'.htmlentities($id_name).'">'.PHP_EOL;
+		foreach ($data_arr[1] as $value) {
+			echo '<option value="'.htmlentities($value).'">'.PHP_EOL;
+		}
+		echo '<option value="-">'.PHP_EOL;
+		echo '</datalist>'.PHP_EOL;
+	}
 ?>
 <!DOCTYPE html>
 <html>
@@ -59,10 +68,14 @@
 					// $proj_template[] = 'default_template.php';
 					$tmpl_name .= 'default_template.php';
 				}
+				// 以下は現状SNTRPG_Skills専用
 				// echo '<p>' . htmlentities(implode(',',$proj_template)) . '</p>';
 				echo '<form action="'.$url .'?id='.htmlentities($current_proj_id).'" method="POST" id="editorArea">'.PHP_EOL;
+				makeDatalist('timings',$data_list['timings']);
+				makeDatalist('renges',$data_list['renges']);
+				makeDatalist('targets',$data_list['targets']);
 				$tmpl = file_get_contents(full_path($tmpl_name));
-				foreach ($data_list as $data_row) {
+				foreach ($data_list['skills_view'] as $data_row) {
 					$tmpl_row = $tmpl;
 					foreach ($data_row as $key => $value) {
 						if ($key == 'icon') {

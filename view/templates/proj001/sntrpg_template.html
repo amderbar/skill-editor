@@ -2,18 +2,18 @@
     <tbody>
     <tr>
         <td><img class="icon" src="{icon}"></td>
-        <td colspan="3">【<input type="text" name="name" value="{name}" readonly class="editable">】</td>
-        <th>消費:</th><td><input type="text" name="cost" value="{cost}" readonly class="editable"></td>
+        <td colspan="3">【<input type="text" name="name[]" value="{name}" class="editable">】</td>
+        <th>消費:</th><td><input type="text" name="cost[]" value="{cost}" class="editable"></td>
     </tr><tr>
-        <th>時機:</th><td><input type="text" name="timing" value="{timing}" readonly class="editable"></td>
-        <th>対象:</th><td><input type="text" name="target" value="{target}" readonly class="editable"></td>
-        <th>射程:</th><td><input type="text" name="renge" value="{renge}" readonly class="editable"></td>
+        <th>時機:</th><td><input type="text" name="timing[]" value="{timing}" class="editable" list="timings"></td>
+        <th>対象:</th><td><input type="text" name="target[]" value="{target}" class="editable" list="targets"></td>
+        <th>射程:</th><td><input type="text" name="renge[]" value="{renge}" class="editable" list="renges"></td>
     </tr><tr>
-        <th>前提:</th><td colspan="3"><input type="text" name="preconditions" value="{preconditions}" readonly class="editable"></td>
-        <th>Lv.上限:</th><td><input type="text" name="lv_limit" value="{lv_limit}" readonly class="editable"></td>
+        <th>前提:</th><td colspan="3"><input type="text" name="preconditions[]" value="{preconditions}" class="editable"></td>
+        <th>Lv.上限:</th><td><input type="text" name="lv_limit[]" value="{lv_limit}" class="editable"></td>
     </tr><tr>
         <th class="textarea-label">説明:</th>
-        <td colspan="5"><textarea cols="80" rows="5" name="description" readonly class="editable">{description}</textarea></td>
+        <td colspan="5"><textarea cols="80" rows="5" name="description[]" class="editable">{description}</textarea></td>
     </tr><tr>
         <td></td><td></td>
         <td></td><td><input class="copyBtn" value="複製" type="button"/></td>

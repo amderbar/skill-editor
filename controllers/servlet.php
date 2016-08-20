@@ -20,8 +20,11 @@ class Servlet {
             $current_proj_id = intval($_GET['id']);
             $proj_name = $proj_list[$current_proj_id];
             self::$db_editor->open(sprintf('proj%03d.db',$current_proj_id),$proj_name);
-            // テーブル名がマジックナンバーになっている。ここもSNTRPG_Skills専用
-            $data_list = self::$db_editor->listData($proj_name,'skills_view');
+            $table_list = self::$db_editor->listTables($proj_name);
+            $data_list = array();
+            foreach ($table_list as $table) {
+                $data_list[$table] = self::$db_editor->listData($proj_name,$table);
+            }
             $proj_template = self::$db_editor->getTemplates($current_proj_id);
         }
         return include(full_path('view/index_page.php'));
@@ -35,7 +38,7 @@ class Servlet {
             $proj_id = self::$db_editor->registerDB($_POST['proj-name']);
         } elseif (isset($_FILES['tmpl-file'])) {
             $proj_id = intval($_GET['id']);
-            $tmpl_name = self::fileUpLoad($proj_id);
+            $tmpl_name = self::upLoadFile($proj_id);
             self::$db_editor->registerTemplate($proj_id,$tmpl_name);
         }
         $redirect_uri = empty($_SERVER["HTTPS"]) ? "http://" : "https://";
@@ -57,7 +60,7 @@ class Servlet {
     /**
     * 
     */
-    private static function fileUpLoad($proj_id) {
+    private static function upLoadFile($proj_id) {
         // ファイル名についてのその他のバリデーションが必要
         switch ($_FILES['tmpl-file']['error']) {
             case UPLOAD_ERR_OK:

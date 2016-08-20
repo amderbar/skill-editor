@@ -58,14 +58,16 @@ class SQLiteHandler {
     /**
     * 
     */
-    public function findByKey($table,$key_col,$value) {
+    public function findByKey($table,$key_col,$value,$column='') {
         // $tableと$columnのエスケープ処理が必要
-        $stmt = $this->pdo->query('PRAGMA table_info('.$table.')');
-        $names = array();
-        while ($row = $stmt->fetch()) {
-            $names[] = $row['name'];
+        if (! $column) {
+            $stmt = $this->pdo->query('PRAGMA table_info('.$table.')');
+            $names = array();
+            while ($row = $stmt->fetch()) {
+                $names[] = $row['name'];
+            }
+            $column = implode(',',$names);
         }
-        $column = implode(',',$names);
         $stmt = $this->pdo->prepare(
             'SELECT '.$column.' FROM '.$table.' WHERE '.$key_col.'= ?;');
         if ($stmt->execute(array($value))) {

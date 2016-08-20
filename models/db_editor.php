@@ -126,6 +126,21 @@ class DBEditor {
     /**
     * 
     */
+    public function listTables($proj_name) {
+        try {
+            $table_list = $this->con[$proj_name]->findByKey('sqlite_master','type','table','name');
+            $table_list = array_merge($table_list,$this->con[$proj_name]->findByKey('sqlite_master','type','view','name'));
+            $table_list = call_user_func_array('array_map',array_merge(array(null),$table_list));
+            $table_list = array_diff(call_user_func_array ('array_merge',$table_list), array('sqlite_sequence'));
+            return array_values($table_list);
+        } catch (PDOException $e){
+            die('PDOException throwen:'. $e->getMessage());
+        }
+    }
+
+    /**
+    * 
+    */
     public function listData($proj_name,$table) {
         try {
             return $this->con[$proj_name]->fetchAll($table);
