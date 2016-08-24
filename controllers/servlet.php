@@ -1,8 +1,6 @@
 <?php
 require_once(full_path('models/db_editor.php'));
 
-Servlet::setup();
-
 /**
  * 
  */

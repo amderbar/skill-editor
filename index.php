@@ -5,6 +5,9 @@
 define('ROOT_DB', 'project_manager.db');
 require_once(full_path('controllers/servlet.php'));
 session_start();
+// if (!isset($_COOKIE['PHPSESSID'])) {
+    Servlet::setup();
+// }
 if($_SERVER["REQUEST_METHOD"] === 'GET'){
     Servlet::doGet();
 } else if($_SERVER["REQUEST_METHOD"] === 'POST'){
