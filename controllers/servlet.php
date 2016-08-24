@@ -26,6 +26,7 @@ class Servlet {
                 $data_list[$table] = self::$db_editor->listData($proj_name,$table);
             }
             $proj_template = self::$db_editor->getTemplates($current_proj_id);
+            $selected_tmpl = key($proj_template);
         }
         return include(full_path('view/index_page.php'));
     }

@@ -1,14 +1,6 @@
 <?php
+	require_once(full_path('view/form_helper.php'));
 	$url = parse_url($_SERVER["REQUEST_URI"],PHP_URL_HOST);
-	function makeDatalist($id_name,$data_arr) {
-		$data_arr = call_user_func_array('array_map',array_merge(array(null),$data_arr));
-		echo '<datalist id="'.htmlentities($id_name).'">'.PHP_EOL;
-		foreach ($data_arr[1] as $value) {
-			echo '<option value="'.htmlentities($value).'">'.PHP_EOL;
-		}
-		echo '<option value="-">'.PHP_EOL;
-		echo '</datalist>'.PHP_EOL;
-	}
 ?>
 <!DOCTYPE html>
 <html>
@@ -37,7 +29,7 @@
 		<ul class="side_menu">
 			<?php foreach ($proj_list as $proj_id => $proj_name) {
 				$href = $url .'?id='.htmlentities($proj_id);
-				echo '<li><a href="'.$href.'">'.htmlentities($proj_name).'</a><input class="deleteBtn" value="削除" type="button"/></li>'."\n";
+				echo '<li><a href="'.$href.'">'.htmlentities($proj_name).'</a><input class="deleteBtn" value="削除" type="button"/></li>'.PHP_EOL;
 			} ?>
 			<li><input type="file" id="file_select" onchange="handleFileSelect(this)"></li>
 		</ul>
@@ -47,12 +39,9 @@
 			<h4>Editor Area</h4>
 			<?php if ($proj_template !== null) { // プロジェクトを開いている時だけボタンを表示 ?>
 			<ul>
+				<li><?php FormHelper::input_submit('save', '上書き保存', 'editorArea') ?></li>
 				<li><?php if (count($proj_template)) {
-					echo '<select name="aplied_templete">'.PHP_EOL;
-					foreach ($proj_template as $tmpl) {
-						echo '<option value="en">'.htmlentities($tmpl).'</option>'.PHP_EOL;
-					}
-					echo '</select>'.PHP_EOL;
+					FormHelper::input_select('aplied_templete', $selected_tmpl, $proj_template);
 				} else {
 					echo 'デフォルトテンプレート'.PHP_EOL;
 				} ?></li>
@@ -63,7 +52,7 @@
 			<?php if ($proj_template !== null) {
 				$tmpl_name = 'view/templates/';
 				if (count($proj_template)) {
-					$tmpl_name .= sprintf('proj%03d/',$current_proj_id).$proj_template[0];
+					$tmpl_name .= sprintf('proj%03d/',$current_proj_id).$proj_template[$selected_tmpl];
 				} else {
 					// $proj_template[] = 'default_template.php';
 					$tmpl_name .= 'default_template.php';
@@ -71,9 +60,9 @@
 				// 以下は現状SNTRPG_Skills専用
 				// echo '<p>' . htmlentities(implode(',',$proj_template)) . '</p>';
 				echo '<form action="'.$url .'?id='.htmlentities($current_proj_id).'" method="POST" id="editorArea">'.PHP_EOL;
-				makeDatalist('timings',$data_list['timings']);
-				makeDatalist('renges',$data_list['renges']);
-				makeDatalist('targets',$data_list['targets']);
+				FormHelper::makeDatalist('timings',$data_list['timings']);
+				FormHelper::makeDatalist('renges',$data_list['renges']);
+				FormHelper::makeDatalist('targets',$data_list['targets']);
 				$tmpl = file_get_contents(full_path($tmpl_name));
 				foreach ($data_list['skills_view'] as $data_row) {
 					$tmpl_row = $tmpl;
@@ -85,6 +74,7 @@
 					}
 					echo $tmpl_row.PHP_EOL;
 				}
+				echo '<input value="新規レコード" type="button"/>'.PHP_EOL;
 				echo '</form>'.PHP_EOL;
 			} else {
 				echo '<p>プロジェクトを選択してください。</p>';

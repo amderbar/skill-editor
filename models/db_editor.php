@@ -18,7 +18,9 @@ class DBEditor {
     */
     public function open($db_file,$proj_name = null) {
         $proj_name = ($proj_name) ? $proj_name : $db_file ;
-        $this->con[$proj_name] = new SQLiteHandler($db_file,true);
+        if (! isset($this->con[$proj_name])) {
+            $this->con[$proj_name] = new SQLiteHandler($db_file,true);
+        }
     }
 
     /**
@@ -114,8 +116,9 @@ class DBEditor {
     public function getTemplates($proj_id) {
         try {
             $tmpl_list = array();
-            foreach ($this->con[ROOT_DB]->findByKey('templates','proj_id',$proj_id) as $row) {
-                $tmpl_list[] = $row['tmpl_name'];
+            $tmpls = $this->con[ROOT_DB]->findByKey('templates','proj_id',$proj_id);
+            foreach ($tmpls as $row) {
+                $tmpl_list[$row['id']] = $row['tmpl_name'];
             }
             return $tmpl_list;
         } catch (PDOException $e){
