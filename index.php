@@ -5,6 +5,7 @@
 define('ROOT_DB', 'project_manager.db');
 require_once(full_path('controllers/servlet.php'));
 session_start();
+$URL = parse_url($_SERVER["REQUEST_URI"],PHP_URL_PATH);
 // if (!isset($_COOKIE['PHPSESSID'])) {
     Servlet::setup();
 // }
@@ -13,6 +14,13 @@ if($_SERVER["REQUEST_METHOD"] === 'GET'){
 } else if($_SERVER["REQUEST_METHOD"] === 'POST'){
     Servlet::doPost();
 }
+
+    /**
+    * 
+    */
+    function foward($dist, $REQ_SCOPE = null) {
+        return include($dist);
+    }
 
     /**
     * return file full path of argument string
@@ -36,5 +44,69 @@ if($_SERVER["REQUEST_METHOD"] === 'GET'){
         echo '<pre>';
         var_dump($var);
         echo '</pre>';
+    }
+
+    /**
+    * https://www.softel.co.jp/blogs/tech/archives/58 からコピペした
+    * 多次元配列の次元数を調べる関数
+    */
+    function array_depth($a, $c = 0) {
+        return (is_array($a) && count($a))
+                ? max(array_map("array_depth", $a, array_fill(0, count($a), ++$c)))
+                : $c;
+    }
+
+    /**
+    * http://doop-web.com/blog/archives/1182 からコピペし、改造した
+    * ファイルの更新日時をリクエストパラメータ風にファイル名に付け加える関数
+    */
+    function addFilemtime($filename) {
+        if (file_exists($filename)) {
+            return $filename . '?date='. date('YmdHis', filemtime($filename));
+        } else {
+            return $filename;
+        }
+    }
+
+    
+    /**
+    * http://10000-hours.jp/wordpress/2015/09/2015091101/ からコピペした
+    * 多次元配列の差分を求める関数
+    */
+    function array_diff_assoc_recursive( ) {
+        $args = func_get_args();
+        //エラーチェック
+        if( empty($args) ) {
+            return false;
+        }
+        foreach($args as $array_one) {
+            if( !is_array( $array_one ) ) {
+                return false;
+            }
+        }
+        //2つ以上配列の指定がある場合
+        $difference = array();
+        if( count($args) > 2 ) {
+            $difference = array_shift( $args );
+            foreach($args as $array_one) {
+                $difference = array_diff_assoc_recursive( $difference , $array_one );
+            }
+        } else {
+            foreach($args[0] as $key => $value) {
+                if( is_array($value) ) {
+                    if( !isset($args[1][$key]) || !is_array($args[1][$key]) ) {
+                        $difference[$key] = $value;
+                    } else {
+                        $new_diff = array_diff_assoc_recursive($value, $args[1][$key]);
+                        if( !empty($new_diff) ) {
+                            $difference[$key] = $new_diff;
+                        }
+                    }
+                } else if( !array_key_exists($key,$args[1]) || $args[1][$key] !== $value ) {
+                    $difference[$key] = $value;
+                }
+            }
+        }
+        return $difference;
     }
 ?>
