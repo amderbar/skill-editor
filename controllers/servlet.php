@@ -12,8 +12,11 @@ class Servlet {
     * 
     */
     public static function doGet($req='') {
+        $REQ_SCOPE = array();
         $proj_list = self::$db_editor->listDB();
-        $proj_template = null;
+        $REQ_SCOPE['proj_list'] = $proj_list;
+        $tmpl_list = null;
+        // リクエストパラメータidがセットされている時、そのidのプロジェクトが開かれる
         if (isset($_GET['id'])&&$_GET['id']!='') {
             $current_proj_id = intval($_GET['id']);
             $proj_name = $proj_list[$current_proj_id];
@@ -23,10 +26,19 @@ class Servlet {
             foreach ($table_list as $table) {
                 $data_list[$table] = self::$db_editor->listData($proj_name,$table);
             }
-            $proj_template = self::$db_editor->getTemplates($current_proj_id);
-            $selected_tmpl = key($proj_template);
+            $tmpl_list = self::$db_editor->getTemplates($current_proj_id);
+            // 先頭要素のキーを取得
+            $selected_tmpl = key($tmpl_list);
+            // リクエストスコープ相当の配列にデータを格納
+            $REQ_SCOPE['proj_list'] = $proj_list;
+            $REQ_SCOPE['current_proj_data_list'] = $data_list;
+            $REQ_SCOPE['current_proj_tbl_list'] = $table_list;
+            $REQ_SCOPE['tmpl_list'] = $tmpl_list;
+            $REQ_SCOPE['selected_tmpl'] = array('skills_view' => $selected_tmpl);
+            // 肝心のデータはセッションスコープにも入れておく
+            $_SESSION['proj'.$current_proj_id] = $data_list;
         }
-        return include(full_path('view/index_page.php'));
+        return foward(full_path('view/index_page.php'),$REQ_SCOPE);
     }
 
     /**
