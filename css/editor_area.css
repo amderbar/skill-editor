@@ -1,0 +1,69 @@
+.editor-tabs {
+    padding: 0px;
+    width: 100%;
+    background-color:  #E8E8E8;
+}
+.editor-tabs > li{
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border: 1px LightGrey solid;
+    min-width: 10%;
+}
+.tab-page{
+    display: none;
+}
+
+.editor-tabs > li.editting {
+    background-color: white;
+    border-bottom: 1px white solid;
+}
+
+.data-table, .data-table th, .data-table td {
+    border: 1px LightGrey solid;
+}
+.data-table {
+    border-collapse:collapse;
+}
+.draggable {
+	border: 1px solid LightGrey;
+	-webkit-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: inset 0 0 1px #000;
+	-ms-box-shadow: inset 0 0 1px #000;
+	box-shadow: inset 0 0 1px #000;
+	cursor: move;
+}
+
+.dropzone {
+	padding: 10px;
+}
+
+.dropzone.over {
+	border: 1px dashed #000;
+}
+
+.draggable.moving {
+	opacity: .25;
+	-webkit-transform: scale(.8);
+	-moz-transform: scale(.8);
+	-ms-transform: scale(.8);
+	-o-transform: scale(.8);
+}
+/*
+.editable {
+	width: 200px;
+	height: 30px;
+}
+*/
+.editting input {
+	-moz-user-select: element;
+	-khtml-user-select: element;
+	-webkit-user-select: element;
+	user-select: element;
+}
+
+.icon {width: 1em}
+textarea {width: 100%}
+.textarea-label {vertical-align: baseline;}

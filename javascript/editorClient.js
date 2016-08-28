@@ -3,6 +3,25 @@
  */
 
 console.log("#--- Loding Script ---#");
+
+// タブ切り替え関数
+function changeTab(tab) {
+   // 現在のページを消す
+   var current_tab = location.hash;
+   if (current_tab) {
+	   current_tab = current_tab.slice(current_tab.indexOf('#')+1);
+	   document.getElementById(current_tab).style.display = 'none';
+	   document.querySelector('.editor-tabs > li.editting').classList.toggle('editting');
+   }
+	// タブのクラス変更
+	tab.parentNode.classList.toggle('editting');
+   // 指定箇所のみ表示
+   var tabname = tab.href;
+   tabname = tabname.slice(tabname.indexOf('#')+1);
+   document.getElementById(tabname).style.display = 'block';
+}
+
+
 var dragSrcEl = null;
 
 function handleDragStart(e) {

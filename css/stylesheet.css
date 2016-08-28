@@ -27,7 +27,7 @@ header {
 	display: flex;
 	margin: auto 0 0;
 }
-.header > ul li, ul.side_menu li {
+.header > ul li, ul.side_menu > li {
 	display: block;
 	padding: 5px;
 }
@@ -44,7 +44,7 @@ footer {
 	top: 42px;
 	bottom: 15px;
 }
-#main > nav, #main > div, ul.side_menu li {
+#main > nav, #main > div, ul.side_menu > li {
 	border: 1px solid LightGrey;
 	-webkit-border-radius: 5px;
 	-ms-border-radius: 5px;
@@ -58,7 +58,6 @@ footer {
 	overflow: auto;
 }
 #main > nav {
-	flex: 1;
 	padding: 0;
 }
 #main > nav > ul {
@@ -79,49 +78,6 @@ footer {
 
 #main > div {
 	padding: 0 10px;
-	flex: 3;
+	width: inherit;
 } 
 
-.draggable {
-	border: 1px solid LightGrey;
-	-webkit-border-radius: 5px;
-	-ms-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-	-webkit-box-shadow: inset 0 0 1px #000;
-	-ms-box-shadow: inset 0 0 1px #000;
-	box-shadow: inset 0 0 1px #000;
-	cursor: move;
-}
-
-.dropzone {
-	padding: 10px;
-}
-
-.dropzone.over {
-	border: 1px dashed #000;
-}
-
-.draggable.moving {
-	opacity: .25;
-	-webkit-transform: scale(.8);
-	-moz-transform: scale(.8);
-	-ms-transform: scale(.8);
-	-o-transform: scale(.8);
-}
-/*
-.editable {
-	width: 200px;
-	height: 30px;
-}
-*/
-.draggable.editable .editting input {
-	-moz-user-select: element;
-	-khtml-user-select: element;
-	-webkit-user-select: element;
-	user-select: element;
-}
-
-.icon {width: 1em}
-textarea {width: 100%}
-.textarea-label {vertical-align: baseline;}

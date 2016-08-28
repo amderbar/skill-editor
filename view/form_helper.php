@@ -101,7 +101,9 @@ class FormHelper {
   */
   public static function makeDatalist($id_name,$options) {
 		$options = call_user_func_array('array_map',array_merge(array(null),$options));
-    $options = $options[1];
+    if (array_depth($options) > 1) {
+      $options = $options[1];
+    }
 		echo '<datalist id="'.htmlentities($id_name).'">'.PHP_EOL;
 		foreach ($options as $value) {
 			echo '<option value="'.htmlentities($value).'">'.PHP_EOL;
