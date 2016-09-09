@@ -1,5 +1,5 @@
 .editor-tabs {
-    padding: 0px;
+    padding: 0 10px 0;
     width: 100%;
     background-color:  #E8E8E8;
 }
@@ -9,13 +9,22 @@
     border: 1px LightGrey solid;
     min-width: 10%;
 }
-.tab-page{
-    display: none;
-}
 
 .editor-tabs > li.editting {
     background-color: white;
     border-bottom: 1px white solid;
+}
+
+.tab-page{
+    display: none;
+	padding: 5px 0 100px 0;
+}
+
+.tab-page > ol, .tab-page > table {
+	margin: 0 auto;
+}
+th, td {
+	padding: 2px;
 }
 
 .data-table, .data-table th, .data-table td {
@@ -24,6 +33,7 @@
 .data-table {
     border-collapse:collapse;
 }
+
 .draggable {
 	border: 1px solid LightGrey;
 	-webkit-border-radius: 5px;

@@ -3,31 +3,34 @@ body{
 	margin:0px;
 	min-width: 525px;
 }
-header, footer, #main {
+header, footer, main {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
     box-sizing: border-box;
 	width: 100%;
 	min-width: inherit;
-	position: fixed;
 }
 header, footer {
 	padding-left:10px;
 	padding-right:10px;
 }
 header {
-	border-bottom: solid;
+	position: relative;
 }
-.header, #main {
+header, main {
 	display: flex;
+	flex-direction: row;
 }
-.header > h3 {margin: 10px auto 10px 0;}
-.header > h4 {margin: 10px auto 10px 10px;}
-.header > ul {
+main, footer {
+	position: absolute;
+}
+header > h3 {margin: 10px auto 10px 0;}
+header > h4 {margin: 10px auto 10px 10px;}
+header > ul {
 	display: flex;
 	margin: auto 0 0;
 }
-.header > ul li, ul.side_menu > li {
+header > ul li, nav > ul > li {
 	display: block;
 	padding: 5px;
 }
@@ -36,15 +39,16 @@ header > ul li a:hover{background-color:#aaaaaa;}
 header > ul li a:visited{color:-webkit-link;}
 footer {
 	font-size: small;
-	border-top: solid 2px;
 	bottom: 0;
 	text-align: right;
 }
-#main {
+main {
+	border-bottom: 2px solid;
+	border-top: 2px solid;
 	top: 42px;
 	bottom: 15px;
 }
-#main > nav, #main > div, ul.side_menu > li {
+main > nav, main > article, .side-menu > li {
 	border: 1px solid LightGrey;
 	-webkit-border-radius: 5px;
 	-ms-border-radius: 5px;
@@ -54,15 +58,32 @@ footer {
 	-ms-box-shadow: inset 0 0 1px #000;
 	box-shadow: inset 0 0 1px #000;
 	height: inherit;
-	padding: 10px;
+	padding: 0px;
+}
+main > article, main > nav {
+	padding: 0;
+	position: relative;
+}
+main > article {
+	width: 100%;
+}
+.tab-page, .side-menu {
+	position: absolute;
+	width: inherit;
+	top: 30px;
+	bottom: 0px;
+	left: 0;
+	right: 0;
 	overflow: auto;
 }
-#main > nav {
-	padding: 0;
-}
-#main > nav > ul {
+.side-menu {
+	display: flex;
+	flex-direction: column;
 	padding: 0;
 	margin: 0;
+}
+.side-menu > li {
+	padding: 10px;
 }
 /* Prevent the text contents of draggable elements from being selectable. */
 /*[draggable] {
@@ -75,9 +96,4 @@ footer {
 	-webkit-user-drag: element;
 }
 */
-
-#main > div {
-	padding: 0 10px;
-	width: inherit;
-} 
 

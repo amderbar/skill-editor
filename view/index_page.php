@@ -33,7 +33,7 @@
 </head>
 <body>
 	<header class="header">
-		<h3 id="page_title"><a href="<?=$GLOBALS['URL']?>">Data Editor on Browser</a></h3>
+		<h3 id="top-title"><a href="<?=$GLOBALS['URL']?>">Data Editor on Browser</a></h3>
 		<ul id="system_menu">
 			<?php if (isset($REQ_SCOPE['tmpl_list'])) { // プロジェクトを開いている時だけボタンを表示 ?>
 				<li><?php FormHelper::input_submit('save', '上書き保存', 'editorArea') ?></li>
@@ -50,24 +50,24 @@
 			<li><a href="#">システム設定</a></li>
 		</ul>
 	</header>
-	<div id="main">
+	<main id="main">
 		<nav id="side_menu">
-		<div class="header">
-			<h4>Projects</h4>
-			<ul>
-				<li><input type="button" id="proj-Btn" onclick="openModal(this)" value="新規作成"></li>
+			<header class="header">
+				<h4>Projects</h4>
+				<ul>
+					<li><input type="button" id="proj-Btn" onclick="openModal(this)" value="新規作成"></li>
+				</ul>
+			</header>
+			<ul class="side-menu">
+				<?php if (isset($REQ_SCOPE['current_proj_data_list'])) {
+					makeSideItems($REQ_SCOPE['proj_list'],$REQ_SCOPE['current_proj_tbl_list']);
+				} else {
+					makeSideItems($REQ_SCOPE['proj_list']);
+				} ?>
+				<li><input type="file" id="file_select" onchange="handleFileSelect(this)"></li>
 			</ul>
-		</div>
-		<ul class="side_menu">
-			<?php if (isset($REQ_SCOPE['current_proj_data_list'])) {
-				makeSideItems($REQ_SCOPE['proj_list'],$REQ_SCOPE['current_proj_tbl_list']);
-			} else {
-				makeSideItems($REQ_SCOPE['proj_list']);
-			} ?>
-			<li><input type="file" id="file_select" onchange="handleFileSelect(this)"></li>
-		</ul>
 		</nav>
-		<div id="editor">
+		<article id="editor">
 			<?php if (isset($REQ_SCOPE['tmpl_list'])) {
 				$editor_area = new EditorArea($GLOBALS['URL'],$_GET['id']);
 				$editor_area->makePage(
@@ -76,13 +76,13 @@
 					$REQ_SCOPE['selected_tmpl'],
 					$REQ_SCOPE['current_proj_data_list']
 				);
-			} else {
-				echo '<p>プロジェクトを選択してください。</p>';
+			// } else {
+			// 	echo '<p>プロジェクトを選択してください。</p>';
 			} ?>
-		</div>
-	</div>
+		</article>
+	</main>
 	<footer>ver 1.0.0</footer>
-	<div class="modal-content" id="new-proj">
+	<section class="modal-content" id="new-proj">
 		<form action="<?=$_SERVER["REQUEST_URI"]?>" method="POST">
 			<fieldset>
 				<legend>新規プロジェクト作成</legend>
@@ -96,8 +96,8 @@
 				</table>
 			</fieldset>
 		</form>
-	</div>
-	<div class="modal-content" id="new-tmpl">
+	</section>
+	<section class="modal-content" id="new-tmpl">
 		<form action="<?=$_SERVER["REQUEST_URI"]?>" method="POST" enctype="multipart/form-data">
 			<fieldset>
 				<legend>テンプレート登録</legend>
@@ -112,7 +112,7 @@
 				</table>
 			</fieldset>
 		</form>
-	</div>
+	</section>
 	<div id="modal-overlay"></div>
 	<script src="<?=addFilemtime('javascript/editorClient.js')?>"></script>
 	<script src="<?=addFilemtime('javascript/editorCommon.js')?>"></script>

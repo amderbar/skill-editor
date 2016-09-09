@@ -18,7 +18,7 @@ function changeTab(tab) {
    // 指定箇所のみ表示
    var tabname = tab.href;
    tabname = tabname.slice(tabname.indexOf('#')+1);
-   document.getElementById(tabname).style.display = 'block';
+   document.getElementById(tabname).style.display = 'initial';
 }
 
 

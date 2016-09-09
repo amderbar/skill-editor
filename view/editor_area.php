@@ -24,18 +24,18 @@ class EditorArea {
             $this->makePain($tbl_num,$tmpl_name,$data_list[$tbl_name]);
         }
         echo '</form>'.PHP_EOL;
-        $this->makeFooter();
+        // $this->makeFooter();
     }
 
     public function makeTabs($tabs) {
         $this->tab_list = $tabs;
-        echo '<div class="header">'.PHP_EOL;
+        echo '<header class="header">'.PHP_EOL;
         echo '<ul class="editor-tabs">'.PHP_EOL;
         foreach ($tabs as $tbl_num => $tbl_name) {
             echo '<li><a href="'.$this->href.'#tab'.htmlentities($tbl_num).'" onclick="changeTab(this);">'.htmlentities($tbl_name).'</a></li>'.PHP_EOL;
         }
         echo '</ul>'.PHP_EOL;
-        echo '</div>'.PHP_EOL;
+        echo '</header>'.PHP_EOL;
     }
 
     public function makePain($tab_num,$tmpl_name,$data_list) {
@@ -43,7 +43,7 @@ class EditorArea {
             return;
         }
         // 以下は現状SNTRPG_Skills専用
-        echo '<div id="tab'.htmlentities($tab_num).'" class="tab-page">'.PHP_EOL;
+        echo '<section id="tab'.htmlentities($tab_num).'" class="tab-page">'.PHP_EOL;
         FormHelper::makeDatalist($this->tab_list[$tab_num],$data_list);
         if ($tmpl_name) {
             $tmpl = file_get_contents(full_path($tmpl_name));
@@ -63,7 +63,7 @@ class EditorArea {
             $tmpl_name = $this->tmpl_root . 'default_template.php';
             include($tmpl_name);
         }
-        echo '</div>'.PHP_EOL;
+        echo '</section>'.PHP_EOL;
     }
 
     public function makeFooter() {
