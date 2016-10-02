@@ -24,15 +24,17 @@ header, main {
 main, footer {
 	position: absolute;
 }
-header > h3 {margin: 10px auto 10px 0;}
-header > h4 {margin: 10px auto 10px 10px;}
+h1, h2 {
+	margin: 5px auto 5px 0;
+	font-size: small;
+}
 header > ul {
 	display: flex;
 	margin: auto 0 0;
 }
 header > ul li, nav > ul > li {
 	display: block;
-	padding: 5px;
+	padding: 0px 5px;
 }
 header > ul li a {text-decoration: none;}
 header > ul li a:hover{background-color:#aaaaaa;}
@@ -45,7 +47,7 @@ footer {
 main {
 	border-bottom: 2px solid;
 	border-top: 2px solid;
-	top: 42px;
+	top: 30px;
 	bottom: 15px;
 }
 main > nav, main > article, .side-menu > li {

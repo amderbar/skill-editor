@@ -33,7 +33,7 @@
 </head>
 <body>
 	<header class="header">
-		<h3 id="top-title"><a href="<?=$GLOBALS['URL']?>">Data Editor on Browser</a></h3>
+		<h1 id="top-title"><a href="<?=$GLOBALS['URL']?>">Data Editor on Browser</a></h1>
 		<ul id="system_menu">
 			<?php if (isset($REQ_SCOPE['tmpl_list'])) { // プロジェクトを開いている時だけボタンを表示 ?>
 				<li><?php FormHelper::input_submit('save', '上書き保存', 'editorArea') ?></li>
@@ -53,7 +53,7 @@
 	<main id="main">
 		<nav id="side_menu">
 			<header class="header">
-				<h4>Projects</h4>
+				<h2>Projects</h2>
 				<ul>
 					<li><input type="button" id="proj-Btn" onclick="openModal(this)" value="新規作成"></li>
 				</ul>
@@ -76,6 +76,8 @@
 					$REQ_SCOPE['selected_tmpl'],
 					$REQ_SCOPE['current_proj_data_list']
 				);
+			} elseif (condition) {
+				# code...
 			// } else {
 			// 	echo '<p>プロジェクトを選択してください。</p>';
 			} ?>

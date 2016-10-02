@@ -1,12 +1,12 @@
 .editor-tabs {
     padding: 0 10px 0;
     width: 100%;
-    background-color:  #E8E8E8;
 }
 .editor-tabs > li{
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     border: 1px LightGrey solid;
+    background-color:  #E8E8E8;
     min-width: 10%;
 }
 
