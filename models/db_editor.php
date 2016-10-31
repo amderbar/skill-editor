@@ -68,7 +68,7 @@ class DBEditor {
                     'projects','proj_name',$proj_name);
                 $id = $row[0]['id'];
             }
-            $tmpl_dir = full_path(sprintf('view/templates/proj%03d',$id),true);
+            $tmpl_dir = full_path(sprintf('resources/templates/proj%03d',$id),true);
             if(! file_exists($tmpl_dir)){
                 mkdir($tmpl_dir, 0666);
             }

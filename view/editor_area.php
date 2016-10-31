@@ -5,7 +5,7 @@
 class EditorArea {
     private $href;
     private $proj_id;
-    private $tmpl_root = 'view/templates/';
+    private $tmpl_root = 'resources/templates/';
     private $tab_list = null;
 
     function __construct($url,$proj_id) {
