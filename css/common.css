@@ -1,0 +1,38 @@
+body{
+	font-family:'ヒラギノ角ゴ ProN W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,osaka,'ＭＳ Ｐゴシック',"Lucida Grande","segoe UI",geneva,verdana,sans-serif;
+	font-size: small;
+	padding:0px;
+	margin:0px;
+}
+h1, h2 {
+	margin: 5px auto 5px 0;
+	font-size: small;
+}
+header {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+    box-sizing: border-box;
+	width: 100%;
+	min-width: inherit;
+	padding-left:10px;
+	padding-right:10px;
+	position: relative;
+}
+.with-btns {
+	display: flex;
+	flex-direction: row;
+    align-items: center;
+}
+.with-btns > ul {
+	display: flex;
+	margin: 0 0 0 auto;
+	padding: 0;
+	justify-content: flex-end;
+}
+.with-btns > ul li {
+	display: block;
+	padding: 0px 5px;
+}
+.btn {text-decoration: none;}
+.btn:hover{background-color:#aaaaaa;}
+.btn:visited{color:-webkit-link;}

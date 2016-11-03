@@ -5,13 +5,13 @@ session_start();
 * 
 */
 require_once('./common.php');
-require_once(full_path('controllers/index_servlet.php'));
+require_once(full_path('controllers/side_servlet.php'));
 
-IndexServlet::setup();
+SideServlet::setup();
 if($_SERVER["REQUEST_METHOD"] === 'GET'){
-    IndexServlet::doGet();
+    SideServlet::doGet();
 } else if($_SERVER["REQUEST_METHOD"] === 'POST'){
-    IndexServlet::doPost();
+    SideServlet::doPost();
 }
 
 ?>

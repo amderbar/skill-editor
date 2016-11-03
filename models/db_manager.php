@@ -124,7 +124,7 @@ abstract class DTO {
     /**
     * 
     */
-    public function getInsertSQL() {}
+    abstract public function getInsertSQL();
 
     /**
     * 

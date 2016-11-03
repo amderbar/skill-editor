@@ -1,21 +1,42 @@
-.editor-tabs {
-    padding: 0 10px 0;
-    width: 100%;
+.tab-bar {
+	display: flex;
+	flex-direction: row;
+    align-items: center;
+	justify-content: space-between;
+	padding: 0 0 0 5px;
 }
-.editor-tabs > li{
+
+.editor-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	align-content: flex-end;
+	margin: 0 0 0 auto;
+    padding: 0 0 0 10px;
+	width: 100%;
+}
+.editor-tabs li{
+	display: block;
+	padding: 0px 5px;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     border: 1px LightGrey solid;
     background-color:  #E8E8E8;
-    min-width: 10%;
+	flex: 0 0 auto;
+	min-width: 10%;
 }
-
-.editor-tabs > li.editting {
+.editor-tabs li.editting {
     background-color: white;
     border-bottom: 1px white solid;
 }
 
-.tab-page{
+.tab-page {
+	position: absolute;
+	width: inherit;
+	top: 30px;
+	bottom: 0px;
+	left: 0;
+	right: 0;
+	overflow: auto;
     display: none;
 	padding: 5px 0 100px 0;
 }

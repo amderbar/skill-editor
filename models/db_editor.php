@@ -1,4 +1,9 @@
 <?php
+/**
+* session check.
+*/
+require($_SERVER['DOCUMENT_ROOT'].'/skill_editor/gatekeeper.php');
+
 require_once(full_path('models/db_manager.php'));
 
 /**
@@ -9,7 +14,7 @@ class DBEditor {
 
     function __construct() {
         $this->con = array();
-        $this->con[ROOT_DB] = new SQLiteHandler(ROOT_DB,true);
+        $this->con[ROOT_DB] = new SQLiteHandler(ROOT_DB, true);
         $this->setupRootDB();
     }
 
@@ -19,7 +24,7 @@ class DBEditor {
     public function open($db_file,$proj_name = null) {
         $proj_name = ($proj_name) ? $proj_name : $db_file ;
         if (! isset($this->con[$proj_name])) {
-            $this->con[$proj_name] = new SQLiteHandler($db_file,true);
+            $this->con[$proj_name] = new SQLiteHandler($db_file, true);
         }
     }
 
@@ -54,7 +59,7 @@ class DBEditor {
             $dto = new class($proj_name) extends DTO {
                 private $table = 'projects';
                 function __construct($proj_name) {
-                    $this->setParm(':proj_name',$proj_name);
+                    $this->setParm(':proj_name', $proj_name);
                 }
                 public function getInsertSQL() {
                     return 'INSERT INTO '.$this->table.'(proj_name) VALUES (:proj_name)';
@@ -65,7 +70,7 @@ class DBEditor {
                 $id = $newid[0]['id'];
             } else {
                 $row = $this->con[ROOT_DB]->findByKey(
-                    'projects','proj_name',$proj_name);
+                    'projects','proj_name', $proj_name);
                 $id = $row[0]['id'];
             }
             $tmpl_dir = full_path(sprintf('resources/templates/proj%03d',$id),true);
@@ -73,7 +78,7 @@ class DBEditor {
                 mkdir($tmpl_dir, 0666);
             }
             $db_file = sprintf('proj%03d.db',$id);
-            $this->open($db_file,$proj_name);
+            $this->open($db_file, $proj_name);
             return $id;
         } catch (PDOException $e){
             die('PDOException throwen:'. $e->getMessage());

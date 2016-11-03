@@ -1,5 +1,11 @@
 <?php
 /**
+* session check.
+*/
+require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/gatekeeper.php');
+//
+require_once(full_path('models/html_handler.php'));
+/**
  * 
  */
 class EditorArea {
@@ -9,7 +15,7 @@ class EditorArea {
     private $tab_list = null;
 
     function __construct($url,$proj_id) {
-        $this->href = htmlentities($url).'?id='.htmlentities($proj_id);
+        $this->href = HTMLHandler::specialchars($url).'?id='.HTMLHandler::specialchars($proj_id);
         $this->proj_id = intval($proj_id);
     }
 
@@ -29,11 +35,13 @@ class EditorArea {
 
     public function makeTabs($tabs) {
         $this->tab_list = $tabs;
-        echo '<header class="header">'.PHP_EOL;
+        echo '<header class="tab-bar">'.PHP_EOL;
+        echo '<a href="#" class="icon-list2 btn" title="サイドメニュー"></a>'.PHP_EOL;
         echo '<ul class="editor-tabs">'.PHP_EOL;
         foreach ($tabs as $tbl_num => $tbl_name) {
-            echo '<li><a href="'.$this->href.'#tab'.htmlentities($tbl_num).'" onclick="changeTab(this);">'.htmlentities($tbl_name).'</a></li>'.PHP_EOL;
+            echo '<li><a href="'.$this->href.'#tab'.HTMLHandler::specialchars($tbl_num).'" onclick="changeTab(this);">'.HTMLHandler::specialchars($tbl_name).'</a></li>'.PHP_EOL;
         }
+        // echo '<a href="#" class="icon-new-tab btn"></a>'.PHP_EOL;
         echo '</ul>'.PHP_EOL;
         echo '</header>'.PHP_EOL;
     }
@@ -43,8 +51,8 @@ class EditorArea {
             return;
         }
         // 以下は現状SNTRPG_Skills専用
-        echo '<section id="tab'.htmlentities($tab_num).'" class="tab-page">'.PHP_EOL;
-        FormHelper::makeDatalist($this->tab_list[$tab_num],$data_list);
+        echo '<section id="tab'.HTMLHandler::specialchars($tab_num).'" class="tab-page">'.PHP_EOL;
+        HTMLHandler::makeDatalist($this->tab_list[$tab_num],$data_list);
         if ($tmpl_name) {
             $tmpl = file_get_contents(full_path($tmpl_name));
             echo '<ol>'.PHP_EOL;
@@ -54,7 +62,7 @@ class EditorArea {
                     if ($key == 'icon') {
                         $value = 'img/'.$value;
                     }
-                    $tmpl_row = str_replace('{'.$key.'}',htmlentities($value),$tmpl_row);
+                    $tmpl_row = str_replace('{'.$key.'}',HTMLHandler::specialchars($value),$tmpl_row);
                 }
                 echo '<li>' . $tmpl_row . '</li>'.PHP_EOL;
             }
@@ -72,3 +80,28 @@ class EditorArea {
     }
 }
 ?>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/common.css')?>">
+	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/fonts.css')?>">
+	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/editor_area.css')?>">
+	<title>Editor on Browser</title>
+</head>
+<body>
+<?php
+if (isset($tmpl_list)) {
+    $editor_area = new EditorArea($GLOBALS['URL'], $_GET['id']);
+    $editor_area->makePage(
+        $current_proj_tbl_list,
+        $tmpl_list,
+        $selected_tmpl,
+        $current_proj_data_list
+    );
+}
+?>
+	<script src="<?=addFilemtime('js/editorClient.js')?>"></script>
+</body>
+</html>
