@@ -17,26 +17,20 @@ function makeSideItems($proj_list, $current_proj_tbl_list = null) {
 <head>
 	<meta charset="UTF-8">
 	<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+	<script src="<?=addFilemtime('js/side_menu.js')?>"></script>
 	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/common.css')?>">
 	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/fonts.css')?>">
 	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/side_menu.css')?>">
-	<script type="text/javascript">
-	<!--
-		function changeEditor(id) {
-			parent.editor_area.location.href = "editor_area.php?id=" + id;
-		}
-	//-->
-	</script>
 	<title>Editor on Browser</title>
 </head>
 <body>
 	<header class="with-btns">
 		<h2>Projects</h2>
 		<ul>
-			<a href="#" id="proj-Btn" class="btn" onclick="openModal(this)"><li class="icon-database" title="新規作成"></li></a>
+			<a href="#" id="new-proj" class="btn"><li class="icon-database" title="新規作成"></li></a>
 		</ul>
 	</header>
-    <ul class="side-menu">
+    <ul class="side-menu" id="menu-list">
         <?php foreach ($proj_list as $proj_id => $proj_name) {
 			$proj_id = HTMLHandler::specialchars($proj_id);
 			$href = $URL.'?id='.$proj_id;

@@ -58,9 +58,9 @@ class SQLiteHandler {
     /**
     * 
     */
-    public function findByKey($table,$key_col,$value,$column='') {
+    public function findByKey($table, $key_col, $value,$column='') {
         // $tableと$columnのエスケープ処理が必要
-        if (! $column) {
+        if (!$column) {
             $stmt = $this->pdo->query('PRAGMA table_info('.$table.')');
             $names = array();
             while ($row = $stmt->fetch()) {

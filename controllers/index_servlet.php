@@ -58,6 +58,8 @@ class IndexServlet extends Servlet {
         if (isset($_POST['proj-name']) && ($_POST['proj-name'] != '')) {
             // プロジェクトの新規作成時
             $proj_id = self::$db_editor->registerDB($_POST['proj-name']);
+            echo $proj_id;
+            return;
         } elseif (isset($_FILES['tmpl-file'])) {
             // テンプレートの登録時
             $tmpl_name = self::upLoadFile($proj_id);
