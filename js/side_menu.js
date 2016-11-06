@@ -42,7 +42,6 @@ $(function(){
             case 'del-prj':
                 /* プロジェクト削除ボタンの時。確認ダイアログ表示 */
                 var proj_name = $(this).closest('.with-btns').find('h2').text();
-                console.log(location.pathname);
                 if (confirm("プロジェクト「" + proj_name + "」を削除してもよろしいですか？")) {
                     $.post(location.pathname,
                         { 'id': proj_id, 'fMode': f_mode }
