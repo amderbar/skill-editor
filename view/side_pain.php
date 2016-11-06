@@ -30,7 +30,7 @@ function makeSideItems($proj_list, $current_proj_tbl_list = null) {
 			<a href="#" id="new-proj" class="btn"><li class="icon-database" title="新規作成"></li></a>
 		</ul>
 	</header>
-    <ul class="side-menu" id="menu-list">
+    <ul class="side-menu" id="proj-list">
         <?php foreach ($proj_list as $proj_id => $proj_name) {
 			$proj_id = HTMLHandler::specialchars($proj_id);
 			$href = $URL.'?id='.$proj_id;

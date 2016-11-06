@@ -3,7 +3,7 @@ $(function(){
      * プロジェクト新規作成ボタン押下時の処理
      */
     $('#new-proj').click(function (e) {
-        $('#menu-list').append($('<li/>')
+        $('#proj-list').append($('<li/>')
             .append($('<div/>', {'class': 'with-btns'})
                 .append($('<input type="text"/>').attr({'id': 'new-proj-name', 'value': 'untitled'}))
                 .append($('<ul/>', {'class': 'btns'})
