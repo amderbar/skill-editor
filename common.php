@@ -5,15 +5,13 @@
 require_once(full_path('gatekeeper.php'));
 
 /**
-*
-*/
-mb_internal_encoding("UTF-8");
-mb_regex_encoding();
-
-/**
 * Definition of constants and global valiables.
 */
-define('ROOT_DB', 'project_manager.db');
+define('VERSION', 'ver.0.0.0');
+define('ENCODE', 'UTF-8');
+mb_internal_encoding(ENCODE);
+mb_regex_encoding();
+
 $URL = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 
 /**
@@ -39,6 +37,13 @@ function pre_dump($var) {
     var_dump($var);
     echo '</pre>';
     return $var;
+}
+
+/**
+* 
+*/
+function fnv132($str) {
+    return hash('fnv132', $str);
 }
 
 /**

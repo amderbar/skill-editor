@@ -100,6 +100,24 @@ if (isset($tmpl_list)) {
         $selected_tmpl,
         $current_proj_data_list
     );
+} elseif (isset($proj_name)) {
+    echo '<form action="editor_area.php" method="POST">'.PHP_EOL;
+    echo '<header class="tab-bar">'.PHP_EOL;
+    echo '<a href="#" class="icon-list2 btn" title="サイドメニュー"></a>'.PHP_EOL;
+    echo '<h2>New Table '.HTMLHandler::input_text('tbl_name', 'untitled').' @ '.$proj_name.'</h2>'.PHP_EOL;
+    echo '</header>'.PHP_EOL;
+    echo '<table class="data-table">'.PHP_EOL;
+    echo '<tr><th></th><th>列1</th></tr>'.PHP_EOL;
+    echo '<tr><th>列名</th><td>'.HTMLHandler::input_text('colname[]').'</td></tr>'.PHP_EOL;
+    echo '<tr><th>データ型</th><td>'.HTMLHandler::input_text('type[]').'</td></tr>'.PHP_EOL;
+    echo '<tr><th>初期値</th><td>'.HTMLHandler::input_text('default[]').'</td></tr>'.PHP_EOL;
+    echo '<tr><th>一意</th><td>'.HTMLHandler::input_radiocheck('checkbox', 'uniq[]', 1).'<input type="" name=""></td></tr>'.PHP_EOL;
+    echo '<tr><th>非Null</th><td>'.HTMLHandler::input_radiocheck('checkbox', 'not_null[]', 1).'</td></tr>'.PHP_EOL;
+    echo '<tr><th>外部参照</th><td>'.HTMLHandler::input_radiocheck('checkbox', 'foreign[]', 1).'</td></tr>'.PHP_EOL;
+    echo '</table>'.PHP_EOL;
+    echo HTMLHandler::hidden('id', $_GET['id']).PHP_EOL;
+    echo HTMLHandler::input_submit('save', '作成').PHP_EOL;
+    echo '</form>'.PHP_EOL;
 }
 ?>
 	<script src="<?=addFilemtime('js/editorClient.js')?>"></script>

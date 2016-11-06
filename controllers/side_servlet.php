@@ -26,13 +26,13 @@ class SideServlet extends Servlet {
         $REQ_SCOPE['proj_list'] = $proj_list;
         $tmpl_list = null;
         // リクエストパラメータidがセットされている時、そのidのプロジェクトが開かれる
-        if (isset($_GET['id']) && $_GET['id']!='') {
+        if (isset($_GET['id']) && $_GET['id'] != '') {
             $current_proj_id = intval($_GET['id']);
-            $proj_name = $proj_list[$current_proj_id];
-            self::$db_editor->open(sprintf('proj%03d.db',$current_proj_id), $proj_name);
-            $table_list = self::$db_editor->listTables($proj_name);
+            if(self::$db_editor->open($current_proj_id) === false){
+                return self::redirect($_SERVER['PHP_SELF']);
+            }
+            $table_list = self::$db_editor->listTables($current_proj_id);
             // リクエストスコープ相当の配列にデータを格納
-            $REQ_SCOPE['proj_list'] = $proj_list;
             $REQ_SCOPE['current_proj_tbl_list'] = $table_list;
         }
         return self::foward('view/side_pain.php', $REQ_SCOPE);
@@ -42,8 +42,19 @@ class SideServlet extends Servlet {
     * 
     */
     public static function doPost($req='') {
-        self::doGet($req);
-        return;
+        pre_dump($_POST);
+        if (isset($_POST['fMode'])) {
+            if ($_POST['fMode'] == 'del-prj') {
+                // プロジェクト削除時
+                // 本当はここで入力値チェックをする
+                $proj_id = isset($_POST['id']) ? intval($_POST['id']) : null;
+                if ($proj_id) {
+                    self::$db_editor->deleteDB($proj_id);
+                }
+            }
+        }
+        return self::redirect($_SERVER["REQUEST_URI"]);
+        // return self::doGet($req);
     }
 
     /**

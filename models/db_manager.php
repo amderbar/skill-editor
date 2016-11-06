@@ -3,21 +3,33 @@
 * 
 */
 class SQLiteHandler {
+    /** */
     private $pdo = null;
+    /** */
+    static public $DATA_TYPES = array(
+        'TEXT' => true,
+        'INTEGER' => true,
+        'REAL' => true,
+        'NONE' => true
+    );
+    /** */
+    static public $ON_DELETE = array(
+        'NULL' => 'SET NULL',
+        'CASCADE' => 'CASCADE'
+    );
 
     /**
     * 
     */
-    function __construct($db_name,$newfile=false) {
-        $this->connect($db_name,$newfile);
+    function __construct($db_name) {
+        $this->connect($db_name);
     }
 
     /**
     * 
     */
-    public function connect($db_name,$newfile=false) {
-        $dsn = 'resources/' . $db_name;
-        $dsn = 'sqlite:' . full_path($dsn,$newfile);
+    public function connect($db_name) {
+        $dsn = 'sqlite:' . $db_name;
         try {
             $this->pdo = new PDO($dsn);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -38,7 +50,7 @@ class SQLiteHandler {
     /**
     * 
     */
-    public function fetchAll($table,$column='') {
+    public function fetchAll($table, $column='') {
         // $tableと$columnのエスケープ処理が必要
         if (! $column) {
             $stmt = $this->pdo->query('PRAGMA table_info('.$table.')');
@@ -58,7 +70,7 @@ class SQLiteHandler {
     /**
     * 
     */
-    public function findByKey($table, $key_col, $value,$column='') {
+    public function findByKey($table, $key_col, $value, $column = '') {
         // $tableと$columnのエスケープ処理が必要
         if (!$column) {
             $stmt = $this->pdo->query('PRAGMA table_info('.$table.')');
@@ -66,7 +78,7 @@ class SQLiteHandler {
             while ($row = $stmt->fetch()) {
                 $names[] = $row['name'];
             }
-            $column = implode(',',$names);
+            $column = implode(',', $names);
         }
         $stmt = $this->pdo->prepare(
             'SELECT '.$column.' FROM '.$table.' WHERE '.$key_col.'= ?;');
@@ -83,8 +95,8 @@ class SQLiteHandler {
         try {
             $stmt = $this->pdo->prepare($dto->getInsertSQL());
             $parms = $dto->getParms();
-            $result = $stmt->execute($parms);
-            return $result;
+            $stmt->execute($parms);
+            return $this->pdo->lastInsertId();
         } catch (PDOException $e){
             if (strpos($e->getMessage(),'19 UNIQUE constraint failed')>0) {
                 error_log($e->getMessage() . "\n");
@@ -92,6 +104,79 @@ class SQLiteHandler {
             } else {
                 throw $e;
             }
+        }
+    }
+
+    /**
+    * 
+    */
+    public function delete($table, $key_col, $value) {
+        try {
+            $stmt = $this->pdo->prepare(
+                'DELETE FROM '.$table.' WHERE '.$key_col.'= ?;');
+            return $stmt->execute(array($value));
+        } catch (PDOException $e){
+            throw $e;
+        }
+    }
+
+    /**
+    * 
+    */
+    public function createTable($tdo, $if_not_exist = false) {
+        try {
+            $sql = 'CREATE TABLE ';
+            $sql .= ($if_not_exist) ? 'IF NOT EXISTS ' : '';
+            $sql .= $tdo->tableName().' (';
+            $sql .= 'id integer PRIMARY KEY AUTOINCREMENT';
+            while ($col = $tdo->fetchColumn()) {
+                if(!isset(self::$DATA_TYPES[strtoupper($col['type'])])) {
+                    throw new PDOException("Inviled data type specified :".$col['type'], 1);
+                }
+                $sql .= ', '.$col['name'].' '.$col['type'];
+                if ($col['default'] !== null) {
+                    $sql .= ' DEFAULT ';
+                    if ($col['default'] === false) {
+                        $sql .= 'false';
+                    } else {
+                        $sql .= $col['default'];
+                    }
+                }
+                if ($col['uniq']) {
+                    $sql .= ' UNIQUE';
+                }
+                if ($col['not_null']) {
+                    $sql .= ' NOT NULL';
+                }
+                if ($col['foreign']) {
+                    $sql .= ' REFERENCES '.$col['foreign']['ref'];
+                    if (isset(self::$ON_DELETE[strtoupper($col['foreign']['del'])])) {
+                        $sql .= ' on DELETE '.self::$ON_DELETE[strtoupper($col['foreign']['del'])];
+                    } else {
+                       throw new PDOException("Inviled SQL keyword :".$col['foreign']['del'], 1);
+                    }
+                }
+            }
+            while ($con = $tdo->fetchConstraint()) {
+                $sql .= ', ';
+                switch (strtoupper($con['type'])) {
+                    case 'UNIQ':
+                        $sql .= ' UNIQUE('.implode(',', $con['targets']).')';
+                        break;
+                    case 'FOREIGN':
+                        $sql .= ' FOREIGN KEY '.implode(',', $con['targets']);
+                        $sql .= ' REFERENCES '.$con['references']['tbl'].'('
+                                    .implode(',', $con['references'][cols]).')';
+                        break;
+                }
+            }
+            $sql .= ');';
+            $stmt = $this->pdo->prepare($sql);
+            $result = $stmt->execute();
+            return $result;
+        } catch (PDOException $e){
+            error_log($e->getMessage() . "\n");
+            throw $e;
         }
     }
 
@@ -136,8 +221,75 @@ abstract class DTO {
     /**
     * 
     */
-    public function setParm($parm,$value) {
+    public function setParm($parm, $value) {
         $this->parms[$parm] = $value;
+    }
+}
+
+/**
+ * 
+ */
+class TableDefineObject {
+    /**  */
+    private $tbl_name = "";
+    /**  */
+    private $colmuns = array();
+    /** */
+    private $constraints = array();
+
+    /**
+    * 
+    */
+    function __construct($tbl_name, $colmuns = null) {
+        $this->tbl_name = $tbl_name;
+    }
+
+    /**
+    * 
+    */
+    public function tableName() {
+        return $this->tbl_name;
+    }
+
+    /**
+    * 
+    */
+    public function appendColumn($col_name, $type, $constraints) {
+        $col_hash = array(
+            'name' => $col_name,
+            'type' => $type,
+            'default' => (isset($constraints['default'])) ? $constraints['default'] : null,
+            'uniq' => (isset($constraints['uniq'])) ? $constraints['uniq'] : false,
+            'not_null'=> (isset($constraints['not_null'])) ? $constraints['not_null'] : false,
+            'foreign' => (isset($constraints['foreign'])) ? $constraints['foreign'] : null // reference and on delete
+        );
+        $this->colmuns[] = $col_hash;
+    }
+
+    /**
+    * 
+    */
+    public function fetchColumn() {
+        return array_shift($this->colmuns);
+    }
+
+    /**
+    * 
+    */
+    public function appendConstraint($con_name, $targets, $references = null) {
+        $con_hash = array(
+            'type' => $con_name,
+            'targets' => $targets, // constraint target columins (itselfs)
+            'references' => $references // foreign key constraint references columins
+        );
+        $this->constraints[] = $con_hash;
+    }
+
+    /**
+    * 
+    */
+    public function fetchConstraint() {
+        return array_shift($this->constraints);
     }
 }
 

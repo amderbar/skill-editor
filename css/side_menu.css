@@ -29,8 +29,8 @@ li.with-btns::before {
 	padding-left: 30px;
 }
 .side-children > li ul {
-	display: none;
+	visibility: hidden;
 }
 .side-children > li:hover ul {
-	display: inherit;
+	visibility: inherit;
 }

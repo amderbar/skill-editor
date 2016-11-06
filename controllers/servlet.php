@@ -36,6 +36,15 @@ abstract class Servlet {
         return include(full_path($dist));
     }
 
+    /**
+    * 
+    */
+    protected static function redirect($dist) {
+        global $URL;
+        $redirect_uri = empty($_SERVER["HTTPS"]) ? "http://" : "https://";
+        $redirect_uri .= $_SERVER["HTTP_HOST"] . $dist;
+        return header('Location: ' . $redirect_uri);
+    }
 }
 
 ?>

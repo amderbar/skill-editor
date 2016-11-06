@@ -37,7 +37,7 @@
 	left: 0;
 	right: 0;
 	overflow: auto;
-    display: none;
+    /*display: none;*/
 	padding: 5px 0 100px 0;
 }
 

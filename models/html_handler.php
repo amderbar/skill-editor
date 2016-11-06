@@ -19,13 +19,25 @@ class HTMLHandler {
     }
     
     /**
-    * Helper function for print text-box.
+    * Helper function for print hidden tag.
     * @param $element_name
     * @param $values
     */
-    public static function input_text($element_name, $values, $type = 'text') {
-        echo '<input type="' . $type . '" name="' . $element_name . '" value="';
-        echo self::specialchars($values[$element_name]) . '">'.PHP_EOL;
+    public static function hidden($element_name, $value) {
+        $tag_str = '<input type="hidden" name="' . $element_name . '" value="';
+        $tag_str .= self::specialchars($value) . '">'.PHP_EOL;
+        return $tag_str;
+    }
+
+    /**
+    * Helper function for print text-box.
+    * @param $element_name
+    * @param $value
+    */
+    public static function input_text($element_name, $value = '', $type = 'text') {
+        $tag_str = '<input type="' . $type . '" name="' . $element_name . '" value="';
+        $tag_str .= self::specialchars($value) . '">'.PHP_EOL;
+        return $tag_str;
     }
 
     /**
@@ -33,10 +45,12 @@ class HTMLHandler {
     * @param $element_name
     * @param $label
     */
-    public static function input_submit ($element_name, $label, $form_id = null) {
+    public static function input_submit ($element_name, $label, $form_id = null, $additional = null) {
         $form_attr = $form_id ? '" form="'.$form_id : '' ;
-        echo '<input type="submit" name="' . $element_name . '" value="';
-        echo self::specialchars($label) . $form_attr .'">'.PHP_EOL;
+        $additional = $additional ? ' '.$additional : '' ;
+        $tag_str = '<input type="submit" name="' . $element_name . '" value="';
+        $tag_str .= self::specialchars($label) . $form_attr .'"'.$additional.'>'.PHP_EOL;
+        return $tag_str;
     }
 
     /**
@@ -45,23 +59,39 @@ class HTMLHandler {
     * @param $values
     */
     public static function input_textarea ($element_name, $values) {
-        echo '<textarea name="' . $element_name . '">';
-        echo self::specialchars($values[$element_name]) . '</textarea>'.PHP_EOL;
+        $tag_str = '<textarea name="' . $element_name . '">';
+        $tag_str .= self::specialchars($values[$element_name]) . '</textarea>'.PHP_EOL;
+        return $tag_str;
     }
 
     /**
     * radio button or check box.
     * @param $type
     * @param $element_name
-    * @param $values
-    * @param $element_value
+    * @param $values is an array has checkbox value as key and label text as value of array.
+    * @param $checked_value
     */
-    public static function input_radiocheck ($type, $element_name, $values, $element_value) {
-        echo '<input type="' . $type . '" name="' . $element_name . '" value="' . $element_value . '" ';
-        if ($element_value == $values[$element_name]) {
-            echo ' checked="checked"';
+    public static function input_radiocheck ($type, $element_name, $values, $checked_value = null) {
+        $tag_str_common = '<input type="' . $type . '" name="' . $element_name . '" value="';
+        if (!is_array($values)) {
+            $values = array($values => null);
         }
-            echo '>'.PHP_EOL;
+        foreach ($values as $value => $label) {
+            if ($label) {
+                $tag_str = '<label>' . $tag_str_common;
+            } else {
+                $tag_str = $tag_str_common;
+            }
+            $tag_str .= self::specialchars($value) . '" ';
+            if ($checked_value == $value) {
+                $tag_str .= ' checked="checked"';
+            }
+            $tag_str .= '>';
+            if ($label) {
+                $tag_str .= self::specialchars($label).'</label>';
+            }
+            return $tag_str.PHP_EOL;
+        }
     }
 
     /**
@@ -74,11 +104,11 @@ class HTMLHandler {
     */
     public static function input_select($element_name, $selected, $options, $multiple = false) {
     // start select tag
-        echo '<select name="' . $element_name;
+        $tag_str = '<select name="' . $element_name;
         if ($multiple) {
-            echo '[]" multiple="multiple';
+            $tag_str .= '[]" multiple="multiple';
         }
-        echo '">'.PHP_EOL;
+        $tag_str .= '">'.PHP_EOL;
         // set default
         $selected_options = array();
         if ($multiple) {
@@ -90,14 +120,15 @@ class HTMLHandler {
         }
         // options
         foreach ($options as $option => $label) {
-            echo '<option value="' . self::specialchars($option) . '"';
+            $tag_str .= '<option value="' . self::specialchars($option) . '"';
                 if ($selected_options[$option]) {
-                    echo ' selected="selected"';
+                    $tag_str = ' selected="selected"';
                 }
-            echo '>' . self::specialchars($label) . '</option>'.PHP_EOL;
+            $tag_str .= '>' . self::specialchars($label) . '</option>'.PHP_EOL;
         }
         // end select tag
-        echo '</select>'.PHP_EOL;
+        $tag_str .= '</select>'.PHP_EOL;
+        return $tag_str;
     }
 
     /**
@@ -112,12 +143,13 @@ class HTMLHandler {
             if (array_depth($options) > 1) {
                 $options = $options[1];
             }
-        echo '<datalist id="'.self::specialchars($id_name).'">'.PHP_EOL;
+        $tag_str = '<datalist id="'.self::specialchars($id_name).'">'.PHP_EOL;
         foreach ($options as $value) {
-            echo '<option value="'.self::specialchars($value).'">'.PHP_EOL;
+            $tag_str .= '<option value="'.self::specialchars($value).'">'.PHP_EOL;
         }
-        echo '<option value="--">'.PHP_EOL;
-        echo '</datalist>'.PHP_EOL;
+        $tag_str .= '<option value="--">'.PHP_EOL;
+        $tag_str .= '</datalist>'.PHP_EOL;
+        return $tag_str;
     }
 }
 

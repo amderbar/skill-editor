@@ -15,18 +15,20 @@ require_once(full_path('models/html_handler.php'));
 	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/fonts.css')?>">
 	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/index.css')?>">
 	<script type="text/javascript">
+	<!--
 		$(function() {
 			$("#download").click(function(){
 				alert("Hello!");
 			});
 		});
+	//-->
 	</script>
 	<title>Editor on Browser</title>
 </head>
 <body>
 	<header class="with-btns">
-		<h1 id="top-title"><a href="<?=$GLOBALS['URL']?>">Data Editor on Browser</a></h1>
-		<ul id="system_menu">
+		<h1 id="top-title"><a href="<?=$URL?>">Data Editor on Browser</a></h1>
+		<ul id="system_menu" class="btns">
 			<?php if (isset($tmpl_list)) { // プロジェクトを開いている時だけボタンを表示 ?>
 				<li><?php HTMLHandler::input_submit('save', '上書き保存', 'editorArea') ?></li>
 				<!-- <li><?php
@@ -47,10 +49,10 @@ require_once(full_path('models/html_handler.php'));
 			<iframe name="side_menu" src="side_menu.php" scrolling="no" frameborder="no"></iframe>
 		</nav>
 		<article>
-			<iframe name="editor_area" src="editor_area.php" scrolling="no" frameborder="no"></iframe>
+			<iframe name="editor_area" src="editor_area.php<?=(isset($proj_id))?'?id='.$proj_id:''?>" scrolling="no" frameborder="no"></iframe>
 		</article>
 	</main>
-	<footer>ver 0.0.0</footer>
+	<footer><?=VERSION?></footer>
 	<section class="modal-content" id="new-proj">
 		<form action="<?=$_SERVER["REQUEST_URI"]?>" method="POST">
 			<fieldset>

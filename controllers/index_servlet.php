@@ -22,30 +22,10 @@ class IndexServlet extends Servlet {
     */
     public static function doGet($req='') {
         $REQ_SCOPE = array();
-        $proj_list = self::$db_editor->listDB();
-        $REQ_SCOPE['proj_list'] = $proj_list;
-        $tmpl_list = null;
         // リクエストパラメータidがセットされている時、そのidのプロジェクトが開かれる
         if (isset($_GET['id']) && $_GET['id']!='') {
-            $current_proj_id = intval($_GET['id']);
-            $proj_name = $proj_list[$current_proj_id];
-            self::$db_editor->open(sprintf('proj%03d.db',$current_proj_id), $proj_name);
-            $table_list = self::$db_editor->listTables($proj_name);
-            $data_list = array();
-            foreach ($table_list as $table) {
-                $data_list[$table] = self::$db_editor->listData($proj_name,$table);
-            }
-            $tmpl_list = self::$db_editor->getTemplates($current_proj_id);
-            // 先頭要素のキーを取得
-            $selected_tmpl = key($tmpl_list);
-            // リクエストスコープ相当の配列にデータを格納
-            $REQ_SCOPE['proj_list'] = $proj_list;
-            $REQ_SCOPE['current_proj_data_list'] = $data_list;
-            $REQ_SCOPE['current_proj_tbl_list'] = $table_list;
-            $REQ_SCOPE['tmpl_list'] = $tmpl_list;
-            $REQ_SCOPE['selected_tmpl'] = array('skills_view' => $selected_tmpl);
-            // 肝心のデータはセッションスコープにも入れておく
-            $_SESSION['proj'.$current_proj_id] = $data_list;
+            // リクエストスコープ相当の配列にidを格納
+            $REQ_SCOPE['proj_id'] = intval($_GET['id']);
         }
         return self::foward('view/index_page.php', $REQ_SCOPE);
     }
@@ -68,9 +48,7 @@ class IndexServlet extends Servlet {
             // データの上書き保存時
             self::saveData($proj_id);
         }
-        $redirect_uri = empty($_SERVER["HTTPS"]) ? "http://" : "https://";
-        $redirect_uri .= $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"];
-        // header('Location: ' . $redirect_uri);
+        return self::redirect($_SERVER["REQUEST_URI"]);
         // return self::doGet();
     }
 

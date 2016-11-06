@@ -26,7 +26,7 @@ function makeSideItems($proj_list, $current_proj_tbl_list = null) {
 <body>
 	<header class="with-btns">
 		<h2>Projects</h2>
-		<ul>
+		<ul class="btns">
 			<a href="#" id="new-proj" class="btn"><li class="icon-database" title="新規作成"></li></a>
 		</ul>
 	</header>
@@ -34,12 +34,15 @@ function makeSideItems($proj_list, $current_proj_tbl_list = null) {
         <?php foreach ($proj_list as $proj_id => $proj_name) {
 			$proj_id = HTMLHandler::specialchars($proj_id);
 			$href = $URL.'?id='.$proj_id;
-			echo '<li><div class="with-btns">';
-			echo '<a href="'.$href.'" onclick="changeEditor('.$proj_id.');"><h2>'.HTMLHandler::specialchars($proj_name).'</h2></a>';
-			echo '<ul>
-			<li class="icon-folder-plus btn" title="テーブルの追加"></li>
-			<li class="icon-bin btn" title="プロジェクトの削除"></li>
-			</ul>';
+			echo '<li><div class="with-btns">'.PHP_EOL;
+			echo '<a href="'.$href.'" onclick="changeEditor('.$proj_id.');"><h2>'.HTMLHandler::specialchars($proj_name).'</h2></a>'.PHP_EOL;
+		    echo '<form action="'.$URL.'" method="POST">'.PHP_EOL;
+		    echo HTMLHandler::hidden('id', $proj_id);
+			echo '<ul class="btns">
+					<li class="icon-folder-plus btn submit" title="テーブルの追加">'.HTMLHandler::hidden('fMode', 'add-tbl').'</li>
+					<li class="icon-bin btn submit" title="プロジェクトの削除">'.HTMLHandler::hidden('fMode', 'del-prj').'</li>
+				  </ul>';
+			echo '</form>'.PHP_EOL;
 			echo '</div>';
 			if (isset($_GET['id']) && $_GET['id'] == $proj_id) {
 				echo '<ul class="side-children">'.PHP_EOL;
@@ -47,7 +50,7 @@ function makeSideItems($proj_list, $current_proj_tbl_list = null) {
 					echo '<li class="with-btns">
 					<a href="'.$href.'#tab'.HTMLHandler::specialchars($tbl_num).'" onclick="changeTab(this);">'
 					.HTMLHandler::specialchars($tbl_name).'</a>
-					<ul>
+					<ul class="btns">
 					<li class="icon-bin btn" title="テーブルの削除"></li>
 					</ul>
 					</li>'.PHP_EOL;

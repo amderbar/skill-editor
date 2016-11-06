@@ -27,23 +27,28 @@ class EditorServlet extends Servlet {
         // リクエストパラメータidがセットされている時、そのidのプロジェクトが開かれる
         if (isset($_GET['id']) && $_GET['id']!='') {
             $current_proj_id = intval($_GET['id']);
-            $proj_name = $proj_list[$current_proj_id];
-            self::$db_editor->open(sprintf('proj%03d.db',$current_proj_id), $proj_name);
-            $table_list = self::$db_editor->listTables($proj_name);
-            $data_list = array();
-            foreach ($table_list as $table) {
-                $data_list[$table] = self::$db_editor->listData($proj_name,$table);
+            if(self::$db_editor->open($current_proj_id) === false){
+                return self::redirect($_SERVER['PHP_SELF']);
             }
-            $tmpl_list = self::$db_editor->getTemplates($current_proj_id);
-            // 先頭要素のキーを取得
-            $selected_tmpl = key($tmpl_list);
-            // リクエストスコープ相当の配列にデータを格納
-            $REQ_SCOPE['current_proj_data_list'] = $data_list;
-            $REQ_SCOPE['current_proj_tbl_list'] = $table_list;
-            $REQ_SCOPE['tmpl_list'] = $tmpl_list;
-            $REQ_SCOPE['selected_tmpl'] = array('skills_view' => $selected_tmpl);
-            // 肝心のデータはセッションスコープにも入れておく
-            $_SESSION['proj'.$current_proj_id] = $data_list;
+            $table_list = self::$db_editor->listTables($current_proj_id);
+            if ($table_list) {
+                $data_list = array();
+                foreach ($table_list as $table) {
+                    $data_list[$table] = self::$db_editor->listData($current_proj_id,$table);
+                }
+                $tmpl_list = self::$db_editor->getTemplates($current_proj_id);
+                // 先頭要素のキーを取得
+                $selected_tmpl = key($tmpl_list);
+                // リクエストスコープ相当の配列にデータを格納
+                $REQ_SCOPE['current_proj_data_list'] = $data_list;
+                $REQ_SCOPE['current_proj_tbl_list'] = $table_list;
+                $REQ_SCOPE['tmpl_list'] = $tmpl_list;
+                $REQ_SCOPE['selected_tmpl'] = array('skills_view' => $selected_tmpl);
+                // 肝心のデータはセッションスコープにも入れておく
+                $_SESSION['proj'.$current_proj_id] = $data_list;
+            } else {
+                $REQ_SCOPE['proj_name'] = self::$db_editor->projName($current_proj_id);
+            }
         }
         return self::foward('view/editor_pain.php', $REQ_SCOPE);
     }
@@ -52,8 +57,13 @@ class EditorServlet extends Servlet {
     * 
     */
     public static function doPost($req='') {
-        self::doGet($req);
-        return;
+        $proj_id = isset($_GET['id']) ? intval($_GET['id']) : null;
+        if ($proj_id && isset($_POST) && !empty($_POST)) {
+            // 本当はここで入力値チェックをする
+            // $_POST
+            // self::$db_editor->addUserTable($proj_id, $_POST['tbl_name'], $prop_hash);
+        }
+        return self::redirect($_SERVER["REQUEST_URI"]);
     }
 
     /**
