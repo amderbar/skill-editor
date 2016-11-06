@@ -110,20 +110,13 @@ class HTMLHandler {
         }
         $tag_str .= '">'.PHP_EOL;
         // set default
-        $selected_options = array();
-        if ($multiple) {
-            foreach ($selected as $val) {
-                $selected_options[$val] = true;
-            }
-        } else {
-            $selected_options[$selected] = true;
-        }
+        $selected = array_flip($selected);
         // options
         foreach ($options as $option => $label) {
             $tag_str .= '<option value="' . self::specialchars($option) . '"';
-                if ($selected_options[$option]) {
-                    $tag_str = ' selected="selected"';
-                }
+            if (isset($selected[$option])) {
+                $tag_str .= ' selected="selected"';
+            }
             $tag_str .= '>' . self::specialchars($label) . '</option>'.PHP_EOL;
         }
         // end select tag

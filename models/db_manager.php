@@ -7,10 +7,10 @@ class SQLiteHandler {
     private $pdo = null;
     /** */
     static public $DATA_TYPES = array(
-        'TEXT' => true,
-        'INTEGER' => true,
-        'REAL' => true,
-        'NONE' => true
+        'TEXT' => '文字列',
+        'INTEGER' => '整数値',
+        'REAL' => '実数値',
+        'NONE' => 'その他なんでも'
     );
     /** */
     static public $ON_DELETE = array(

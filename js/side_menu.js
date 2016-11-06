@@ -25,7 +25,6 @@ $(function(){
                 { 'proj-name': proj_name }
             ).done(function(id){
                     location.reload(true);
-                    alert(id);
                     changeEditor(id);
             }).fail(function(data){
                 alert('error!!!');

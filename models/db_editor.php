@@ -414,6 +414,15 @@ class DBEditor {
             die('PDOException throwen:'. $e->getMessage());
         }
     }
+
+    /**
+    * 
+    */
+    public static function getDateTypeList() {
+        return SQLiteHandler::$DATA_TYPES;
+    }
+
+
 }
 
 ?>

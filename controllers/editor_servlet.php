@@ -22,30 +22,29 @@ class EditorServlet extends Servlet {
     */
     public static function doGet($req='') {
         $REQ_SCOPE = array();
-        $tmpl_list = null;
-        $proj_list = self::$db_editor->listDB();
+        $REQ_SCOPE['tbl_list'] = array();
         // リクエストパラメータidがセットされている時、そのidのプロジェクトが開かれる
         if (isset($_GET['id']) && $_GET['id']!='') {
             $current_proj_id = intval($_GET['id']);
             if(self::$db_editor->open($current_proj_id) === false){
                 return self::redirect($_SERVER['PHP_SELF']);
             }
+            $REQ_SCOPE['proj_id'] = $current_proj_id;
             $table_list = self::$db_editor->listTables($current_proj_id);
             if ($table_list) {
-                $data_list = array();
-                foreach ($table_list as $table) {
-                    $data_list[$table] = self::$db_editor->listData($current_proj_id,$table);
-                }
+                $opened_tab = (isset($_GET['tab'])) ? intval($_GET['tab']) : 0;
+                $teble_data = self::$db_editor->listData($current_proj_id, $table_list[$opened_tab]);
                 $tmpl_list = self::$db_editor->getTemplates($current_proj_id);
                 // 先頭要素のキーを取得
                 $selected_tmpl = key($tmpl_list);
                 // リクエストスコープ相当の配列にデータを格納
-                $REQ_SCOPE['current_proj_data_list'] = $data_list;
-                $REQ_SCOPE['current_proj_tbl_list'] = $table_list;
-                $REQ_SCOPE['tmpl_list'] = $tmpl_list;
-                $REQ_SCOPE['selected_tmpl'] = array('skills_view' => $selected_tmpl);
+                $REQ_SCOPE['tbl_list'] = $table_list;
+                $REQ_SCOPE['tbl_data'] = $teble_data;
+                $REQ_SCOPE['tbl_tmpl'] = ($table_list[$opened_tab] == 'skills_view') ?
+                    full_path(sprintf('resources/templates/proj%03d/', $current_proj_id).$tmpl_list[$selected_tmpl]) :
+                    full_path('resources/templates/default_template.php');
                 // 肝心のデータはセッションスコープにも入れておく
-                $_SESSION['proj'.$current_proj_id] = $data_list;
+                $_SESSION['proj'.$current_proj_id][$opened_tab] = $teble_data;
             } else {
                 $REQ_SCOPE['proj_name'] = self::$db_editor->projName($current_proj_id);
             }
