@@ -41,7 +41,7 @@
 	padding: 5px 0 100px 0;
 }
 
-.tab-page > ol, .tab-page > table {
+.tab-page ol, .data-table {
 	margin: 0 auto;
 }
 th, td {

@@ -7,7 +7,13 @@ $(function() {
  * サイドメニューの表示、非表示切り替え関数
  */
 $('#toggle_menu').click(function () {
-	$('#side_menu', parent.document).toggle('slide');
+	var side_menu = $('#side_menu', parent.document);
+	if(side_menu.is(':visible')){
+		$(this).attr('title', 'サイドメニューを開く');
+	} else {
+		$(this).attr('title', 'サイドメニューを閉じる');
+	}
+	side_menu.toggle('slide', 'linear', 100);
 });
 
 

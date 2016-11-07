@@ -18,7 +18,7 @@ require_once(full_path('models/html_handler.php'));
 </head>
 <body>
     <header class="tab-bar">
-        <a href="#" class="icon-list2" title="サイドメニュー" id="toggle_menu"></a>
+        <a href="#" class="icon-list2" title="サイドメニューを閉じる" id="toggle_menu"></a>
         <ul class="editor-tabs">
 <?php
     foreach ($tbl_list as $tbl_num => $tbl_name) {
@@ -37,8 +37,9 @@ if (isset($tbl_tmpl)) {
 } elseif (isset($proj_name)) {
     echo '<form action="editor_area.php" method="POST">'.PHP_EOL;
     echo '<header>'.PHP_EOL;
-    echo '<h2>New Table '.HTMLHandler::input_text('tbl_name', 'untitled').' @ '.$proj_name.'</h2>'.PHP_EOL;
+    echo '<h1>New Table '.HTMLHandler::input_text('tbl_name', 'untitled').' @ '.$proj_name.'</h1>'.PHP_EOL;
     echo '</header>'.PHP_EOL;
+    echo '<h2>Table Data definition</h2>'.PHP_EOL;
     echo '<table class="data-table">'.PHP_EOL;
     echo '<tr><th></th><th>列1</th></tr>'.PHP_EOL;
     echo '<tr><th>列名</th><td>'.HTMLHandler::input_text('colname[]').'</td></tr>'.PHP_EOL;
@@ -48,6 +49,7 @@ if (isset($tbl_tmpl)) {
     echo '<tr><th>非Null</th><td>'.HTMLHandler::input_radiocheck('checkbox', 'not_null[]', 1).'</td></tr>'.PHP_EOL;
     echo '<tr><th>外部参照</th><td>'.HTMLHandler::input_radiocheck('checkbox', 'foreign[]', 1).'</td></tr>'.PHP_EOL;
     echo '</table>'.PHP_EOL;
+    echo '<h2>Table Display Design</h2>'.PHP_EOL;
     echo HTMLHandler::hidden('id', $_GET['id']).PHP_EOL;
     echo HTMLHandler::input_submit('save', '作成').PHP_EOL;
     echo '</form>'.PHP_EOL;
