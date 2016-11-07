@@ -18,7 +18,7 @@ require_once(full_path('models/html_handler.php'));
 </head>
 <body>
     <header class="tab-bar">
-        <a href="#" class="icon-list2 btn" title="サイドメニュー"></a>
+        <a href="#" class="icon-list2" title="サイドメニュー" id="toggle_menu"></a>
         <ul class="editor-tabs">
 <?php
     foreach ($tbl_list as $tbl_num => $tbl_name) {

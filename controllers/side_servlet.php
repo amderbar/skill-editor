@@ -47,6 +47,7 @@ class SideServlet extends Servlet {
             if ($_POST['fMode'] == 'del-prj') {
                 // プロジェクト削除時
                 // 本当はここで入力値チェックをする
+                // CSRF対策のトークンチェックも必要
                 $proj_id = isset($_POST['id']) ? intval($_POST['id']) : null;
                 if ($proj_id) {
                     self::$db_editor->deleteDB($proj_id);

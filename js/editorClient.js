@@ -1,8 +1,15 @@
 /**
  * Editor on Browser: client script.
  */
+$(function() {
 
-console.log("#--- Loding Script ---#");
+/**
+ * サイドメニューの表示、非表示切り替え関数
+ */
+$('#toggle_menu').click(function () {
+	$('#side_menu', parent.document).toggle('slide');
+});
+
 
 // タブ切り替え関数
 function changeTab(tab) {
@@ -284,3 +291,4 @@ document.getElementById("download").addEventListener('click', handleDownload,fal
 // document.getElementById('file_drop_zone').addEventListener('dragover',handleFileDragOver, false);
 // document.getElementById('file_drop_zone').addEventListener('drop', handleFileDrop,false);
 // document.getElementById('file_select').addEventListener('onchange', handleFileSelect,false);
+});

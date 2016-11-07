@@ -38,6 +38,7 @@ function makeSideItems($proj_list, $current_proj_tbl_list = null) {
 			echo '<a href="'.$href.'" onclick="changeEditor('.$proj_id.');"><h2>'.HTMLHandler::specialchars($proj_name).'</h2></a>'.PHP_EOL;
 		    echo '<form action="'.$URL.'" method="POST">'.PHP_EOL;
 		    echo HTMLHandler::hidden('id', $proj_id);
+		    echo HTMLHandler::hidden('token', session_id());
 			echo '<ul class="btns">
 					<li class="icon-folder-plus btn submit" title="テーブルの追加">'.HTMLHandler::hidden('fMode', 'add-tbl').'</li>
 					<li class="icon-bin btn submit" title="プロジェクトの削除">'.HTMLHandler::hidden('fMode', 'del-prj').'</li>
