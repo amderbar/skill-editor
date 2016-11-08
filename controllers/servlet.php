@@ -2,7 +2,7 @@
 /**
 * session check.
 */
-require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/gatekeeper.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.php');
 
 /**
  * the super class for servlets.

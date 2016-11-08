@@ -2,7 +2,7 @@
 /**
 * session check.
 */
-require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/gatekeeper.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.php');
 //
 require_once(full_path('models/html_handler.php'));
 ?>
@@ -22,7 +22,9 @@ require_once(full_path('models/html_handler.php'));
         <ul class="editor-tabs">
 <?php
     foreach ($tbl_list as $tbl_num => $tbl_name) {
-        echo '<li><a href="'.$URL.'?id='.HTMLHandler::specialchars($proj_id).'&tab='.HTMLHandler::specialchars($tbl_num).'">'
+        $tab_class = ($tbl_num == $opened_tab) ? ' class="editting"' : '';
+        echo '<li'.$tab_class.'>
+        <a href="'.$URL.'?id='.HTMLHandler::specialchars($proj_id).'&tab='.HTMLHandler::specialchars($tbl_num).'">'
         .HTMLHandler::specialchars($tbl_name).'</a></li>'.PHP_EOL;
     }
 ?>
@@ -41,7 +43,7 @@ if (isset($tbl_tmpl)) {
     echo '</header>'.PHP_EOL;
     echo '<h2>Table Data definition</h2>'.PHP_EOL;
     echo '<table class="data-table">'.PHP_EOL;
-    echo '<tr><th></th><th>列1</th></tr>'.PHP_EOL;
+    echo '<tr id="head-row"><th></th><th>列1</th><th>列追加</th></tr>'.PHP_EOL;
     echo '<tr><th>列名</th><td>'.HTMLHandler::input_text('colname[]').'</td></tr>'.PHP_EOL;
     echo '<tr><th>データ型</th><td>'.HTMLHandler::input_select('type[]', ['TEXT'], DBEditor::getDateTypeList()).'</td></tr>'.PHP_EOL;
     echo '<tr><th>初期値</th><td>'.HTMLHandler::input_text('default[]').'</td></tr>'.PHP_EOL;
@@ -50,7 +52,7 @@ if (isset($tbl_tmpl)) {
     echo '<tr><th>外部参照</th><td>'.HTMLHandler::input_radiocheck('checkbox', 'foreign[]', 1).'</td></tr>'.PHP_EOL;
     echo '</table>'.PHP_EOL;
     echo '<h2>Table Display Design</h2>'.PHP_EOL;
-    echo HTMLHandler::hidden('id', $_GET['id']).PHP_EOL;
+    echo HTMLHandler::hidden('id', $proj_id).PHP_EOL;
     echo HTMLHandler::input_submit('save', '作成').PHP_EOL;
     echo '</form>'.PHP_EOL;
 }

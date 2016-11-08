@@ -43,6 +43,7 @@ class EditorServlet extends Servlet {
                 $REQ_SCOPE['tbl_tmpl'] = ($table_list[$opened_tab] == 'skills_view') ?
                     full_path(sprintf('resources/templates/proj%03d/', $current_proj_id).$tmpl_list[$selected_tmpl]) :
                     full_path('resources/templates/default_template.php');
+                $REQ_SCOPE['opened_tab'] = $opened_tab;
                 // 肝心のデータはセッションスコープにも入れておく
                 $_SESSION['proj'.$current_proj_id][$opened_tab] = $teble_data;
             } else {

@@ -2,7 +2,7 @@
 /**
 * session check.
 */
-require($_SERVER['DOCUMENT_ROOT'].'/skill_editor/gatekeeper.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.php');
 
 require_once(full_path('models/db_manager.php'));
 define('ROOT_DB', 'resources/system_admin.db');

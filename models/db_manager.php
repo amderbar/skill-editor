@@ -2,6 +2,11 @@
 /**
 * 
 */
+require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.php');
+
+/**
+* 
+*/
 class SQLiteHandler {
     /** */
     private $pdo = null;
