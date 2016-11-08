@@ -16,6 +16,19 @@ $('#toggle_menu').click(function () {
 	side_menu.toggle('slide', 'linear', 100);
 });
 
+/**
+ * テーブル作成時のカラム追加関数
+ */
+$('#add-col').click(function () {
+	var col_h = $(this).prev().text();
+	var col_num = col_h.match(/\d+/)[0];
+	col_num++;
+	$(this).before($('<th/>').text(col_h.replace(/\d+/, col_num)));
+	$('#def-tbl tbody').children('tr').each(function(i, elem){
+		$(elem).append($(elem).children().last().clone());
+	});
+});
+
 // var dragSrcEl = null;
 
 // function handleDragStart(e) {

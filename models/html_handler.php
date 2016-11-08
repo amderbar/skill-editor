@@ -35,14 +35,24 @@ class HTMLHandler {
     }
 
     /**
+    * Helper function for print text-box like form.
+    * @param $element_name
+    * @param $value
+    */
+    public static function input($type, $element_name, $value = '', $additional = null) {
+        $additional = $additional ? ' '.$additional : '' ;
+        $tag_str = '<input type="' . $type . '" name="' . $element_name . '" value="';
+        $tag_str .= self::specialchars($value) .'"'.$additional.'>'.PHP_EOL;
+        return $tag_str;
+    }
+
+    /**
     * Helper function for print text-box.
     * @param $element_name
     * @param $value
     */
-    public static function input_text($element_name, $value = '', $type = 'text') {
-        $tag_str = '<input type="' . $type . '" name="' . $element_name . '" value="';
-        $tag_str .= self::specialchars($value) . '">'.PHP_EOL;
-        return $tag_str;
+    public static function input_text($element_name, $value = '', $additional = null) {
+        return self::input('text', $element_name, $value, $additional);
     }
 
     /**
