@@ -2,9 +2,9 @@
 /**
 * session check.
 */
-require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 //
-require_once(full_path('models/html_handler.php'));
+require_once(full_path('models/html_handler.inc'));
 ?>
 <!DOCTYPE html>
 <html>

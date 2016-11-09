@@ -2,9 +2,9 @@
 /**
 * session check.
 */
-require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 
-require_once(full_path('models/db_manager.php'));
+require_once(full_path('models/db_manager.inc'));
 define('ROOT_DB', 'resources/system_admin.db');
 define('ACTUAL_TBL', 'actual_names_tbl');
 define('ACTUAL_COL', 'actual_names_col');

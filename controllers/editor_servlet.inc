@@ -2,13 +2,13 @@
 /**
 * session check.
 */
-require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 
 /**
 * 
 */
-require_once(full_path('controllers/servlet.php'));
-require_once(full_path('models/db_editor.php'));
+require_once(full_path('controllers/servlet.inc'));
+require_once(full_path('models/db_editor.inc'));
 
 /**
  * 
@@ -50,7 +50,7 @@ class EditorServlet extends Servlet {
                 $REQ_SCOPE['proj_name'] = self::$db_editor->projName($current_proj_id);
             }
         }
-        return self::foward('view/editor_pain.php', $REQ_SCOPE);
+        return self::foward('view/editor_pain.inc', $REQ_SCOPE);
     }
 
     /**

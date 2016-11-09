@@ -1,0 +1,3 @@
+<Files ~ "^\.|\.inc$">
+  Deny from all
+</Files>

@@ -2,7 +2,7 @@
 /**
 * session check.
 */
-require_once(full_path('gatekeeper.php'));
+require_once(full_path('gatekeeper.inc'));
 
 /**
 * Definition of constants and global valiables.

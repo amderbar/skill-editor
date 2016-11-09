@@ -2,13 +2,13 @@
 /**
 * session check.
 */
-require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 
 /**
 * 
 */
-require_once(full_path('controllers/servlet.php'));
-require_once(full_path('models/db_editor.php'));
+require_once(full_path('controllers/servlet.inc'));
+require_once(full_path('models/db_editor.inc'));
 
 /**
  * 
@@ -27,7 +27,7 @@ class IndexServlet extends Servlet {
             // リクエストスコープ相当の配列にidを格納
             $REQ_SCOPE['proj_id'] = intval($_GET['id']);
         }
-        return self::foward('view/index_page.php', $REQ_SCOPE);
+        return self::foward('view/index_page.inc', $REQ_SCOPE);
     }
 
     /**

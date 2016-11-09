@@ -2,13 +2,13 @@
 /**
 * session check.
 */
-require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 
 /**
 * 
 */
-require_once(full_path('controllers/servlet.php'));
-require_once(full_path('models/db_editor.php'));
+require_once(full_path('controllers/servlet.inc'));
+require_once(full_path('models/db_editor.inc'));
 
 /**
  * 
@@ -35,7 +35,7 @@ class SideServlet extends Servlet {
             // リクエストスコープ相当の配列にデータを格納
             $REQ_SCOPE['current_proj_tbl_list'] = $table_list;
         }
-        return self::foward('view/side_pain.php', $REQ_SCOPE);
+        return self::foward('view/side_pain.inc', $REQ_SCOPE);
     }
 
     /**

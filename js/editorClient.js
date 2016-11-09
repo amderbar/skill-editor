@@ -25,7 +25,9 @@ $('#add-col').click(function () {
 	col_num++;
 	$(this).before($('<th/>').text(col_h.replace(/\d+/, col_num)));
 	$('#def-tbl tbody').children('tr').each(function(i, elem){
-		$(elem).append($(elem).children().last().clone());
+		var new_td = $(elem).children().last().clone();
+		new_td.find('input').val('');
+		$(elem).append(new_td);
 	});
 });
 
