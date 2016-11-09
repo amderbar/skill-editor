@@ -98,3 +98,14 @@ th, td {
 .icon {width: 1em}
 textarea {width: 100%}
 .textarea-label {vertical-align: baseline;}
+
+#def-tbl {
+	counter-reset: col-num;
+}
+.col-h, #add-col{
+	cursor: pointer;
+}
+.col-h label::after {
+	counter-increment: col-num;
+	content: counter(col-num);
+}

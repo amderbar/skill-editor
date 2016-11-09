@@ -44,7 +44,7 @@ if (isset($tbl_tmpl)) {
     echo '<h2>Table Data definition</h2>'.PHP_EOL;
     echo '<table class="data-table" id="def-tbl">'.PHP_EOL;
     echo '<thead>'.PHP_EOL;
-    echo '<tr><th></th><th>列1</th><th id="add-col">列追加</th></tr>'.PHP_EOL;
+        echo '<tr><th></th><th class="col-h"><label>列</labal></th><th id="add-col">列追加</th></tr>'.PHP_EOL;
     echo '</thead><tbody>'.PHP_EOL;
     echo '<tr><th>列名</th><td>'.HTMLHandler::input_text('colname[]', '', 'size="11"').'</td></tr>'.PHP_EOL;
     echo '<tr><th>データ型</th><td>'.HTMLHandler::input_select('type[]', ['TEXT'], DBEditor::getDateTypeList()).'</td></tr>'.PHP_EOL;

@@ -76,6 +76,6 @@ require_once(full_path('models/html_handler.inc'));
 		</form>
 	</section>
 	<div id="modal-overlay"></div>
-	<script src="<?=addFilemtime('js/editorCommon.js')?>"></script>
+	<script src="<?=addFilemtime('js/common.js')?>"></script>
 </body>
 </html>

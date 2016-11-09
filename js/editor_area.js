@@ -2,34 +2,89 @@
  * Editor on Browser: client script.
  */
 $(function() {
-
-/**
- * サイドメニューの表示、非表示切り替え関数
- */
-$('#toggle_menu').click(function () {
-	var side_menu = $('#side_menu', parent.document);
-	if(side_menu.is(':visible')){
-		$(this).attr('title', 'サイドメニューを開く');
-	} else {
-		$(this).attr('title', 'サイドメニューを閉じる');
-	}
-	side_menu.toggle('slide', 'linear', 100);
-});
-
-/**
- * テーブル作成時のカラム追加関数
- */
-$('#add-col').click(function () {
-	var col_h = $(this).prev().text();
-	var col_num = col_h.match(/\d+/)[0];
-	col_num++;
-	$(this).before($('<th/>').text(col_h.replace(/\d+/, col_num)));
-	$('#def-tbl tbody').children('tr').each(function(i, elem){
-		var new_td = $(elem).children().last().clone();
-		new_td.find('input').val('');
-		$(elem).append(new_td);
+	/**
+	 * サイドメニューの表示、非表示切り替え関数
+	 */
+	$('#toggle_menu').click(function () {
+		var side_menu = $('#side_menu', parent.document);
+		if(side_menu.is(':visible')){
+			$(this).attr('title', 'サイドメニューを開く');
+		} else {
+			$(this).attr('title', 'サイドメニューを閉じる');
+		}
+		side_menu.toggle('slide', 'linear', 100);
 	});
+
+	/**
+	 * テーブル作成時のカラム追加関数
+	 */
+	$('#add-col').click(function () {
+		$('.col-h').unbind();
+		$(this).before($(this).prev().clone());
+		$('#def-tbl tbody').children('tr').each(function(i, elem){
+			var new_td = $(elem).children().last().clone();
+			new_td.find('input').val('');
+			$(elem).append(new_td);
+		});
+		putHandlers();
+	});
+
+	/**
+	 * イベントリスナー設置
+	 */
+	putHandlers();
+	// ファイル保存関連
+	// document.getElementById("download").addEventListener('click', handleDownload,false);
+	// ドラッグアンドドロップでファイルを開くイベントリスナー設置.
+	// document.getElementById('file_drop_zone').addEventListener('dragover',handleFileDragOver, false);
+	// document.getElementById('file_drop_zone').addEventListener('drop', handleFileDrop,false);
+	// document.getElementById('file_select').addEventListener('onchange', handleFileSelect,false);
+
 });
+
+/**
+ * イベントハンドラの設置関数
+ */
+function putHandlers() {
+	// テーブル新規作成画面
+	$('.col-h')
+	.hover(function (e) { // ラベルの切り替え hover
+		$(this).append($("<span>削除</span>"));
+	},function (e) { // out
+		$(this).find('span').last().remove();
+	})
+	.click(function (e) { // 列削除
+		var index = $('.col-h').index(this);
+		index++;
+		if (confirm("列" + index + "を削除してもよろしいですか？")) {
+			$('#def-tbl tbody').children('tr').each(function(i, elem){
+				$(elem).children().eq(index).remove();
+			});
+			$(this).remove();
+		}
+	})
+
+	// ドラッグアンドドロップ関連
+	// var editArea = document.getElementById('editorArea');
+	// [].forEach.call(editArea.getElementsByClassName('draggable'), function(col) {
+	// 	col.addEventListener('dragstart', handleDragStart, false);
+	// 	col.addEventListener('dragend', handleDragEnd, false);
+	// });
+	// [].forEach.call(editArea.getElementsByClassName('dropzone'), function(elem) {
+	// 	elem.addEventListener('drop', handleDrop, false);
+	// 	elem.addEventListener('dragenter', handleDragEnter, false)
+	// 	elem.addEventListener('dragover', handleDragOver, false);
+	// 	elem.addEventListener('dragleave', handleDragLeave, false);
+	// });
+	// // クリックして編集モード
+	// [].forEach.call(editArea.getElementsByClassName('editable'), function(elem) {
+	// 	elem.addEventListener('click', handleOnClick, false);
+	// });
+	// // 要素の複製
+	// [].forEach.call(editArea.getElementsByClassName('copyBtn'), function(elem) {
+	// 	elem.addEventListener('click', handleCopy, false);
+	// });
+}
 
 // var dragSrcEl = null;
 
@@ -262,35 +317,3 @@ $('#add-col').click(function () {
 // 	evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
 // }
 
-// // イベントハンドラの設置関数。
-// function putHandlers() {
-// 	// ドラッグアンドドロップ関連
-// 	var editArea = document.getElementById('editorArea');
-// 	[].forEach.call(editArea.getElementsByClassName('draggable'), function(col) {
-// 		col.addEventListener('dragstart', handleDragStart, false);
-// 		col.addEventListener('dragend', handleDragEnd, false);
-// 	});
-// 	[].forEach.call(editArea.getElementsByClassName('dropzone'), function(elem) {
-// 		elem.addEventListener('drop', handleDrop, false);
-// 		elem.addEventListener('dragenter', handleDragEnter, false)
-// 		elem.addEventListener('dragover', handleDragOver, false);
-// 		elem.addEventListener('dragleave', handleDragLeave, false);
-// 	});
-// 	// クリックして編集モード
-// 	[].forEach.call(editArea.getElementsByClassName('editable'), function(elem) {
-// 		elem.addEventListener('click', handleOnClick, false);
-// 	});
-// 	// 要素の複製
-// 	[].forEach.call(editArea.getElementsByClassName('copyBtn'), function(elem) {
-// 		elem.addEventListener('click', handleCopy, false);
-// 	});
-// }
-// // 初期設定
-// putHandlers();
-// // ファイル保存関連
-// document.getElementById("download").addEventListener('click', handleDownload,false);
-// // ドラッグアンドドロップでファイルを開くイベントリスナー設置.
-// // document.getElementById('file_drop_zone').addEventListener('dragover',handleFileDragOver, false);
-// // document.getElementById('file_drop_zone').addEventListener('drop', handleFileDrop,false);
-// // document.getElementById('file_select').addEventListener('onchange', handleFileSelect,false);
-});

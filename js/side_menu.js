@@ -15,7 +15,11 @@ $(function(){
         var new_name_box = $('#new-proj-name');
         new_name_box.keypress(function (e) {
             if ( e.which == 13 ) {
+                // Enter で決定
                 $(this).blur();
+            } else if ( e.which == 27 ) {
+                // Esc でキャンセル…としたいけどこれでは動かない
+                $('#proj-list').children().last().remove();
             }
         });
         new_name_box.blur(function (){
