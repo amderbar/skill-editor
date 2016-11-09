@@ -24,6 +24,58 @@ class HTMLHandler {
     }
     
     /**
+    * Helper function for sanitize url. this is not yet complete.
+    * @param $str
+    */
+    public static function sanitizeUrl($url) {
+        $allow_scheme = array(
+            'http' => true,
+            'https' => true
+        );
+        $url_scheme = parse_url($url, PHP_URL_SCHEME);
+        if ($url_scheme && !isset($allow_scheme[$url_scheme])) {
+            mb_ereg_replace($url_scheme, '', $url);
+        }
+        return $url;
+    }
+
+    /**
+    * Helper function for Construction of attributes string.
+    * @param $str
+    */
+    public static function attr($attr_hash) {
+        if (empty($attr_hash)) {
+            return '';
+        }
+        $tmp = array();
+        foreach ($attr_hash as $name => $value) {
+            if (is_array($value)) {
+                $value = implode(' ', $value);
+            }
+            $tmp[] = self::specialchars($name).'="'.self::specialchars($value).'"';
+        }
+        return implode(' ', $tmp);
+    }
+
+    /**
+    * Helper function for hyper link.
+    * @param $str
+    */
+    public static function link($text, $href, $query = null, $additional = null) {
+        $href = self::sanitizeUrl($href);
+        if (empty($href)) {
+           return null;
+        }
+        $tmp = array();
+        foreach ($query as $name => $value) {
+            $tmp[] = self::specialchars($name).'='.urlencode(self::specialchars($value));
+        }
+        $query = implode('&', $tmp);
+        $query = ($query) ? '?'.$query : $query;
+        return '<a href="'.$href.$query.'" '.self::attr($additional).'>'.self::specialchars($text).'</a>';
+    }
+    
+    /**
     * Helper function for print hidden tag.
     * @param $element_name
     * @param $values
