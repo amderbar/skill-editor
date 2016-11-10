@@ -45,7 +45,7 @@ function makeSideItems($proj_list, $current_proj_tbl_list = null) {
 				  </ul>';
 			echo '</form>'.PHP_EOL;
 			echo '</div>';
-			if (isset($_GET['id']) && $_GET['id'] == $proj_id) {
+			if (isset($opend_id) && $proj_id == $opend_id) {
 				echo '<ul class="side-children">'.PHP_EOL;
 				foreach ($current_proj_tbl_list as $tbl_num => $tbl_name) {
 					echo '<li class="with-btns">'.PHP_EOL;

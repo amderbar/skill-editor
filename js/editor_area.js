@@ -32,7 +32,7 @@ $(function() {
 	/**
 	 * イベントリスナー設置
 	 */
-	putHandlers();
+	// putHandlers();
 	// ファイル保存関連
 	// document.getElementById("download").addEventListener('click', handleDownload,false);
 	// ドラッグアンドドロップでファイルを開くイベントリスナー設置.
@@ -47,13 +47,11 @@ $(function() {
  */
 function putHandlers() {
 	// テーブル新規作成画面
-	$('.col-h')
-	.hover(function (e) { // ラベルの切り替え hover
-		$(this).append($("<span>削除</span>"));
-	},function (e) { // out
-		$(this).find('span').last().remove();
-	})
-	.click(function (e) { // 列削除
+	$('.col-h').hover(function (e) { // ラベルの切り替え hover
+			$(this).append($("<span>削除</span>"));
+		},function (e) { // out
+			$(this).find('span').last().remove();
+	}).click(function (e) { // 列削除
 		var index = $('.col-h').index(this);
 		index++;
 		if (confirm("列" + index + "を削除してもよろしいですか？")) {
@@ -61,8 +59,11 @@ function putHandlers() {
 				$(elem).children().eq(index).remove();
 			});
 			$(this).remove();
+			if ($('.col-h').length < 2) {
+				$('.col-h').unbind();
+			}
 		}
-	})
+	});
 
 	// ドラッグアンドドロップ関連
 	// var editArea = document.getElementById('editorArea');

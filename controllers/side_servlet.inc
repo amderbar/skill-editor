@@ -33,6 +33,7 @@ class SideServlet extends Servlet {
             }
             $table_list = self::$db_editor->listTables($current_proj_id);
             // リクエストスコープ相当の配列にデータを格納
+            $REQ_SCOPE['opend_id'] = $current_proj_id;
             $REQ_SCOPE['current_proj_tbl_list'] = $table_list;
         }
         return self::foward('view/side_pain.inc', $REQ_SCOPE);
