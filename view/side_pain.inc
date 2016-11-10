@@ -35,7 +35,7 @@ function makeSideItems($proj_list, $current_proj_tbl_list = null) {
 			$proj_id = HTMLHandler::specialchars($proj_id);
 			$href = $URL.'?id='.$proj_id;
 			echo '<li><div class="with-btns">'.PHP_EOL;
-			echo '<a href="'.$href.'" onclick="changeEditor('.$proj_id.');"><h2>'.HTMLHandler::specialchars($proj_name).'</h2></a>'.PHP_EOL;
+			echo '<h2>'.HTMLHandler::link($proj_name, $URL, ['id' => $proj_id], ['onclick' => 'changeEditor('.$proj_id.')']).'</h2>'.PHP_EOL;
 		    echo '<form action="'.$URL.'" method="POST">'.PHP_EOL;
 		    echo HTMLHandler::hidden('id', $proj_id);
 		    echo HTMLHandler::hidden('token', session_id());
@@ -48,10 +48,9 @@ function makeSideItems($proj_list, $current_proj_tbl_list = null) {
 			if (isset($_GET['id']) && $_GET['id'] == $proj_id) {
 				echo '<ul class="side-children">'.PHP_EOL;
 				foreach ($current_proj_tbl_list as $tbl_num => $tbl_name) {
-					echo '<li class="with-btns">
-					<a href="'.$href.'#tab'.HTMLHandler::specialchars($tbl_num).'" onclick="changeTab(this);">'
-					.HTMLHandler::specialchars($tbl_name).'</a>
-					<ul class="btns">
+					echo '<li class="with-btns">'.PHP_EOL;
+					echo HTMLHandler::link($tbl_name, '#', [], ['onclick' => 'changeEditor('.$proj_id.','.$tbl_num.')']).PHP_EOL;
+					echo '<ul class="btns">
 					<li class="icon-bin btn" title="テーブルの削除"></li>
 					</ul>
 					</li>'.PHP_EOL;

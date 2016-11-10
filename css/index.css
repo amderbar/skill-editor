@@ -21,8 +21,8 @@ main {
 	flex-direction: row;
 	border-bottom: 2px solid;
 	border-top: 2px solid;
-	top: 30px;
-	bottom: 15px;
+	top: 20px;
+	bottom: 20px;
 }
 
 main > nav, main > article {

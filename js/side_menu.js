@@ -51,7 +51,7 @@ $(function(){
                         { 'id': proj_id, 'fMode': f_mode }
                     ).done(function(){
                             location.reload(true);
-                            parent.editor_area.location.reload(true);
+                            changeEditor();
                     }).fail(function(data){
                         console.log(data);
                         alert('error!!!');
@@ -64,7 +64,17 @@ $(function(){
     });
 });
 
-function changeEditor(id) {
-    var query_str = (id != null) ? '?id=' + id : '';
-    parent.editor_area.location.href = 'editor_area.php' + query_str;
+function changeEditor(id, tab) {
+    var return_val = true;
+    if (id != null) {
+        var query_str = '?id=' + id;
+        if (tab != null) {
+            query_str += '&tab=' + tab;
+            return_val = false;
+        }
+        parent.editor_area.location.href = 'editor_area.php' + query_str;
+    } else {
+        parent.editor_area.location.reload(true);
+    }
+    return return_val;
 }
