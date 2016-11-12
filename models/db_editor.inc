@@ -155,9 +155,12 @@ class DBEditor {
     /**
     * 
     */
-    public function dropRoot() {
-        $this->con[0]->execSQL('drop table templates;');
-        $this->con[0]->execSQL('drop table projects;');
+    public function getAllTemplates() {
+        try {
+            return $this->con[0]->fetchAll('templates');
+        } catch (PDOException $e){
+            die('PDOException throwen:'. $e->getMessage());
+        }
     }
 
     /**
@@ -166,7 +169,7 @@ class DBEditor {
     public function getTemplates($proj_id) {
         try {
             $tmpl_list = array();
-            $tmpls = $this->con[0]->findByKey('templates','proj_id',$proj_id);
+            $tmpls = $this->con[0]->findByKey('templates', 'proj_id', $proj_id);
             foreach ($tmpls as $row) {
                 $tmpl_list[$row['id']] = $row['tmpl_name'];
             }
@@ -274,7 +277,7 @@ class DBEditor {
                 $id = $newid[0]['id'];
             } else {
                 $row = $this->con[$proj_id]->findByKey(
-                    $dto->getTableName(),$colname,$parms[$key]);
+                    $dto->getTableName(), $colname, $parms[$key]);
                 $id = $row[0]['id'];
             }
         } catch (PDOException $e){

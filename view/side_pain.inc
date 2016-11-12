@@ -3,8 +3,6 @@
 * session check.
 */
 require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
-//
-require_once(full_path('models/html_handler.inc'));
 /**
 * 
 */
@@ -32,8 +30,6 @@ function makeSideItems($proj_list, $current_proj_tbl_list = null) {
 	</header>
     <ul class="side-menu" id="proj-list">
         <?php foreach ($proj_list as $proj_id => $proj_name) {
-			$proj_id = HTMLHandler::specialchars($proj_id);
-			$href = $URL.'?id='.$proj_id;
 			echo '<li><div class="with-btns">'.PHP_EOL;
 			echo '<h2>'.HTMLHandler::link($proj_name, $URL, ['id' => $proj_id], ['onclick' => 'changeEditor('.$proj_id.')']).'</h2>'.PHP_EOL;
 		    echo '<form action="'.$URL.'" method="POST">'.PHP_EOL;

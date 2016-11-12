@@ -1,9 +1,11 @@
 <?php
 $primary_colmun = array();
 foreach ($tbl_data as $key => $row) {
-    $primary_colmun[] = (isset($row['id'])) ? $row['id'] : null;
     if (isset($row['id'])) {
+        $primary_colmun[$key] = $row['id'];
         unset($tbl_data[$key]['id']);
+    } else {
+        $primary_colmun[$key] = null;
     }
 }
 if (array_depth($tbl_data) == 2) {
@@ -13,21 +15,19 @@ if (array_depth($tbl_data) == 2) {
         $column_names += array_keys($row);
     }
     echo '<tr>'.PHP_EOL;
-    echo '<th></th>';
+    echo '<td></td>';
     foreach ($column_names as $key) {
-        echo '<th>'.HTMLHandler::specialchars($key).'</th>';
+        echo '<th>'.HTMLHandler::escape($key).'</th>';
     }
     echo PHP_EOL.'</tr>';
     foreach ($tbl_data as $key => $row) {
         echo '<tr>'.PHP_EOL;
-        // if ($primary_colmun[$key]) {
-        //     echo '<input type="hidden" name="id[]" value="'.HTMLHandler::specialchars($primary_colmun[$key]).'">';
-        // }
-        echo '<th>'.HTMLHandler::specialchars($key).'</th>';
+        $hidden = (isset($primary_colmun[$key])) ? HTMLHandler::hidden('id[]', $primary_colmun[$key]) : '';
+        echo '<th>'.$hidden.HTMLHandler::escape($key + 1).'</th>';
         foreach ($column_names as $column_name) {
             echo '<td>';
             if (isset($row[$column_name])) {
-                echo HTMLHandler::specialchars($row[$column_name]);
+                echo HTMLHandler::escape($row[$column_name]);
             }
             echo '</td>';
         }

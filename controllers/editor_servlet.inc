@@ -1,12 +1,12 @@
 <?php
 /**
-* session check.
-*/
+ * session check.
+ */
 require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 
 /**
-* 
-*/
+ * 
+ */
 require_once(full_path('controllers/servlet.inc'));
 require_once(full_path('models/db_editor.inc'));
 
@@ -18,8 +18,8 @@ class EditorServlet extends Servlet {
     private static $db_editor = null;
 
     /**
-    * 
-    */
+     * 
+     */
     public static function doGet($req='') {
         $REQ_SCOPE = array();
         // リクエストパラメータidがセットされている時、そのidのプロジェクトが開かれる
@@ -37,10 +37,25 @@ class EditorServlet extends Servlet {
                 $opened_tab = 0;
             }
             if (empty($table_list) || ($opened_tab === 'new')) {
+            // テーブル新規作成タブを開く
                 $REQ_SCOPE['new_tab'] = true;
+                $REQ_SCOPE['data_types'] = DBEditor::getDateTypeList();
+                $REQ_SCOPE['form_types'] = HTMLHandler::$FROM_TYPES;
                 $REQ_SCOPE['opened_tab'] = null;
                 $REQ_SCOPE['proj_name'] = self::$db_editor->projName($current_proj_id);
+                $tmpl_list = self::$db_editor->getAllTemplates();
+                $REQ_SCOPE['tbl_tmpls'] = ['default' => full_path('resources/templates/default_template.php')];
+                foreach ($tmpl_list as $tmpl) {
+                    $REQ_SCOPE['tbl_tmpls'][$tmpl['tmpl_name']]
+                     = full_path(sprintf('resources/templates/proj%03d/', $tmpl['proj_id']).$tmpl['tmpl_name']);
+                }
+                $REQ_SCOPE['tbl_data'] = array(
+                    ['id' => 1, 'Nameless' => ''],
+                    ['id' => 2, 'Nameless' => ''],
+                    ['id' => 3, 'Nameless' => '']
+                );
             } else {
+            // 既存テーブルのタブを開く
                 $teble_data = self::$db_editor->listData($current_proj_id, $table_list[$opened_tab]);
                 $tmpl_list = self::$db_editor->getTemplates($current_proj_id);
                 // 先頭要素のキーを取得
@@ -59,8 +74,8 @@ class EditorServlet extends Servlet {
     }
 
     /**
-    * 
-    */
+     * 
+     */
     public static function doPost($req='') {
         $proj_id = isset($_GET['id']) ? intval($_GET['id']) : null;
         if ($proj_id && isset($_POST) && !empty($_POST)) {
@@ -72,8 +87,8 @@ class EditorServlet extends Servlet {
     }
 
     /**
-    * サーブレットの初期設定メソッド
-    */
+     * サーブレットの初期設定メソッド
+     */
     public static function setup($arg='') {
         if (self::$db_editor == null) {
             self::$db_editor = new DBEditor();

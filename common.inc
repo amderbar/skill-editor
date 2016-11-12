@@ -3,7 +3,6 @@
 * session check.
 */
 require_once(full_path('gatekeeper.inc'));
-
 /**
 * Definition of constants and global valiables.
 */
@@ -13,6 +12,11 @@ mb_internal_encoding(ENCODE);
 mb_regex_encoding();
 
 $URL = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+
+/**
+* load library and common functions
+*/
+require_once(full_path('models/html_handler.inc'));
 
 /**
 * return file full path of argument string

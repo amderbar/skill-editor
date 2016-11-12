@@ -3,33 +3,6 @@
  */
 $(function() {
 	/**
-	 * サイドメニューの表示、非表示切り替え関数
-	 */
-	$('#toggle_menu').click(function () {
-		var side_menu = $('#side_menu', parent.document);
-		if(side_menu.is(':visible')){
-			$(this).attr('title', 'サイドメニューを開く');
-		} else {
-			$(this).attr('title', 'サイドメニューを閉じる');
-		}
-		side_menu.toggle('slide', 'linear', 100);
-	});
-
-	/**
-	 * テーブル作成時のカラム追加関数
-	 */
-	$('#add-col').click(function () {
-		$('.col-h').unbind();
-		$(this).before($(this).prev().clone());
-		$('#def-tbl tbody').children('tr').each(function(i, elem){
-			var new_td = $(elem).children().last().clone();
-			new_td.find('input').val('');
-			$(elem).append(new_td);
-		});
-		putHandlers();
-	});
-
-	/**
 	 * イベントリスナー設置
 	 */
 	// putHandlers();
@@ -46,25 +19,6 @@ $(function() {
  * イベントハンドラの設置関数
  */
 function putHandlers() {
-	// テーブル新規作成画面
-	$('.col-h').hover(function (e) { // ラベルの切り替え hover
-			$(this).append($("<span>削除</span>"));
-		},function (e) { // out
-			$(this).find('span').last().remove();
-	}).click(function (e) { // 列削除
-		var index = $('.col-h').index(this);
-		index++;
-		if (confirm("列" + index + "を削除してもよろしいですか？")) {
-			$('#def-tbl tbody').children('tr').each(function(i, elem){
-				$(elem).children().eq(index).remove();
-			});
-			$(this).remove();
-			if ($('.col-h').length < 2) {
-				$('.col-h').unbind();
-			}
-		}
-	});
-
 	// ドラッグアンドドロップ関連
 	// var editArea = document.getElementById('editorArea');
 	// [].forEach.call(editArea.getElementsByClassName('draggable'), function(col) {

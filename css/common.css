@@ -16,7 +16,7 @@ header {
 	min-width: inherit;
 	padding-left:10px;
 	padding-right:10px;
-	position: relative;
+	/*position: relative;*/
 }
 .with-btns {
 	display: flex;

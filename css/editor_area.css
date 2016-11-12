@@ -1,9 +1,10 @@
-.tab-bar {
+#tab-bar {
 	display: flex;
 	flex-direction: row;
     align-items: center;
 	justify-content: space-between;
 	padding: 5px 0 0 5px;
+    border-bottom: 1px LightGrey solid;
 }
 
 .editor-tabs {
@@ -29,7 +30,7 @@
     border-bottom: 1px white solid;
 }
 
-.tab-page {
+#tab-page {
 	position: absolute;
 	width: inherit;
 	top: 30px;
@@ -41,18 +42,16 @@
 	padding: 5px 0 100px 0;
 }
 
-.tab-page ol, .data-table {
+.data-table {
 	margin: 0 auto;
+    border-collapse:collapse;
 }
-th, td {
+.data-table th, .data-table td {
 	padding: 3px;
+	vertical-align: top;
 }
-
 .data-table, .data-table th, .data-table td {
     border: 1px LightGrey solid;
-}
-.data-table {
-    border-collapse:collapse;
 }
 
 .draggable {

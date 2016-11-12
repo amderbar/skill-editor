@@ -12,20 +12,48 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
  * Time: 9:16
  */
 class HTMLHandler {
-    /**  */
-    private static $CODE = 'UTF-8';
+    /** */
+    // list属性、step属性によるバリエーションもある
+    public static $FROM_TYPES = array(
+        'input tag' => array(
+            'text' => '一行テキスト',
+            'listext' => '入力候補付き一行テキスト',
+            'tel' => '電話番号', // textと変わらない
+            'url' => 'URL',
+            'email' => 'メールアドレス',
+            'password' => 'パスワード',
+            'datetime' => 'UTC日時', // textと変わらない
+            'date' => '日付',
+            'month' => '月',
+            'week' => '週',
+            'time' => '時刻',
+            'datetime-local' => 'ローカル日時', // timestampっぽい
+            'number' => '数値(直接入力)',
+            'range' => '数値(スライダー)',
+            'color' => '色',
+            'checkbox' => '単一チェックボックス',
+            'multicheck' => '選択チェックボックス',
+            'radio' => 'ラジオボタン',
+            'file' => 'ファイル添付',
+            'image' => '画像ボタン'
+        ),
+        'other tag' => array(
+            'textarea' => '複数行テキスト',
+            'selectbox' => 'プルダウン'
+        )
+    );
 
     /**
     * Helper function for html escape.
     * @param $str
     */
-    public static function specialchars($str) {
-        return htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE, self::$CODE);
+    public static function escape($str) {
+        return htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE, ENCODE);
     }
     
     /**
     * Helper function for sanitize url. this is not yet complete.
-    * @param $str
+    * @param $url
     */
     public static function sanitizeUrl($url) {
         $allow_scheme = array(
@@ -41,7 +69,7 @@ class HTMLHandler {
 
     /**
     * Helper function for Construction of attributes string.
-    * @param $str
+    * @param mixed hash $attr_hash
     */
     public static function attr($attr_hash) {
         if (empty($attr_hash)) {
@@ -52,14 +80,17 @@ class HTMLHandler {
             if (is_array($value)) {
                 $value = implode(' ', $value);
             }
-            $tmp[] = self::specialchars($name).'="'.self::specialchars($value).'"';
+            $tmp[] = self::escape($name).'="'.self::escape($value).'"';
         }
-        return implode(' ', $tmp);
+        return ' '.implode(' ', $tmp);
     }
 
     /**
     * Helper function for hyper link.
-    * @param $str
+    * @param string $text
+    * @param string $href
+    * @param mixed hash $query
+    * @param mixed hash $additional
     */
     public static function link($text, $href, $query = null, $additional = null) {
         $href = self::sanitizeUrl($href);
@@ -68,43 +99,56 @@ class HTMLHandler {
         }
         $tmp = array();
         foreach ($query as $name => $value) {
-            $tmp[] = self::specialchars($name).'='.urlencode(self::specialchars($value));
+            $tmp[] = self::escape($name).'='.urlencode(self::escape($value));
         }
         $query = implode('&', $tmp);
         $query = ($query) ? '?'.$query : $query;
-        return '<a href="'.$href.$query.'" '.self::attr($additional).'>'.self::specialchars($text).'</a>';
-    }
-    
-    /**
-    * Helper function for print hidden tag.
-    * @param $element_name
-    * @param $values
-    */
-    public static function hidden($element_name, $value) {
-        $tag_str = '<input type="hidden" name="' . $element_name . '" value="';
-        $tag_str .= self::specialchars($value) . '">'.PHP_EOL;
-        return $tag_str;
+        return '<a href="'.$href.$query.'"'.self::attr($additional).'>'.self::escape($text).'</a>';
     }
 
     /**
     * Helper function for print text-box like form.
-    * @param $element_name
-    * @param $value
+    * @param string $element_name
+    * @param mixed $value
+    * @param mixed hash $additional
     */
-    public static function input($type, $element_name, $value = '', $additional = null) {
-        $additional = $additional ? ' '.$additional : '' ;
+    public static function inputForm($type, $element_name, $value = '', $additional = null) {
         $tag_str = '<input type="' . $type . '" name="' . $element_name . '" value="';
-        $tag_str .= self::specialchars($value) .'"'.$additional.'>'.PHP_EOL;
+        $tag_str .= self::escape($value) .'"'.self::attr($additional).'>';
         return $tag_str;
+    }
+    
+    /**
+    * Helper function for print hidden tag.
+    * @param string $element_name
+    * @param mixed $value
+    * @param mixed hash $additional
+    */
+    public static function hidden($element_name, $value, $additional = null) {
+        return self::inputForm('hidden', $element_name, $value, $additional);
     }
 
     /**
     * Helper function for print text-box.
-    * @param $element_name
-    * @param $value
+    * @param string $element_name
+    * @param mixed $value
+    * @param mixed hash $additional
     */
-    public static function input_text($element_name, $value = '', $additional = null) {
-        return self::input('text', $element_name, $value, $additional);
+    public static function textbox($element_name, $value = '', $additional = null) {
+        return self::inputForm('text', $element_name, $value, $additional);
+    }
+
+    /**
+    * Helper function for print number-box.
+    * @param string $element_name
+    * @param mixed $value
+    * @param mixed hash $additional
+    */
+    public static function number($element_name, $value = '', $step = null, $additional = array()) {
+        if (isset($step)) {
+            $additional['step'] = $step;
+        }
+        return self::inputForm('number', $element_name, $value, $additional);
     }
 
     /**
@@ -112,22 +156,22 @@ class HTMLHandler {
     * @param $element_name
     * @param $label
     */
-    public static function input_submit ($element_name, $label, $form_id = null, $additional = null) {
+    public static function submit($element_name, $label, $form_id = null, $additional = null) {
         $form_attr = $form_id ? '" form="'.$form_id : '' ;
         $additional = $additional ? ' '.$additional : '' ;
         $tag_str = '<input type="submit" name="' . $element_name . '" value="';
-        $tag_str .= self::specialchars($label) . $form_attr .'"'.$additional.'>'.PHP_EOL;
+        $tag_str .= self::escape($label) . $form_attr .'"'.$additional.'>';
         return $tag_str;
     }
 
     /**
-    * Helper function for print the submit button.
+    * Helper function for print the textarea.
     * @param $element_name
     * @param $values
     */
-    public static function input_textarea ($element_name, $values) {
+    public static function textarea($element_name, $values) {
         $tag_str = '<textarea name="' . $element_name . '">';
-        $tag_str .= self::specialchars($values[$element_name]) . '</textarea>'.PHP_EOL;
+        $tag_str .= self::escape($values[$element_name]) . '</textarea>';
         return $tag_str;
     }
 
@@ -138,7 +182,7 @@ class HTMLHandler {
     * @param $values is an array has checkbox value as key and label text as value of array.
     * @param $checked_value
     */
-    public static function input_radiocheck ($type, $element_name, $values, $checked_value = null) {
+    public static function radiocheck ($type, $element_name, $values, $checked_value = null) {
         $tag_str_common = '<input type="' . $type . '" name="' . $element_name . '" value="';
         if (!is_array($values)) {
             $values = array($values => null);
@@ -149,13 +193,13 @@ class HTMLHandler {
             } else {
                 $tag_str = $tag_str_common;
             }
-            $tag_str .= self::specialchars($value) . '" ';
+            $tag_str .= self::escape($value) . '" ';
             if ($checked_value == $value) {
                 $tag_str .= ' checked="checked"';
             }
             $tag_str .= '>';
             if ($label) {
-                $tag_str .= self::specialchars($label).'</label>';
+                $tag_str .= self::escape($label).'</label>';
             }
             return $tag_str.PHP_EOL;
         }
@@ -163,31 +207,71 @@ class HTMLHandler {
 
     /**
     * select box
-    * @param $element_name
-    * @param $selected selected option(s). NOT label.
-    *        if $multiple == true then it should be an array, else it should be a scalar variable.
-    * @param $options
-    * @param bool $multiple
+    * @param string $element_name
+    * @param string or array $options
+    * @param array $selected selected option(s). NOT label.
+    * @param boolean $multiple
+    * @param hash $additional
     */
-    public static function input_select($element_name, $selected, $options, $multiple = false) {
-    // start select tag
-        $tag_str = '<select name="' . $element_name;
+    public static function selectbox($element_name, $options, $selected = null, $multiple = false, $additional = null) {
+        // start select tag
+        $tag_str = '<select name="'. $element_name;
         if ($multiple) {
             $tag_str .= '[]" multiple="multiple';
         }
-        $tag_str .= '">'.PHP_EOL;
-        // set default
-        $selected = array_flip($selected);
+        $tag_str .= '"'.self::attr($additional).'>'.PHP_EOL;
         // options
-        foreach ($options as $option => $label) {
-            $tag_str .= '<option value="' . self::specialchars($option) . '"';
-            if (isset($selected[$option])) {
-                $tag_str .= ' selected="selected"';
+        if (is_array($options)) {
+            if (array_depth($options) > 1) {
+                $tag_str .= self::optgroups($options, $selected);
+            } else {
+                $tag_str .= self::options($options, $selected);
             }
-            $tag_str .= '>' . self::specialchars($label) . '</option>'.PHP_EOL;
+        } else {
+        // string $options is available
+        // but this case should be only when it is made by options() or optgroups() function.
+            $tag_str .= $options;
         }
         // end select tag
         $tag_str .= '</select>'.PHP_EOL;
+        return $tag_str;
+    }
+
+    /**
+    * select box options
+    * @param array $options
+    * @param array $selected selected option(s). NOT label.
+    * @param hash $additional
+    */
+    public static function optgroups($optgrps, $selected = null, $additional = null) {
+        $tag_str = '';
+        foreach ($optgrps as $label => $options) {
+            $tag_str .= '<optgroup label="' . self::escape($label).'"'.self::attr($additional).'>'.PHP_EOL;
+            $tag_str .= self::options($options, $selected);
+            $tag_str .= '</optgroup>'.PHP_EOL;
+        }
+        return $tag_str;
+    }
+
+    /**
+    * select box options
+    * @param array $options
+    * @param array $selected selected option(s). NOT label.
+    */
+    private static function options($options, $selected = null) {
+        // set default
+        if (isset($selected)) {
+            $selected = array_flip($selected);
+        }
+        // options
+        $tag_str = '';
+        foreach ($options as $option => $label) {
+            $tag_str .= '<option value="' . self::escape($option) . '"';
+            if (isset($selected[$option])) {
+                $tag_str .= ' selected="selected"';
+            }
+            $tag_str .= '>' . self::escape($label) . '</option>'.PHP_EOL;
+        }
         return $tag_str;
     }
 
@@ -198,14 +282,14 @@ class HTMLHandler {
     * @param $options
     * @param bool $multiple
     */
-    public static function makeDatalist($id_name,$options) {
+    public static function datalist($id_name,$options) {
         $options = call_user_func_array('array_map',array_merge(array(null),$options));
             if (array_depth($options) > 1) {
                 $options = $options[1];
             }
-        $tag_str = '<datalist id="'.self::specialchars($id_name).'">'.PHP_EOL;
+        $tag_str = '<datalist id="'.self::escape($id_name).'">'.PHP_EOL;
         foreach ($options as $value) {
-            $tag_str .= '<option value="'.self::specialchars($value).'">'.PHP_EOL;
+            $tag_str .= '<option value="'.self::escape($value).'">'.PHP_EOL;
         }
         $tag_str .= '<option value="--">'.PHP_EOL;
         $tag_str .= '</datalist>'.PHP_EOL;

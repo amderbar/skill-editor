@@ -3,8 +3,6 @@
 * session check.
 */
 require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
-
-require_once(full_path('models/html_handler.inc'));
 ?>
 <!DOCTYPE html>
 <html>
@@ -24,7 +22,7 @@ require_once(full_path('models/html_handler.inc'));
 				<li><?php HTMLHandler::input_submit('save', '上書き保存', 'editorArea') ?></li>
 				<!-- <li><?php
 				// if (count($tmpl_list)) {
-				// 	HTMLHandler::input_select('aplied_templete', $selected_tmpl'], $REQ_SCOPE['tmpl_list);
+				// 	HTMLHandler::selectbox('aplied_templete', $REQ_SCOPE['tmpl_list'], $selected_tmpl);
 				// } else {
 				// 	echo 'デフォルトテンプレート'.PHP_EOL;
 				// }
