@@ -66,7 +66,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
     if (isset($proj_id)) {
         foreach ($tbl_list as $tbl_num => $tbl_name) {
             $tab_class = ($tbl_num === $opened_tab) ? ' class="editting"' : '';
-            echo '<li'.$tab_class.'>'.HTMLHandler::link($tbl_name, $URL, ['id' => $proj_id, 'tab' => $tbl_num], $additional = null).'</li>'.PHP_EOL;
+            echo '<li'.$tab_class.'>'.HTMLHandler::link($tbl_name, $URL, ['id' => $proj_id, 'tab' => $tbl_num]).'</li>'.PHP_EOL;
         }
         if (isset($new_tab)) {
             echo '<li class="editting"><span id="new-tab-name">Untitled</span></li>'.PHP_EOL;
@@ -82,9 +82,9 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 if (isset($proj_id)) {
     if (isset($new_tab)) {
         $forms = array();
-        $forms['tbl_name'] = HTMLHandler::textbox('tbl_name', 'untitled');
+        $forms['tbl_name'] = HTMLHandler::textbox('tbl_name', 'untitled', ['required' => true, 'autofocus' => true]);
         $forms['proj_name'] = HTMLHandler::escape($proj_name);
-        $forms['colname'] = HTMLHandler::textbox('colname[]', '', ['required' => 'required']);
+        $forms['colname'] = HTMLHandler::textbox('colname[0]', '', ['required' => true]);
         echo <<< _HTML_
         <form action="editor_area.php" method="POST" id="tbl-def">
             <header>
@@ -99,19 +99,23 @@ if (isset($proj_id)) {
                     <tr><th>列名</th><td>{$forms['colname']}</td></tr>
 _HTML_;
         echo '<tr><th>入力形式</th><td>'.PHP_EOL;
-        echo HTMLHandler::selectbox('form_type[]', $form_types).PHP_EOL;
-        echo '<div name="step" hidden><label>刻み幅:'.HTMLHandler::number('step[]', 1).'</label></div>'.PHP_EOL;
-        echo '<div name="max" hidden><label>最大値:'.HTMLHandler::number('max[]').'</label></div>'.PHP_EOL;
-        echo '<div name="min" hidden><label>最小値:'.HTMLHandler::number('min[]').'</label></div>'.PHP_EOL;
-        echo '<div name="multi" hidden><label>'.HTMLHandler::radiocheck('checkbox', 'multi[]', 1).'複数選択をする</label></div>'.PHP_EOL;
-        // ↓プロジェクト内の全列リストが必要。表ごとにoptgroupにする
-        echo '<div name="ref" hidden><label>選択肢<br>'.HTMLHandler::selectbox('ref_dist[]', $tbl_list).'</label></div>'.PHP_EOL;
+        echo HTMLHandler::selectbox('form_type[0]', $form_types).PHP_EOL;
+        echo '<div name="step" hidden><label>刻み幅:'
+        .HTMLHandler::number('step[0]', 1, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
+        echo '<div name="max" hidden><label>最大値:'
+        .HTMLHandler::number('max[0]', null, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
+        echo '<div name="min" hidden><label>最小値:'
+        .HTMLHandler::number('min[0]', null, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
+        echo '<div name="multi" hidden><label>'
+        .HTMLHandler::radiocheck('checkbox', 'multiple[0]', 1, null, ['disabled' => true]).'複数選択をする</label></div>'.PHP_EOL;
+        echo '<div name="ref" hidden><label>選択肢<br>'
+        .HTMLHandler::selectbox('ref_dist[0]', $col_list, null, false, ['disabled' => true]).'</label></div>'.PHP_EOL;
         echo '</td></tr>'.PHP_EOL;
-        // echo '<tr><th>データ型</th><td>'.HTMLHandler::selectbox('type[]', $data_types, ['TEXT']).'</td></tr>'.PHP_EOL;
-        echo '<tr><th>初期値</th><td>'.HTMLHandler::textbox('default[]', '').'</td></tr>'.PHP_EOL;
-        echo '<tr><th>一意</th><td>'.HTMLHandler::radiocheck('checkbox', 'uniq[]', 1).'</td></tr>'.PHP_EOL;
-        echo '<tr><th>非Null</th><td>'.HTMLHandler::radiocheck('checkbox', 'not_null[]', 1).'</td></tr>'.PHP_EOL;
-        // echo '<tr><th>外部参照</th><td>'.HTMLHandler::radiocheck('checkbox', 'foreign[]', 1).'</td></tr>'.PHP_EOL;
+        // echo '<tr><th>データ型</th><td>'.HTMLHandler::selectbox('type[0]', $data_types, ['TEXT']).'</td></tr>'.PHP_EOL;
+        echo '<tr><th>初期値</th><td>'.HTMLHandler::textbox('default[0]', '').'</td></tr>'.PHP_EOL;
+        echo '<tr><th>一意</th><td>'.HTMLHandler::radiocheck('checkbox', 'uniq[0]', 1).'</td></tr>'.PHP_EOL;
+        echo '<tr><th>非Null</th><td>'.HTMLHandler::radiocheck('checkbox', 'not_null[0]', 1).'</td></tr>'.PHP_EOL;
+        // echo '<tr><th>外部参照</th><td>'.HTMLHandler::radiocheck('checkbox', 'foreign[0]', 1).'</td></tr>'.PHP_EOL;
         echo <<< _HTML_
                 </tbody>
             </table>
@@ -119,7 +123,7 @@ _HTML_;
         echo HTMLHandler::hidden('id', $proj_id).PHP_EOL;
         echo HTMLHandler::submit('save', '作成').PHP_EOL;
         echo '</form>'.PHP_EOL;
-
+        //
         echo '<h2>Table Desgin Preview : Template ';
         $options = array_keys($tbl_tmpls);
         echo HTMLHandler::selectbox('tbl_templs', $options, [0], false, ['id' => 'tbl_templs']);

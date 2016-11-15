@@ -28,8 +28,8 @@ $(function(){
             $.post("index.php",
                 { 'proj-name': proj_name }
             ).done(function(id){
-                    location.reload(true);
-                    changeEditor(id);
+                location.reload(true);
+                changeEditor(id);
             }).fail(function(data){
                 alert('error!!!');
             });

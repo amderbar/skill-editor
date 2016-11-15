@@ -6,8 +6,8 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 
 require_once(full_path('models/db_manager.inc'));
 define('ROOT_DB', 'resources/system_admin.db');
-define('ACTUAL_TBL', 'actual_names_tbl');
-define('ACTUAL_COL', 'actual_names_col');
+define('SYSTEM_TBL', 's_admin_tbl');
+define('SYSTEM_COL', 's_admin_col');
 
 /**
  * 
@@ -91,15 +91,21 @@ class DBEditor {
             }
             $db_con = $this->open($id, true);
             // system_admin tables
-            $tdo = new TableDefineObject(ACTUAL_TBL);
+            $tdo = new TableDefineObject(SYSTEM_TBL);
             $tdo->appendColumn('tbl_name', 'text', ['uniq' => true, 'not_null' => true]);
             // $tdo->appendColumn('actual_name', 'text', ['foreign' => ['ref' => 'sqlite_master(name)', 'del' => 'cascade']]);
             $tdo->appendColumn('actual_name', 'text', ['uniq' => true, 'not_null' => true]);
             $db_con->createTable($tdo, true);
-            $tdo = new TableDefineObject(ACTUAL_COL);
-            $tdo->appendColumn('tbl_id', 'integer', ['foreign' => ['ref' => 'actual_names_tbl(id)', 'del' => 'cascade']]);
+            $tdo = new TableDefineObject(SYSTEM_COL);
+            $tdo->appendColumn('tbl_id', 'integer', ['foreign' => ['ref' => SYSTEM_TBL.'(id)', 'del' => 'cascade']]);
             $tdo->appendColumn('col_name', 'text', ['not_null' => true]);
             $tdo->appendColumn('actual_name', 'text', ['not_null' => true]);
+            $tdo->appendColumn('ref_col', 'integer', ['foreign' => ['ref' => SYSTEM_COL.'(id)', 'del' => 'null']]);
+            $tdo->appendColumn('form_type', 'text', ['not_null' => true]);
+            $tdo->appendColumn('step', 'real');
+            $tdo->appendColumn('max', 'real');
+            $tdo->appendColumn('min', 'real');
+            $tdo->appendColumn('multiple', 'text', ['not_null' => true, 'default' => 'false']);
             $db_con->createTable($tdo, true);
             return $id;
         } catch (PDOException $e){
@@ -190,7 +196,7 @@ class DBEditor {
                 $table_list = call_user_func_array('array_map',array_merge(array(null),$table_list));
                 $table_list = array_diff(
                     call_user_func_array('array_merge',$table_list),
-                    array('sqlite_sequence', ACTUAL_TBL, ACTUAL_COL)
+                    array('sqlite_sequence', SYSTEM_TBL, SYSTEM_COL)
                 );
             }            
             return array_values($table_list);
@@ -205,13 +211,13 @@ class DBEditor {
     public function addUserTable($proj_id, $tbl_name, $cols_hash, $constraints_hash = array()) {
         try {
             //トランザクション処理必要
-            $actual_tbl_name = fnv132($tbl_name);
-            $actual_col_name = array();
-            $tdo = new TableDefineObject($actual_tbl_name);
+            $SYSTEM_TBL_name = fnv132($tbl_name);
+            $SYSTEM_COL_name = array();
+            $tdo = new TableDefineObject($SYSTEM_TBL_name);
             foreach ($cols_hash as $col_name => $settings) {
                 $actual_name = fnv132($col_name);
                 $tdo->appendColumn($actual_name, $settings['type'], $settings['constraints']);
-                $actual_col_name[$col_name] = $actual_name;
+                $SYSTEM_COL_name[$col_name] = $actual_name;
             }
             foreach ($constraintss_hash as $con_name => $settings) {
                 $targets = $settings['targets'];
@@ -220,20 +226,20 @@ class DBEditor {
                 }
                 $references = array();
                 foreach ($settings['references'] as $tbl => $cols) {
-                    $actual_cols = array();
+                    $SYSTEM_COLs = array();
                     foreach ($cols as $col) {
-                        $actual_cols[] = fnv132($col);
+                        $SYSTEM_COLs[] = fnv132($col);
                     }
-                    $references[fnv132($tbl)] = $actual_cols;
+                    $references[fnv132($tbl)] = $SYSTEM_COLs;
                 }
                 $tdo->appendConstraint($con_name, $targets, $references);
             }
             $this->con[$proj_id]->createTable($tdo);
             // システムテーブルに表名と列名を登録
-            $tbl_id = $this->insertData($proj_id, ACTUAL_TBL,
-                ['tbl_name' => $tbl_name, 'actual_name' => $actual_tbl_name]);
-            foreach ($actual_col_name as $col_name => $actual_name) {
-                $this->insertData($proj_id, ACTUAL_COL,
+            $tbl_id = $this->insertData($proj_id, SYSTEM_TBL,
+                ['tbl_name' => $tbl_name, 'actual_name' => $SYSTEM_TBL_name]);
+            foreach ($SYSTEM_COL_name as $col_name => $actual_name) {
+                $this->insertData($proj_id, SYSTEM_COL,
                     ['tbl_id' => $tbl_id, 'col_name' => $col_name, 'actual_name' => $actual_name]);
             }
             return;
@@ -412,6 +418,11 @@ class DBEditor {
             $tdo->appendColumn('proj_id', 'integer', ['foreign' => ['ref' => 'projects(id)', 'del' => 'null']]);
             $tdo->appendColumn('tmpl_name', 'text', ['not_null' => true]);
             $tdo->appendConstraint('uniq', ['proj_id', 'tmpl_name']);
+            $this->con[0]->createTable($tdo, true);
+            // users table
+            $tdo = new TableDefineObject('users');
+            $tdo->appendColumn('name', 'text', ['not_null' => true]);
+            $tdo->appendColumn('passwd', 'text', ['not_null' => true]);
             $this->con[0]->createTable($tdo, true);
         } catch (PDOException $e){
             die('PDOException throwen:'. $e->getMessage());

@@ -29,6 +29,7 @@ class HTMLHandler {
             'time' => '時刻',
             'datetime-local' => 'ローカル日時', // timestampっぽい
             'number' => '数値(直接入力)',
+            'numlist' => '入力候補付き数値(直接入力)',
             'range' => '数値(スライダー)',
             'color' => '色',
             'checkbox' => '単一チェックボックス',
@@ -39,7 +40,7 @@ class HTMLHandler {
         ),
         'other tag' => array(
             'textarea' => '複数行テキスト',
-            'selectbox' => 'プルダウン'
+            'select' => 'プルダウン'
         )
     );
 
@@ -77,10 +78,14 @@ class HTMLHandler {
         }
         $tmp = array();
         foreach ($attr_hash as $name => $value) {
-            if (is_array($value)) {
-                $value = implode(' ', $value);
+            $attr_str = self::escape($name);
+            if (!is_bool($value)) {
+                if (is_array($value)) {
+                    $value = implode(' ', $value);
+                }
+                $attr_str .= '="'.self::escape($value).'"';
             }
-            $tmp[] = self::escape($name).'="'.self::escape($value).'"';
+            $tmp[] = $attr_str;
         }
         return ' '.implode(' ', $tmp);
     }
@@ -182,7 +187,7 @@ class HTMLHandler {
     * @param $values is an array has checkbox value as key and label text as value of array.
     * @param $checked_value
     */
-    public static function radiocheck ($type, $element_name, $values, $checked_value = null) {
+    public static function radiocheck ($type, $element_name, $values, $checked_value = null, $additional = null) {
         $tag_str_common = '<input type="' . $type . '" name="' . $element_name . '" value="';
         if (!is_array($values)) {
             $values = array($values => null);
@@ -197,7 +202,7 @@ class HTMLHandler {
             if ($checked_value == $value) {
                 $tag_str .= ' checked="checked"';
             }
-            $tag_str .= '>';
+            $tag_str .= self::attr($additional).'>';
             if ($label) {
                 $tag_str .= self::escape($label).'</label>';
             }

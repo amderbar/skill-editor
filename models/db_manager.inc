@@ -259,7 +259,7 @@ class TableDefineObject {
     /**
     * 
     */
-    public function appendColumn($col_name, $type, $constraints) {
+    public function appendColumn($col_name, $type, $constraints = array()) {
         $col_hash = array(
             'name' => $col_name,
             'type' => $type,

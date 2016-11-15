@@ -44,6 +44,14 @@ class EditorServlet extends Servlet {
                 $REQ_SCOPE['opened_tab'] = null;
                 $REQ_SCOPE['proj_name'] = self::$db_editor->projName($current_proj_id);
                 $tmpl_list = self::$db_editor->getAllTemplates();
+                $REQ_SCOPE['col_list'] = array('This Table' => ['this.0' => '']);
+                // モック生成コード
+                foreach ($table_list as $tbl_num => $tbl_name) {
+                    $REQ_SCOPE['col_list'][$tbl_name] = array();
+                    for ($i=0; $i < 4; $i++) { // 適当に列があることにする
+                        $REQ_SCOPE['col_list'][$tbl_name][$tbl_num.','.$i] = 'column'.$i;
+                    }
+                }
                 $REQ_SCOPE['tbl_tmpls'] = ['default' => full_path('resources/templates/default_template.php')];
                 foreach ($tmpl_list as $tmpl) {
                     $REQ_SCOPE['tbl_tmpls'][$tmpl['tmpl_name']]
