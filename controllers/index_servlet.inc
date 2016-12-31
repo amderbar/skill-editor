@@ -8,64 +8,50 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 * 
 */
 require_once(full_path('controllers/servlet.inc'));
-require_once(full_path('models/db_editor.inc'));
 
 /**
  * 
  */
 class IndexServlet extends Servlet {
-    /**  */
-    private static $db_editor = null;
 
     /**
     * 
     */
-    public static function doGet($req='') {
+    public function doGet($req='') {
         $REQ_SCOPE = array();
         // リクエストパラメータidがセットされている時、そのidのプロジェクトが開かれる
         if (isset($_GET['id']) && $_GET['id']!='') {
             // リクエストスコープ相当の配列にidを格納
             $REQ_SCOPE['proj_id'] = intval($_GET['id']);
         }
-        return self::foward('view/index_page.inc', $REQ_SCOPE);
+        return $this->foward('view/index_page.inc', $REQ_SCOPE);
     }
 
     /**
     * 
     */
-    public static function doPost($req='') {
-        $proj_id = isset($_GET['id']) ? intval($_GET['id']) : null;
+    public function doPost($req='') {
         if (isset($_POST['proj-name']) && ($_POST['proj-name'] != '')) {
             // プロジェクトの新規作成時
-            $proj_id = self::$db_editor->registerDB($_POST['proj-name']);
+            $proj_id = $this->db_editor->registerDB($_POST['proj-name']);
             echo $proj_id;
             return;
         } elseif (isset($_FILES['tmpl-file'])) {
             // テンプレートの登録時
-            $tmpl_name = self::upLoadFile($proj_id);
-            self::$db_editor->registerTemplate($proj_id,$tmpl_name);
+            $tmpl_name = $this->upLoadFile($proj_id);
+            $this->db_editor->registerTemplate($proj_id,$tmpl_name);
         } elseif (isset($_POST['save'])) {
             // データの上書き保存時
-            self::saveData($proj_id);
+            $this->saveData($proj_id);
         }
-        return self::redirect($_SERVER["REQUEST_URI"]);
-        // return self::doGet();
-    }
-
-    /**
-    * サーブレットの初期設定メソッド
-    */
-    public static function setup($arg='') {
-        if (self::$db_editor == null) {
-            self::$db_editor = new DBEditor();
-            // self::$db_editor->dropRoot();
-        }
+        return $this->redirect($_SERVER["REQUEST_URI"]);
+        // return $this->doGet();
     }
 
     /**
     * ファイルアップロード受付メソッド
     */
-    private static function upLoadFile($proj_id) {
+    private function upLoadFile($proj_id) {
         // ファイル名についてのその他のバリデーションが必要
         switch ($_FILES['tmpl-file']['error']) {
             case UPLOAD_ERR_OK:
@@ -88,7 +74,7 @@ class IndexServlet extends Servlet {
     * データ保存メソッド.現状ではSNTRPG_Skills専用
     * しかも既存データの更新は特に考えてない
     */
-    private static function saveData($proj_id) {
+    private function saveData($proj_id) {
         // POSTデータに対するバリデーションが必要
         $_POST['save'] = null;
         $column_map = array_keys($_POST);

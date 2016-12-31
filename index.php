@@ -7,11 +7,11 @@ session_start();
 require_once('./common.inc');
 require_once(full_path('controllers/index_servlet.inc'));
 
-IndexServlet::setup();
+$servlet = new IndexServlet();
 if($_SERVER["REQUEST_METHOD"] === 'GET'){
-    IndexServlet::doGet();
+    $servlet->doGet();
 } else if($_SERVER["REQUEST_METHOD"] === 'POST'){
-    IndexServlet::doPost();
+    $servlet->doPost();
 }
 
 ?>

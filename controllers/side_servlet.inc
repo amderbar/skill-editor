@@ -8,41 +8,35 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 * 
 */
 require_once(full_path('controllers/servlet.inc'));
-require_once(full_path('models/db_editor.inc'));
 
 /**
  * 
  */
 class SideServlet extends Servlet {
-    /**  */
-    private static $db_editor = null;
 
     /**
     * 
     */
-    public static function doGet($req='') {
+    public function doGet($req='') {
         $REQ_SCOPE = array();
-        $proj_list = self::$db_editor->listDB();
+        $proj_list = $this->db_editor->listDB();
         $REQ_SCOPE['proj_list'] = $proj_list;
         $tmpl_list = null;
-        // リクエストパラメータidがセットされている時、そのidのプロジェクトが開かれる
-        if (isset($_GET['id']) && $_GET['id'] != '') {
-            $current_proj_id = intval($_GET['id']);
-            if(self::$db_editor->open($current_proj_id) === false){
-                return self::redirect($_SERVER['PHP_SELF']);
+            if($this->db_editor->open($current_proj_id) === false){
+                return $this->redirect($_SERVER['PHP_SELF']);
             }
-            $table_list = self::$db_editor->listTables($current_proj_id);
+            $table_list = $this->db_editor->listUsrTables($current_proj_id);
             // リクエストスコープ相当の配列にデータを格納
             $REQ_SCOPE['opend_id'] = $current_proj_id;
             $REQ_SCOPE['current_proj_tbl_list'] = $table_list;
         }
-        return self::foward('view/side_pain.inc', $REQ_SCOPE);
+        return $this->foward('view/side_pain.inc', $REQ_SCOPE);
     }
 
     /**
     * 
     */
-    public static function doPost($req='') {
+    public function doPost($req='') {
         pre_dump($_POST);
         if (isset($_POST['fMode'])) {
             if ($_POST['fMode'] == 'del-prj') {
@@ -51,22 +45,12 @@ class SideServlet extends Servlet {
                 // CSRF対策のトークンチェックも必要
                 $proj_id = isset($_POST['id']) ? intval($_POST['id']) : null;
                 if ($proj_id) {
-                    self::$db_editor->deleteDB($proj_id);
+                    $this->db_editor->deleteDB($proj_id);
                 }
             }
         }
-        return self::redirect($_SERVER["REQUEST_URI"]);
-        // return self::doGet($req);
-    }
-
-    /**
-    * サーブレットの初期設定メソッド
-    */
-    public static function setup($arg='') {
-        if (self::$db_editor == null) {
-            self::$db_editor = new DBEditor();
-            // self::$db_editor->dropRoot();
-        }
+        return $this->redirect($_SERVER["REQUEST_URI"]);
+        // return $this->doGet($req);
     }
 }
 
