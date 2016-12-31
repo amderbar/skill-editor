@@ -8,10 +8,8 @@ require_once(full_path('gatekeeper.inc'));
 */
 define('VERSION', 'ver.0.0.0');
 define('ENCODE', 'UTF-8');
-mb_internal_encoding(ENCODE);
-mb_regex_encoding();
-
-$URL = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+// mb_internal_encoding(ENCODE);
+// mb_regex_encoding();
 
 /**
 * load library and common functions
