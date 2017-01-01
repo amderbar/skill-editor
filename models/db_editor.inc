@@ -8,16 +8,18 @@ require_once(full_path('models/db_manager.inc'));
 define('ROOT_DB', 'resources/system_admin.db');
 define('SYSTEM_TBL', 's_admin_tbl');
 define('SYSTEM_COL', 's_admin_col');
+define('NUM_SETTINGS', 's_num_settings');
 
 /**
  * 
  */
 class DBEditor {
     private $con = array();
+    private $form_id = array();
 
     function __construct() {
         $this->open(0);
-        $this->setupRootDB();
+        $this->setupSystemDB();
     }
 
     /**
@@ -46,7 +48,7 @@ class DBEditor {
     * 
     */
     public function projName($proj_id) {
-        $row = $this->con[0]->findByKey('projects', 'id', $proj_id, 'proj_name');
+        $row = $this->con[0]->findByKey('projects', 'id', $proj_id, ['proj_name']);
         return (isset($row[0]['proj_name'])) ? $row[0]['proj_name'] : null;
     }
 
@@ -70,30 +72,15 @@ class DBEditor {
     */
     public function registerDB($proj_name) {
         try {
-            //トランザクション処理必要
-            $dto = new class($proj_name) extends DTO {
-                private $table = 'projects';
-                function __construct($proj_name) {
-                    $this->setParm(':proj_name', $proj_name);
-                }
-                public function getInsertSQL() {
-                    return 'INSERT INTO '.$this->table.'(proj_name) VALUES (:proj_name)';
-                }
-            };
-            $id = $this->con[0]->insert($dto);
-            if (!$id) {
-                $row = $this->con[0]->findByKey('projects','proj_name', $proj_name);
-                $id = $row[0]['id'];
-            }
-            $tmpl_dir = full_path(sprintf('resources/templates/proj%03d', $id), true);
+            $proj_id = $this->insertData(0, 'projects', ['proj_name' => $proj_name], true);
+            $tmpl_dir = full_path(sprintf('resources/templates/proj%03d', $proj_id), true);
             if(!file_exists($tmpl_dir)){
                 mkdir($tmpl_dir, 0666);
             }
-            $db_con = $this->open($id, true);
+            $db_con = $this->open($proj_id, true);
             // system_admin tables
             $tdo = new TableDefineObject(SYSTEM_TBL);
             $tdo->appendColumn('tbl_name', 'text', ['uniq' => true, 'not_null' => true]);
-            // $tdo->appendColumn('actual_name', 'text', ['foreign' => ['ref' => 'sqlite_master(name)', 'del' => 'cascade']]);
             $tdo->appendColumn('actual_name', 'text', ['uniq' => true, 'not_null' => true]);
             $db_con->createTable($tdo, true);
             $tdo = new TableDefineObject(SYSTEM_COL);
@@ -101,15 +88,19 @@ class DBEditor {
             $tdo->appendColumn('col_name', 'text', ['not_null' => true]);
             $tdo->appendColumn('actual_name', 'text', ['not_null' => true]);
             $tdo->appendColumn('ref_col', 'integer', ['foreign' => ['ref' => SYSTEM_COL.'(id)', 'del' => 'null']]);
-            $tdo->appendColumn('form_type', 'text', ['not_null' => true]);
+            $tdo->appendColumn('form_type', 'integer', ['not_null' => true]);
+            $tdo->appendColumn('multiple', 'boolean', ['not_null' => true, 'default' => false]);
+            $db_con->createTable($tdo, true);
+            $tdo = new TableDefineObject(NUM_SETTINGS);
+            $tdo->appendColumn('col_id', 'integer', ['foreign' => ['ref' => SYSTEM_COL.'(id)', 'del' => 'cascade']]);
             $tdo->appendColumn('step', 'real');
             $tdo->appendColumn('max', 'real');
             $tdo->appendColumn('min', 'real');
-            $tdo->appendColumn('multiple', 'text', ['not_null' => true, 'default' => 'false']);
             $db_con->createTable($tdo, true);
-            return $id;
+            return $proj_id;
         } catch (PDOException $e){
-            die('PDOException throwen:'. $e->getMessage());
+            error_log($e->getMessage());
+            die();
         }
     }
 
@@ -125,7 +116,9 @@ class DBEditor {
         if($tmpl_dir = full_path(sprintf('resources/templates/proj%03d', $proj_id))) {
             if ($handle = opendir($tmpl_dir)) {
                 while (false !== ($tmpl = readdir($handle))) {
-                    unlink($tmpl);
+                    if ($tmpl != "." && $tmpl != "..") {
+                        unlink($tmpl);
+                    }
                 }
                 rmdir($tmpl_dir);
             }
@@ -136,21 +129,24 @@ class DBEditor {
         }
     }
 
+    /**
+    * 
+    */
     public function registerTemplate($proj_id, $tmpl_name) {
         try {
-            $dto = new class($proj_id,$tmpl_name) extends DTO {
-                function __construct($proj_id,$tmpl_name) {
-                    $this->setParm(':proj_id',$proj_id);
-                    $this->setParm(':tmpl_name',$tmpl_name);
+            $dto = new class($proj_id, $tmpl_name) extends DTO {
+                function __construct($proj_id, $tmpl_name) {
+                    $this->setParm(':proj_id', $proj_id);
+                    $this->setParm(':tmpl_name', $tmpl_name);
                 }
                 public function getInsertSQL() {
-                    return 'INSERT INTO templates(proj_id,tmpl_name) VALUES (:proj_id,:tmpl_name);';
+                    return 'INSERT INTO templates(proj_id, tmpl_name) VALUES (:proj_id, :tmpl_name);';
                 }
             };
             if ($this->con[0]->insert($dto)) {
-                $newid = $this->con[0]->execSQL('select last_insert_rowid() AS id');
-                $id = $newid[0]['id'];
-                return $id;
+                $tmpl_id = $this->con[0]->execSQL('select last_insert_rowid() AS id');
+                $tmpl_id = $tmpl_id[0]['id'];
+                return $tmpl_id;
             }
             return false;
         } catch (PDOException $e){
@@ -188,18 +184,24 @@ class DBEditor {
     /**
     * 
     */
-    public function listTables($proj_id) {
+    public function listUsrTables($proj_id) {
         try {
-            $table_list = $this->con[$proj_id]->findByKey('sqlite_master','type','table','name');
-            $table_list = array_merge($table_list, $this->con[$proj_id]->findByKey('sqlite_master','type','view','name'));
-            if ($table_list) {
-                $table_list = call_user_func_array('array_map',array_merge(array(null),$table_list));
-                $table_list = array_diff(
-                    call_user_func_array('array_merge',$table_list),
-                    array('sqlite_sequence', SYSTEM_TBL, SYSTEM_COL)
-                );
-            }            
-            return array_values($table_list);
+            $table_list = array();
+            foreach ($this->con[$proj_id]->fetchAll(SYSTEM_TBL, 'id, tbl_name') as $row) {
+                $table_list[$row['id']] = $row['tbl_name'];
+            }
+            return $table_list;
+        } catch (PDOException $e){
+            die('PDOException throwen:'. $e->getMessage());
+        }
+    }
+
+    /**
+    * 
+    */
+    public function listColumns($proj_id, $tbl_id) {
+        try {
+            return $this->con[$proj_id]->findByKey(SYSTEM_COL, 'tbl_id', $tbl_id, ['id', 'col_name']);
         } catch (PDOException $e){
             die('PDOException throwen:'. $e->getMessage());
         }
@@ -211,38 +213,114 @@ class DBEditor {
     public function addUserTable($proj_id, $tbl_name, $cols_hash, $constraints_hash = array()) {
         try {
             //トランザクション処理必要
-            $SYSTEM_TBL_name = fnv132($tbl_name);
-            $SYSTEM_COL_name = array();
-            $tdo = new TableDefineObject($SYSTEM_TBL_name);
-            foreach ($cols_hash as $col_name => $settings) {
-                $actual_name = fnv132($col_name);
-                $tdo->appendColumn($actual_name, $settings['type'], $settings['constraints']);
-                $SYSTEM_COL_name[$col_name] = $actual_name;
-            }
-            foreach ($constraintss_hash as $con_name => $settings) {
-                $targets = $settings['targets'];
-                foreach ($targets as $key => $value) {
-                    $targets[$key] = fnv132($value);
-                }
-                $references = array();
-                foreach ($settings['references'] as $tbl => $cols) {
-                    $SYSTEM_COLs = array();
-                    foreach ($cols as $col) {
-                        $SYSTEM_COLs[] = fnv132($col);
-                    }
-                    $references[fnv132($tbl)] = $SYSTEM_COLs;
-                }
-                $tdo->appendConstraint($con_name, $targets, $references);
-            }
-            $this->con[$proj_id]->createTable($tdo);
-            // システムテーブルに表名と列名を登録
+            // システムテーブルに表名を登録
+            $actual_tbl_name = 'u_'.fnv132($tbl_name);
             $tbl_id = $this->insertData($proj_id, SYSTEM_TBL,
-                ['tbl_name' => $tbl_name, 'actual_name' => $SYSTEM_TBL_name]);
-            foreach ($SYSTEM_COL_name as $col_name => $actual_name) {
-                $this->insertData($proj_id, SYSTEM_COL,
-                    ['tbl_id' => $tbl_id, 'col_name' => $col_name, 'actual_name' => $actual_name]);
+                ['tbl_name' => $tbl_name, 'actual_name' => $actual_tbl_name]);
+            // システムテーブルに列名を登録
+            $actual_col_name = array();
+            $i = 0;
+            foreach ($cols_hash as $def_hash) {
+                $i++;
+                $actual_name = 'c_'.fnv132($def_hash['col_name']);
+                $form_settings = array(
+                    'tbl_id' => $tbl_id,
+                    'col_name' => $def_hash['col_name'],
+                    'actual_name' => $actual_name,
+                    'form_type' => $this->form_id[$def_hash['form_type']],
+                    'multiple' => isset($def_hash['multiple'])
+                );
+                $col_id = $this->insertData($proj_id, SYSTEM_COL, $form_settings);
+                if (isset($def_hash['step']) && isset($def_hash['max']) && isset($def_hash['min'])) {
+                    $this->insertData($proj_id, NUM_SETTINGS, [
+                        'col_id' => $col_id,
+                        'step' => $def_hash['step'],
+                        'max' => $def_hash['max'],
+                        'min' => $def_hash['min']
+                    ]);
+                }
+                $actual_col_name[$i] = ['col_id' => $col_id, 'actural' => $actual_name];
             }
-            return;
+            $i = 0;
+            foreach ($cols_hash as $def_hash) {
+                $i++;
+                if (isset($def_hash['ref_dist'])) {
+                    if ($def_hash['ref_dist'] < 0) {
+                        $def_hash['ref_dist'] = $actual_col_name[-$def_hash['ref_dist']]['col_id'];
+                    }
+                    $this->updateData($proj_id, SYSTEM_COL,
+                        ['ref_col' => $def_hash['ref_dist']],
+                        ['id' => $actual_col_name[$i]['col_id']]
+                    );
+                }
+            }
+            // テーブル作成
+            $tdo = new TableDefineObject($actual_tbl_name);
+            $i = 0;
+            foreach ($cols_hash as $def_hash) {
+                $i++;
+                switch ($def_hash['form_type']) {
+                    case 'color':
+                    case 'text':
+                    case 'textarea':
+                    case 'tel':
+                    case 'url':
+                    case 'email':
+                    case 'password':
+                    case 'datetime':
+                        $data_type = 'TEXT';
+                        break;
+
+                    case 'date':
+                    case 'month':
+                    case 'week':
+                    case 'time':
+                    case 'datetime-local':
+                        $data_type = 'DATETIME';
+                        break;
+
+                    case 'listext':
+                    case 'number':
+                    case 'numlist':
+                    case 'range':
+                    case 'select':
+                    case 'multicheck':
+                    case 'radio':
+                        $data_type = 'NUMERIC';
+                        break;
+
+                    case 'checkbox':
+                        $data_type = 'BOOLEAN';
+                        break;
+
+                    case 'file':
+                    case 'image':
+                        $data_type = 'BLOB';
+                        break;
+                }
+                $col_constraints = array();
+                $col_constraints['default'] = ($def_hash['default']) ? $def_hash['default'] : null;
+                $col_constraints['not_null'] = isset($def_hash['not_null']);
+                $col_constraints['uniq'] = isset($def_hash['uniq']);
+                $tdo->appendColumn($actual_col_name[$i]['actural'], $data_type, $col_constraints);
+            }
+            // foreach ($constraints_hash as $def_hash) {
+            //     $targets = $def_hash['targets'];
+            //     foreach ($targets as $key => $value) {
+            //         $targets[$key] = fnv132($value);
+            //     }
+            //     $references = array();
+            //     foreach ($def_hash['references'] as $tbl => $cols) {
+            //         $SYSTEM_COLs = array();
+            //         foreach ($cols as $col) {
+            //             $SYSTEM_COLs[] = fnv132($col);
+            //         }
+            //         $references[fnv132($tbl)] = $SYSTEM_COLs;
+            //     }
+            //     $tdo->appendConstraint($con_name, $targets, $references);
+            // }
+            $this->con[$proj_id]->createTable($tdo);
+            return $tbl_id;
         } catch (PDOException $e){
             die('PDOException throwen:'. $e->getMessage());
         }
@@ -251,9 +329,33 @@ class DBEditor {
     /**
     * 
     */
-    public function listData($proj_id, $table) {
+    public function listData($proj_id, $tbl_id) {
         try {
-            return $this->con[$proj_id]->fetchAll($table);
+            $tmp_table = $this->con[$proj_id]->findByKey(SYSTEM_TBL, 'id', $tbl_id, ['actual_name']);
+            $tmp_table = $this->con[$proj_id]->fetchAll($tmp_table[0]['actual_name']);
+            $list_data = array();
+            $col_names = array();
+            foreach ($tmp_table as $row) {
+                $tmp_row = array();
+                foreach ($row as $col => $value) {
+                    if ($col == 'id') {
+                        $col_names[$col] = 'rid';
+                    } elseif (!isset($col_names[$col])) {
+                        $tmp = $this->con[$proj_id]->findByKey(SYSTEM_COL, 'actual_name', $col, ['col_name']);
+                        error_log(var_export($col, true));
+                        error_log(var_export($tmp, true));
+                        $col_names[$col] = $tmp[0]['col_name'];
+                    }
+                    $tmp_row[$col_names[$col]] = $value;
+                }
+                $list_data[] = $tmp_row;
+            }
+            $tmp_row = array();
+            foreach ($this->listColumns($proj_id, $tbl_id) as $col) {
+                $tmp_row[$col['col_name']] = null;
+            };
+            $list_data[] = $tmp_row;
+            return $list_data;
         } catch (PDOException $e){
             die('PDOException throwen:'. $e->getMessage());
         }
@@ -262,32 +364,46 @@ class DBEditor {
     /**
     * 
     */
-    public function insertData($proj_id, $table, $parms) {
-        $dto = new class($key, $colname, $parms[$key]) extends DTO {
+    public function insertData($proj_id, $table, $parms, $if_redundant = false) {
+        $dto = new class($table, $parms) extends DTO {
             private $table = '';
-            private $colname = '';
-            function __construct($key, $colname, $parm) {
-                $this->table = $key . 's';
-                $this->colname = $colname;
-                $this->setParm(':'.$colname, $parm);
-            }
-            public function getInsertSQL() {
-                return 'INSERT INTO '.$this->table.'('.$this->colname.') VALUES (:'.$this->colname.');';
+            function __construct($table, $parms) {
+                $this->table = $table;
+                foreach ($parms as $colname => $value) {
+                    $this->setParm(':'.$colname, $value);
+                }
             }
             public function getTableName(){ return $this->table; }
         };
         try {
             //トランザクション処理必要
-            if ($this->con[$proj_id]->insert($dto)) {
-                $newid = $this->con[$proj_id]->execSQL('select last_insert_rowid() AS id');
-                $id = $newid[0]['id'];
-            } else {
-                $row = $this->con[$proj_id]->findByKey(
-                    $dto->getTableName(), $colname, $parms[$key]);
-                $id = $row[0]['id'];
-            }
+            return $this->con[$proj_id]->insert($dto, $if_redundant);
         } catch (PDOException $e){
-            die('PDOException throwen:'. $e->getMessage());
+            error_log($e->getMessage());
+            die();
+        }
+    }
+
+    /**
+    * 
+    */
+    public function updateData($proj_id, $table, $parms, $conditions = null) {
+        $dto = new class($table, $parms) extends DTO {
+            private $table = '';
+            function __construct($table, $parms) {
+                $this->table = $table;
+                foreach ($parms as $colname => $value) {
+                    $this->setParm(':'.$colname, $value);
+                }
+            }
+            public function getTableName(){ return $this->table; }
+        };
+        try {
+            //トランザクション処理必要
+            return $this->con[$proj_id]->update($dto, $conditions);
+        } catch (PDOException $e){
+            error_log($e->getMessage());
+            die();
         }
     }
 
@@ -305,7 +421,7 @@ class DBEditor {
         $foreign_keys = array('timing' => false, 'target' => false,
             'renge' => false,'icon' => 'file_name');
         try {
-            // 外部キーの要素を登録し、idに変換
+            // 外部キーの要素を登録し、rowidに変換
             foreach ($foreign_keys as $key => $colname) {
                 $colname = $colname ? $colname : $key ;
                 $dto = new class($key,$colname,$parms[$key]) extends DTO {
@@ -322,14 +438,14 @@ class DBEditor {
                     public function getTableName(){return $this->table;}
                 };
                 if ($this->con[$proj_id]->insert($dto)) {
-                    $newid = $this->con[$proj_id]->execSQL('select last_insert_rowid() AS id');
-                    $id = $newid[0]['id'];
+                    $row_id = $this->con[$proj_id]->execSQL('select last_insert_rowid() AS id');
+                    $row_id = $row_id[0]['id'];
                 } else {
                     $row = $this->con[$proj_id]->findByKey(
-                        $dto->getTableName(),$colname,$parms[$key]);
-                    $id = $row[0]['id'];
+                        $dto->getTableName(), $colname, $parms[$key], ['id']);
+                    $row_id = $row[0]['id'];
                 }
-                $parms[$key] = $id;
+                $parms[$key] = $row_id;
             }
             // スキルデータ本体を登録
             $dto = new class($parms) extends DTO {
@@ -353,11 +469,11 @@ class DBEditor {
                 public function getTableName(){return $this->table;}
             };
             if ($this->con[$proj_id]->insert($dto)) {
-                $newid = $this->con[$proj_id]->execSQL('select last_insert_rowid() AS id');
-                $skill_id = $newid[0]['id'];
+                $row_id = $this->con[$proj_id]->execSQL('select last_insert_rowid() AS id');
+                $skill_id = $row_id[0]['id'];
             } else {
                 $row = $this->con[$proj_id]->findByKey(
-                    'skills','name',$parms['name']);
+                    'skills', 'name', $parms['name'], ['id']);
                 $skill_id = $row[0]['id'];
             }
             // 習得前提条件が存在する場合
@@ -375,12 +491,12 @@ class DBEditor {
                         }
                     };
                     if ($this->con[$proj_id]->insert($dto)) {
-                        $newid = $this->con[$proj_id]->execSQL('select last_insert_rowid() AS id');
-                        $id = $newid[0]['id'];
+                        $row_id = $this->con[$proj_id]->execSQL('select last_insert_rowid() AS id');
+                        $row_id = $row_id[0]['id'];
                     } else {
                         $row = $this->con[$proj_id]->findByKey(
-                            'conditions','condition',$condition);
-                        $id = $row[0]['id'];
+                            'conditions', 'condition', $condition, ['id']);
+                        $row_id = $row[0]['id'];
                     }
                     $preconditions[] = array($skill_id,$id);
                 }
@@ -407,7 +523,7 @@ class DBEditor {
     /**
     * 
     */
-    private function setupRootDB() {
+    private function setupSystemDB() {
         try {
             // project table
             $tdo = new TableDefineObject('projects');
@@ -424,6 +540,13 @@ class DBEditor {
             $tdo->appendColumn('name', 'text', ['not_null' => true]);
             $tdo->appendColumn('passwd', 'text', ['not_null' => true]);
             $this->con[0]->createTable($tdo, true);
+            // form_type master table
+            $tdo = new TableDefineObject('form_master');
+            $tdo->appendColumn('type', 'text', ['uniq' => true, 'not_null' => true]);
+            $this->con[0]->createTable($tdo, true);
+            foreach (HTMLHandler::$FROM_TYPES as $type => $txt) {
+                $this->form_id[$type] = $this->insertData(0, 'form_master', ['type' => $type], true);
+            }
         } catch (PDOException $e){
             die('PDOException throwen:'. $e->getMessage());
         }
@@ -432,7 +555,14 @@ class DBEditor {
     /**
     * 
     */
-    public static function getDateTypeList() {
+    public function convertForm2DTO($cols_hash, $constraints_hash = array()) {
+        # code...
+    }
+
+    /**
+    * 
+    */
+    public static function getDataTypeList() {
         return SQLiteHandler::$DATA_TYPES;
     }
 

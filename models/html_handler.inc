@@ -15,9 +15,9 @@ class HTMLHandler {
     /** */
     // list属性、step属性によるバリエーションもある
     public static $FROM_TYPES = array(
-        'input tag' => array(
             'text' => '一行テキスト',
             'listext' => '入力候補付き一行テキスト',
+            'textarea' => '複数行テキスト',
             'tel' => '電話番号', // textと変わらない
             'url' => 'URL',
             'email' => 'メールアドレス',
@@ -32,16 +32,12 @@ class HTMLHandler {
             'numlist' => '入力候補付き数値(直接入力)',
             'range' => '数値(スライダー)',
             'color' => '色',
+            'select' => 'プルダウン',
             'checkbox' => '単一チェックボックス',
             'multicheck' => '選択チェックボックス',
             'radio' => 'ラジオボタン',
             'file' => 'ファイル添付',
             'image' => '画像ボタン'
-        ),
-        'other tag' => array(
-            'textarea' => '複数行テキスト',
-            'select' => 'プルダウン'
-        )
     );
 
     /**
@@ -56,7 +52,7 @@ class HTMLHandler {
     * Helper function for sanitize url. this is not yet complete.
     * @param $url
     */
-    public static function sanitizeUrl($url) {
+    public static function sanitizeUrl($url, $query = null) {
         $allow_scheme = array(
             'http' => true,
             'https' => true
@@ -65,7 +61,16 @@ class HTMLHandler {
         if ($url_scheme && !isset($allow_scheme[$url_scheme])) {
             mb_ereg_replace($url_scheme, '', $url);
         }
-        return $url;
+        if (empty($url)) {
+           return null;
+        }
+        $tmp = array();
+        foreach ($query as $name => $value) {
+            $tmp[] = self::escape($name).'='.urlencode(self::escape($value));
+        }
+        $query = implode('&', $tmp);
+        $query = ($query) ? '?'.$query : $query;
+        return $url.$query;
     }
 
     /**
@@ -97,18 +102,21 @@ class HTMLHandler {
     * @param mixed hash $query
     * @param mixed hash $additional
     */
-    public static function link($text, $href, $query = null, $additional = null) {
-        $href = self::sanitizeUrl($href);
-        if (empty($href)) {
-           return null;
-        }
-        $tmp = array();
-        foreach ($query as $name => $value) {
-            $tmp[] = self::escape($name).'='.urlencode(self::escape($value));
-        }
-        $query = implode('&', $tmp);
-        $query = ($query) ? '?'.$query : $query;
-        return '<a href="'.$href.$query.'"'.self::attr($additional).'>'.self::escape($text).'</a>';
+    public static function link($text, $url, $query = null, $additional = null) {
+        $href = self::sanitizeUrl($url, $query);
+        return '<a href="'.$href.'"'.self::attr($additional).'>'.self::escape($text).'</a>';
+    }
+
+    /**
+    * Helper function for form open tag.
+    * @param string $element_name
+    * @param mixed $value
+    * @param mixed hash $additional
+    */
+    public static function startForm($url, $query = null, $method = 'POST', $additional = null) {
+        $href = self::sanitizeUrl($url, $query);
+        return '<form action="'.$href.'" method="'.$method.'" '.self::attr($additional).'>';
+        return $tag_str;
     }
 
     /**
@@ -118,7 +126,7 @@ class HTMLHandler {
     * @param mixed hash $additional
     */
     public static function inputForm($type, $element_name, $value = '', $additional = null) {
-        $tag_str = '<input type="' . $type . '" name="' . $element_name . '" value="';
+        $tag_str = '<input type="'.self::escape($type).'" name="'.self::escape($element_name).'" value="';
         $tag_str .= self::escape($value) .'"'.self::attr($additional).'>';
         return $tag_str;
     }
@@ -164,7 +172,7 @@ class HTMLHandler {
     public static function submit($element_name, $label, $form_id = null, $additional = null) {
         $form_attr = $form_id ? '" form="'.$form_id : '' ;
         $additional = $additional ? ' '.$additional : '' ;
-        $tag_str = '<input type="submit" name="' . $element_name . '" value="';
+        $tag_str = '<input type="submit" name="'.self::escape($element_name).'" value="';
         $tag_str .= self::escape($label) . $form_attr .'"'.$additional.'>';
         return $tag_str;
     }
@@ -175,7 +183,7 @@ class HTMLHandler {
     * @param $values
     */
     public static function textarea($element_name, $values) {
-        $tag_str = '<textarea name="' . $element_name . '">';
+        $tag_str = '<textarea name="'.self::escape($element_name).'">';
         $tag_str .= self::escape($values[$element_name]) . '</textarea>';
         return $tag_str;
     }
@@ -185,12 +193,15 @@ class HTMLHandler {
     * @param $type
     * @param $element_name
     * @param $values is an array has checkbox value as key and label text as value of array.
-    * @param $checked_value
+    * @param $checked_values
     */
-    public static function radiocheck ($type, $element_name, $values, $checked_value = null, $additional = null) {
-        $tag_str_common = '<input type="' . $type . '" name="' . $element_name . '" value="';
+    public static function radiocheck ($type, $element_name, $values, $checked_values = null, $additional = null) {
+        $tag_str_common = '<input type="'.self::escape($type).'" name="'.self::escape($element_name).'" value="';
         if (!is_array($values)) {
             $values = array($values => null);
+        }
+        if (!is_array($checked_values)) {
+            $checked_values = (isset($checked_values)) ? array($checked_values => true) : array();
         }
         foreach ($values as $value => $label) {
             if ($label) {
@@ -199,7 +210,7 @@ class HTMLHandler {
                 $tag_str = $tag_str_common;
             }
             $tag_str .= self::escape($value) . '" ';
-            if ($checked_value == $value) {
+            if (isset($checked_values[$value])) {
                 $tag_str .= ' checked="checked"';
             }
             $tag_str .= self::attr($additional).'>';
@@ -220,7 +231,7 @@ class HTMLHandler {
     */
     public static function selectbox($element_name, $options, $selected = null, $multiple = false, $additional = null) {
         // start select tag
-        $tag_str = '<select name="'. $element_name;
+        $tag_str = '<select name="'.self::escape($element_name);
         if ($multiple) {
             $tag_str .= '[]" multiple="multiple';
         }

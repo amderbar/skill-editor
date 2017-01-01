@@ -19,8 +19,8 @@ class IndexServlet extends Servlet {
     */
     public function doGet($req='') {
         $REQ_SCOPE = array();
-        // リクエストパラメータidがセットされている時、そのidのプロジェクトが開かれる
-        if (isset($_GET['id']) && $_GET['id']!='') {
+        // リクエストパラメータpidがセットされている時、そのpidのプロジェクトが開かれる
+        if (isset($_GET['pid']) && $_GET['pid']!='') {
             // リクエストスコープ相当の配列にidを格納
             $REQ_SCOPE['proj_id'] = intval($_GET['id']);
         }
@@ -31,6 +31,7 @@ class IndexServlet extends Servlet {
     * 
     */
     public function doPost($req='') {
+        $proj_id = isset($_GET['pid']) ? intval($_GET['pid']) : null;
         if (isset($_POST['proj-name']) && ($_POST['proj-name'] != '')) {
             // プロジェクトの新規作成時
             $proj_id = $this->db_editor->registerDB($_POST['proj-name']);
@@ -85,7 +86,7 @@ class IndexServlet extends Servlet {
         // pre_dump($new_data['skills_view']);
         $old_data = $_SESSION['proj'.$proj_id];
         // 既存データの配列を平滑化
-        // さらにデータをキー、idを値とする連想配列化
+        // さらにデータをキー、pidを値とする連想配列化
         foreach ($old_data as $tbl_name => $tbl_data) {
             if ($tbl_name == 'skills') {
                 continue;

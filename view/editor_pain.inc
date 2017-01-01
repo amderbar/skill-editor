@@ -11,7 +11,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 	<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
     <?php/*エディタ部共通のJavaScript*/?>
     <script type="text/javascript">
-    <!--
+    <!--//
         $(function() {
             /**
              * サイドメニューの表示、非表示切り替え関数
@@ -56,7 +56,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/common.css')?>">
 	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/fonts.css')?>">
 	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/editor_area.css')?>">
-	<title>Editor on Browser</title>
+	<title><?=APP_NAME?></title>
 </head>
 <body>
     <header id="tab-bar">
@@ -64,14 +64,19 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
         <ul class="editor-tabs">
 <?php
     if (isset($proj_id)) {
-        foreach ($tbl_list as $tbl_num => $tbl_name) {
-            $tab_class = ($tbl_num === $opened_tab) ? ' class="editting"' : '';
-            echo '<li'.$tab_class.'>'.HTMLHandler::link($tbl_name, $URL, ['id' => $proj_id, 'tab' => $tbl_num]).'</li>'.PHP_EOL;
+        foreach ($tbl_list as $tbl_id => $tbl_name) {
+            $tab_class = ($tbl_id === $opened_tab) ? ' class="editting"' : '';
+            echo '<li'.$tab_class.'>'.HTMLHandler::link($tbl_name, $URL, ['pid' => $proj_id, 'tab' => $tbl_id]).'</li>'.PHP_EOL;
         }
         if (isset($new_tab)) {
             echo '<li class="editting"><span id="new-tab-name">Untitled</span></li>'.PHP_EOL;
         } else {
-            echo HTMLHandler::link('', $URL, ['id' => $proj_id, 'tab' => 'new'], ['class' => ['icon-new-tab', 'btn'], 'title' => 'テーブルの追加']);
+            echo HTMLHandler::link(
+                '',
+                $URL,
+                ['pid' => $proj_id, 'tab' => 'new'],
+                ['class' => ['icon-new-tab', 'btn'], 'title' => 'テーブルの追加']
+            );
         }
     }
 ?>
@@ -82,45 +87,76 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 if (isset($proj_id)) {
     if (isset($new_tab)) {
         $forms = array();
+        $forms['open_form'] = HTMLHandler::startForm($URL, ['pid' => $proj_id, 'tab' => 'new'], 'POST', ['id' => 'tbl-def']);
         $forms['tbl_name'] = HTMLHandler::textbox('tbl_name', 'untitled', ['required' => true, 'autofocus' => true]);
         $forms['proj_name'] = HTMLHandler::escape($proj_name);
-        $forms['colname'] = HTMLHandler::textbox('colname[0]', '', ['required' => true]);
+        $forms['col_name'] = HTMLHandler::textbox('def_cols[0][col_name]', '', ['required' => true]);
         echo <<< _HTML_
-        <form action="editor_area.php" method="POST" id="tbl-def">
+        {$forms['open_form']}
             <header>
                 <h1>New Table {$forms['tbl_name']} @ {$forms['proj_name']}</h1>
             </header>
             <h2>Table Data definition</h2>
+            <fieldset name="def-cols">
+            <legend>Column definitions</legend>
             <table class="data-table" id="def-tbl">
                 <thead>
-                    <tr><th></th><th class="col-h"><label>列</labal></th><th id="add-col">列追加</th></tr>
+                    <tr>
+                        <th></th><th>ID列</th><th class="col-h"><label>列</labal></th>
+                        <th id="add-col">列追加</th>
+                    </tr>
                 </thead>
                 <tbody>
-                    <tr><th>列名</th><td>{$forms['colname']}</td></tr>
+                    <tr><th>列名</th><td>ID</td><td>{$forms['col_name']}</td></tr>
 _HTML_;
-        echo '<tr><th>入力形式</th><td>'.PHP_EOL;
-        echo HTMLHandler::selectbox('form_type[0]', $form_types).PHP_EOL;
+        echo '<tr><th>入力形式</th><td>--</td><td>'.PHP_EOL;
+        echo HTMLHandler::selectbox('def_cols[0][form_type]', $form_types).PHP_EOL;
         echo '<div name="step" hidden><label>刻み幅:'
-        .HTMLHandler::number('step[0]', 1, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
+        .HTMLHandler::number('def_cols[0][step]', 1, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
         echo '<div name="max" hidden><label>最大値:'
-        .HTMLHandler::number('max[0]', null, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
+        .HTMLHandler::number('def_cols[0][max]', null, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
         echo '<div name="min" hidden><label>最小値:'
-        .HTMLHandler::number('min[0]', null, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
+        .HTMLHandler::number('def_cols[0][min]', null, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
         echo '<div name="multi" hidden><label>'
-        .HTMLHandler::radiocheck('checkbox', 'multiple[0]', 1, null, ['disabled' => true]).'複数選択をする</label></div>'.PHP_EOL;
+        .HTMLHandler::radiocheck('checkbox', 'def_cols[0][multiple]', 1, null, ['disabled' => true]).'複数選択をする</label></div>'.PHP_EOL;
         echo '<div name="ref" hidden><label>選択肢<br>'
-        .HTMLHandler::selectbox('ref_dist[0]', $col_list, null, false, ['disabled' => true]).'</label></div>'.PHP_EOL;
+        .HTMLHandler::selectbox('def_cols[0][ref_dist]', $col_list, null, false, ['disabled' => true]).'</label></div>'.PHP_EOL;
         echo '</td></tr>'.PHP_EOL;
-        // echo '<tr><th>データ型</th><td>'.HTMLHandler::selectbox('type[0]', $data_types, ['TEXT']).'</td></tr>'.PHP_EOL;
-        echo '<tr><th>初期値</th><td>'.HTMLHandler::textbox('default[0]', '').'</td></tr>'.PHP_EOL;
-        echo '<tr><th>一意</th><td>'.HTMLHandler::radiocheck('checkbox', 'uniq[0]', 1).'</td></tr>'.PHP_EOL;
-        echo '<tr><th>非Null</th><td>'.HTMLHandler::radiocheck('checkbox', 'not_null[0]', 1).'</td></tr>'.PHP_EOL;
-        // echo '<tr><th>外部参照</th><td>'.HTMLHandler::radiocheck('checkbox', 'foreign[0]', 1).'</td></tr>'.PHP_EOL;
+        echo '<tr><th>初期値</th><td>自動</td><td>'.HTMLHandler::textbox('def_cols[0][default]', '').'</td></tr>'.PHP_EOL;
+        echo '<tr><th>一意</th><td>'
+            .HTMLHandler::radiocheck('checkbox', '', 1, 1, ['disabled' => true])
+            .'</td><td>'
+            .HTMLHandler::radiocheck('checkbox', 'def_cols[0][uniq]', 1)
+            .'</td></tr>'.PHP_EOL;
+        echo '<tr><th>非Null</th><td>'
+            .HTMLHandler::radiocheck('checkbox', '', 1, 1, ['disabled' => true])
+            .'</td><td>'
+            .HTMLHandler::radiocheck('checkbox', 'def_cols[0][not_null]', 1)
+            .'</td></tr>'.PHP_EOL;
+        // TODO:CHECK制約に相当する部分の実装
+        // echo '<tr><th>その他</th><td></td><td><label>'
+        // .HTMLHandler::radiocheck('checkbox', 'def_cols[0][add_chk]', 1, null).'条件を追加する</label><div>'
+        // .HTMLHandler::selectbox('def_cols[0][check]', $chk_list, null, true).'</div></td></tr>'.PHP_EOL;
         echo <<< _HTML_
                 </tbody>
             </table>
+            </fieldset>
 _HTML_;
-        echo HTMLHandler::hidden('id', $proj_id).PHP_EOL;
+        // TODO:表制約の付加
+//         echo <<< _HTML_
+//             <fieldset name="def-cons">
+//             <legend>Constraints definitions</legend>
+//             <table class="data-table">
+//                 <thead>
+//                     <tr><th>制約タイプ</th><th>ID列</th><th class="col-h"><label>列</labal></th><th id="add-col">列追加</th></tr>
+//                 </thead>
+//                 <tbody>
+                    
+//                 </tbody>
+//             </table>
+//             </fieldset>
+// _HTML_;
+        echo HTMLHandler::hidden('pid', $proj_id).PHP_EOL;
         echo HTMLHandler::submit('save', '作成').PHP_EOL;
         echo '</form>'.PHP_EOL;
         //

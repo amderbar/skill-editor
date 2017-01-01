@@ -19,22 +19,22 @@ function makeSideItems($proj_list, $current_proj_tbl_list = null) {
 	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/common.css')?>">
 	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/fonts.css')?>">
 	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/side_menu.css')?>">
-	<title>Editor on Browser</title>
+	<title><?=APP_NAME?></title>
 </head>
 <body>
 	<header class="with-btns">
 		<h2>Projects</h2>
 		<ul class="btns">
-			<a href="#" id="new-proj" class="btn"><li class="icon-database" title="新規作成"></li></a>
+			<li title="新規作成"><a href="#" id="new-proj" class="icon-database btn"></a></li>
 		</ul>
 	</header>
     <ul class="side-menu" id="proj-list">
         <?php foreach ($proj_list as $proj_id => $proj_name) {
 			echo '<li><div class="with-btns">'.PHP_EOL;
-			echo '<h2>'.HTMLHandler::link($proj_name, $URL, ['id' => $proj_id], ['onclick' => 'changeEditor('.$proj_id.')']).'</h2>'.PHP_EOL;
+			echo '<h2>'.HTMLHandler::link($proj_name, $URL, ['pid' => $proj_id], ['onclick' => 'changeEditor('.$proj_id.')']).'</h2>'.PHP_EOL;
 		    echo '<form action="'.$URL.'" method="POST">'.PHP_EOL;
-		    echo HTMLHandler::hidden('id', $proj_id);
 		    echo HTMLHandler::hidden('token', session_id());
+		    echo HTMLHandler::hidden('pid', $proj_id);
 			echo '<ul class="btns">
 					<li class="icon-folder-plus btn submit" title="テーブルの追加">'.HTMLHandler::hidden('fMode', 'add-tbl').'</li>
 					<li class="icon-bin btn submit" title="プロジェクトの削除">'.HTMLHandler::hidden('fMode', 'del-prj').'</li>

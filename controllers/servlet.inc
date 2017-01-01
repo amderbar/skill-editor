@@ -40,7 +40,7 @@ abstract class Servlet {
     * 
     */
     protected function foward($dist, $REQ_SCOPE = null) {
-        $URL = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+        $URL = getMyTopURL();
         if (isset($REQ_SCOPE)) {
             extract($REQ_SCOPE);
             unset($REQ_SCOPE);
@@ -51,7 +51,10 @@ abstract class Servlet {
     /**
     * 
     */
-    protected function redirect($dist) {
+    protected function redirect($dist = null) {
+        if (empty($dist)) {
+            $dist = getMyTopURL();
+        }
         $redirect_uri = empty($_SERVER["HTTPS"]) ? "http://" : "https://";
         $redirect_uri .= $_SERVER["HTTP_HOST"] . $dist;
         return header('Location: ' . $redirect_uri);

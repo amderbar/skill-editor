@@ -21,8 +21,8 @@ $(function() {
         // 初期化
         initColumn(jdx, true);
         // 外部キー参照先選択セレクトボックスに反映
-        tbody.find('select[name^="ref_dist"]').each(function (idx, ref_dist) {
-            $(ref_dist).find('optgroup').first().append($('<option/>', {value: 'this.' + jdx}));
+        tbody.find('select[name*="ref_dist"]').each(function (idx, ref_dist) {
+            $(ref_dist).find('optgroup').first().append($('<option/>', {value: -jdx}));
         });
         // プレビューに反映
         $('#preview .data-table').each(function (idx, tbl) {
@@ -35,7 +35,7 @@ $(function() {
             });
         });
 		// イベントリスナー設置
-		$('.col-h').unbind();
+		$('.col-h').off();
 		$('.col-h').hover(function (e) { // ラベルの切り替え hover
 				$(this).append($("<span>削除</span>"));
 			},function (e) { // out
@@ -72,16 +72,16 @@ $(function() {
 function putHandlers() {
     // Enterでのフォーム送信を防止
     var inputs = $('input[class!=allow_submit]');
-    inputs.unbind('keypress', preventSubmit);
+    inputs.off('keypress', preventSubmit);
     inputs.keypress(preventSubmit);
 
     // 表定義の入力形式の選択状態に応じて初期値入力フォームを変更したり追加の設定事項を表示したりする
     var tbody = $('#def-tbl tbody');
-    tbody.find('select[name^="form_type"]').unbind('change', updateColumn);
-    tbody.find('select[name^="form_type"]').change(updateColumn);
+    tbody.find('select[name*="form_type"]').off('change', updateColumn);
+    tbody.find('select[name*="form_type"]').change(updateColumn);
 
     // 表定義の変更をリアルタイムにプレビュー等影響下のフォームに反映
-    tbody.find('input').unbind('change', updateForms);
+    tbody.find('input').off('change', updateForms);
     tbody.find('input').change(updateForms);
 }
 
@@ -97,24 +97,24 @@ function preventSubmit(event) {
  */
 function initColumn(col_num, complete) {
     var tbody = $('#def-tbl tbody');
-    tbody.find('select[name^="form_type"]').eq(col_num).siblings('div').prop('hidden', true);
-    tbody.find('input[name^="step"]').eq(col_num).val(1).prop('disabled', true);
-    tbody.find('input[name^="max"]').eq(col_num).val('').prop('disabled', true);
-    tbody.find('input[name^="min"]').eq(col_num).val('').prop('disabled', true);
-    tbody.find('select[name^="ref_dist"]').eq(col_num).val('').prop('disabled', true);
-    var multiple = tbody.find('input[name^="multiple"][type="checkbox"]').eq(col_num).prop({disabled: true, checked: false});
+    tbody.find('select[name*="form_type"]').eq(col_num).siblings('div').prop('hidden', true);
+    tbody.find('input[name*="step"]').eq(col_num).val(1).prop('disabled', true);
+    tbody.find('input[name*="max"]').eq(col_num).val('').prop('disabled', true);
+    tbody.find('input[name*="min"]').eq(col_num).val('').prop('disabled', true);
+    tbody.find('select[name*="ref_dist"]').eq(col_num).val('').prop('disabled', true);
+    var multiple = tbody.find('input[name*="multiple"][type="checkbox"]').eq(col_num).prop({disabled: true, checked: false});
     multiple.siblings('input[type="hidden"]').remove();
-    var not_null = tbody.find('input[name^="not_null"][type="checkbox"]').eq(col_num).prop('disabled', false);
+    var not_null = tbody.find('input[name*="not_null"][type="checkbox"]').eq(col_num).prop('disabled', false);
     not_null.siblings('input[type="hidden"]').remove();
-    var default_input = tbody.find('[name^="default"]').eq(col_num);
+    var default_input = tbody.find('[name*="default"]').eq(col_num);
     if (default_input.prop("tagName") != 'INPUT') {
         var from_name = default_input.attr('name');
         default_input.replaceWith($('<input>', {name: from_name}));
     }
     if (complete) {
-        tbody.find('input[name^="colname"]').eq(col_num).val('');
-        tbody.find('input[name^="default"]').eq(col_num).attr('type', 'text').val('');
-        tbody.find('input[name^="uniq"]').eq(col_num).prop('checked', false);
+        tbody.find('input[name*="col_name"]').eq(col_num).val('');
+        tbody.find('input[name*="default"]').eq(col_num).attr('type', 'text').val('');
+        tbody.find('input[name*="uniq"]').eq(col_num).prop('checked', false);
         not_null.prop('checked', false);
     }
 }
@@ -125,7 +125,7 @@ function initColumn(col_num, complete) {
 function deleteCol(self) {
     var text = $(self).find('label').text();
     var index = $('.col-h').index(self);
-    index = index + 1;
+    index = index + 2;
     if (confirm(text + index + "を削除してもよろしいですか？")) {
         $('#def-tbl tbody').children('tr').each(function(idx, row){
             // name属性の添え字付け替え
@@ -144,7 +144,7 @@ function deleteCol(self) {
         });
         $(self).remove();
         if ($('.col-h').length < 2) {
-            $('.col-h').unbind();
+            $('.col-h').off();
         }
         // 外部キー参照先選択セレクトボックスにも反映が必要
         // プレビューに反映
@@ -162,12 +162,12 @@ function deleteCol(self) {
  */
 function updateColumn(eve) {
     var tbody = $('#def-tbl tbody');
-    var idx = tbody.find('select[name^="form_type"]').index(eve.target);
+    var idx = tbody.find('select[name*="form_type"]').index(eve.target);
     // いったん初期化
     initColumn(idx, false);
     // 変更の適用
     var form_type = $(eve.target).val();
-    var default_input = tbody.find('[name^="default"]').eq(idx);
+    var default_input = tbody.find('[name*="default"]').eq(idx);
     if (/textarea|select/.test(form_type)) {
         var from_name = default_input.attr('name');
         default_input.replaceWith($('<' + form_type + '>', {name: from_name}));
@@ -182,7 +182,7 @@ function updateColumn(eve) {
     } else {
         default_input.attr('type', form_type).val('');
     }
-    var not_null = tbody.find('input[name^="not_null"][type="checkbox"]').eq(idx);
+    var not_null = tbody.find('input[name*="not_null"][type="checkbox"]').eq(idx);
     // list属性の追加
     switch (form_type) {
         case 'listext':
@@ -233,10 +233,11 @@ function updateColumn(eve) {
     // 複数選択の強制
     switch (form_type) {
         case 'multicheck':
-            var multiple = $(eve.target).siblings('div[name="multi"] input[name^="multiple"][type="checkbox"]').prop('checked', true);
+            var multiple = $(eve.target).siblings('div[name="multi"]')
+                .find('input[name*="multiple"][type="checkbox"]').prop('checked', true);
             var hidden = multiple.clone();
             hidden.attr('type', 'hidden');
-            multiple.after(hidden);
+            multiple.prop('disabled', true).after(hidden);
             break;
     }
     // プレビューに反映
@@ -248,16 +249,17 @@ function updateColumn(eve) {
  */
 function updateForms(eve) {
     var name = $(eve.target).attr('name');
-    var index = $('#def-tbl tbody input[name^=' + name.replace(/\[\d\]/, '') + ']').index(eve.target);
+    name = name.match(/\[\d+\]\[(.+)\]/)[1];
+    var index = $('#def-tbl tbody input[name*="' + name.replace(/\[\d\]/, '') + '"]').index(eve.target) + 1;
     var val = $(eve.target).val();
-    switch (true) {
-        case /colname\[\d+\]/.test(name):
+    switch (name) {
+        case 'col_name':
             // 外部キー参照先選択セレクトボックスにも反映が必要
             if (!val) {
                 val = 'Nameless';
             } else {
-                $('#def-tbl tbody select[name^="ref_dist"]').each(function (idx, ref_dist) {
-                    $(ref_dist).find('optgroup').first().children('[value="this.' + index + '"]').text(val);
+                $('#def-tbl tbody select[name*="ref_dist"]').each(function (idx, ref_dist) {
+                    $(ref_dist).find('optgroup').first().children('[value="-' + (index + 1) + '"]').text(val);
                 });
             }
             $('#preview .data-table').each(function (idx, tbl) {
@@ -265,7 +267,7 @@ function updateForms(eve) {
             });
             break;
     
-        case /form_type\[\d+\]/.test(name):
+        case 'form_type':
             $('#preview .data-table').each(function (idx, tbl) {
                 $(tbl).find('tr').each(function(jdx, row){
                     $(row).children('input,select,textarea').eq(index).attr('type', val);
@@ -273,38 +275,39 @@ function updateForms(eve) {
             });
             break;
     
-        case /(step|max|min)\[\d+\]/.test(name):
-            var attr = name.match(/step|max|min/)[0];
+        case 'step':
+        case 'max':
+        case 'min':
             $('#preview .data-table').each(function (idx, tbl) {
                 $(tbl).find('tr').each(function(jdx, row){
-                    $(row).children('input,select,textarea').eq(index).attr(attr, val);
+                    $(row).children('input,select,textarea').eq(index).attr(name, val);
                 });
             });
-            $('#def-tbl tbody [name^="default"]').eq(index).attr(attr, val);
+            $('#def-tbl tbody [name*="default"]').eq(index).attr(name, val);
             break;
     
-        case /multiple\[\d+\]/.test(name):
+        case 'multiple':
             $('#preview .data-table').each(function (idx, tbl) {
                 $(tbl).find('tr').each(function(jdx, row){
                     $(row).children('input,select,textarea').eq(index).prop('multiple', true);
                 });
             });
-            $('#def-tbl tbody [name^="default"]').eq(index).prop('multiple', true);
+            $('#def-tbl tbody [name*="default"]').eq(index).prop('multiple', true);
             break;
     
-        case /ref_dist\[\d+\]/.test(name):
+        case 'ref_dist':
             break;
     
-        case /default\[\d+\]/.test(name):
+        case 'default':
             break;
     
-        case /uniq\[\d+\]/.test(name):
+        case 'uniq':
             break;
     
-        case /not_null\[\d+\]/.test(name):
+        case 'not_null':
             break;
     
-        case /foreign\[\d+\]/.test(name):
+        case 'foreign':
             break;
     }
 }

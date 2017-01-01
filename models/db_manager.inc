@@ -15,7 +15,10 @@ class SQLiteHandler {
         'TEXT' => '文字列',
         'INTEGER' => '整数値',
         'REAL' => '実数値',
-        'NONE' => 'その他なんでも'
+        'DATETIME' => '日付時刻',
+        'BOOLEAN' => '真偽値',
+        'NUMERIC' => '数値',
+        'BLOB' => 'その他なんでも'
     );
     /** */
     static public $ON_DELETE = array(
@@ -63,7 +66,7 @@ class SQLiteHandler {
             while ($row = $stmt->fetch()) {
                 $names[] = $row['name'];
             }
-            $column = implode(',',$names);
+            $column = implode(',', $names);
         }
         $stmt = $this->pdo->prepare('SELECT '.$column.' FROM '.$table.';');
         if ($stmt->execute()) {
@@ -75,18 +78,17 @@ class SQLiteHandler {
     /**
     * 
     */
-    public function findByKey($table, $key_col, $value, $column = '') {
+    public function findByKey($table, $key_col, $value, $column = null) {
         // $tableと$columnのエスケープ処理が必要
-        if (!$column) {
+        if (empty($column)) {
             $stmt = $this->pdo->query('PRAGMA table_info('.$table.')');
-            $names = array();
+            $column = array();
             while ($row = $stmt->fetch()) {
-                $names[] = $row['name'];
+                $column[] = $row['name'];
             }
-            $column = implode(',', $names);
         }
         $stmt = $this->pdo->prepare(
-            'SELECT '.$column.' FROM '.$table.' WHERE '.$key_col.'= ?;');
+            'SELECT '.implode(',', $column).' FROM '.$table.' WHERE '.$key_col.'= ?;');
         if ($stmt->execute(array($value))) {
             return $stmt->fetchAll();
         }
@@ -96,20 +98,60 @@ class SQLiteHandler {
     /**
     * 
     */
-    public function insert($dto) {
+    public function insert($dto, $if_redundant = false) {
         try {
-            $stmt = $this->pdo->prepare($dto->getInsertSQL());
-            $parms = $dto->getParms();
-            $stmt->execute($parms);
+            $place_holders = array_keys($dto->getParms());
+            $colnames = array();
+            foreach ($place_holders as $colname) {
+                $colnames[] = mb_ereg_replace('^:', '', $colname); 
+            }
+            $sql = 'INSERT INTO '.$dto->getTableName();
+            $sql .= '('.implode(',', $colnames).') VALUES ('.implode(',', $place_holders).');';
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($dto->getParms());
             return $this->pdo->lastInsertId();
         } catch (PDOException $e){
-            if (strpos($e->getMessage(),'19 UNIQUE constraint failed')>0) {
-                error_log($e->getMessage() . "\n");
-                return false;
+            if ($e->getCode() == 23000) { // 19 UNIQUE constraint failed
+                if ($if_redundant) {
+                    $err_arr = explode(' ', $e->getMessage());
+                    $colname = explode('.', array_pop($err_arr));
+                    $colname = array_pop($colname);
+                    $parms = $dto->getParms();
+                    $row = $this->findByKey(
+                        $dto->getTableName(), $colname, $parms[':'.$colname]);
+                    return $row[0]['id'];
+                } else {
+                    return false;
+                }
             } else {
                 throw $e;
             }
         }
+    }
+
+    /**
+    * 
+    */
+    public function update($dto, $conditions = null) {
+        $place_holders = array_keys($dto->getParms());
+        $settings = array();
+        foreach ($place_holders as $colname) {
+            $settings[] = mb_ereg_replace('^:', '', $colname).'='.$colname; 
+        }
+        $parms = $dto->getParms();
+        $sql = 'UPDATE '.$dto->getTableName();
+        $sql .= ' SET '.implode(',', $settings);
+        if (!empty($condition)) {
+            $sql .= ' WHERE ';
+            $place_holders = array();
+            foreach ($condition as $colname => $value) {
+                $place_holders[] = $colname.'=:condition_'.$colname;
+                $parms[':condition_'.$colname] = $value;
+            }
+            $sql .= implode(' AND ', $place_holders);
+        }
+        $stmt = $this->pdo->prepare($sql.';');
+        return $stmt->execute($parms);
     }
 
     /**
@@ -130,22 +172,24 @@ class SQLiteHandler {
     */
     public function createTable($tdo, $if_not_exist = false) {
         try {
-            $sql = 'CREATE TABLE ';
-            $sql .= ($if_not_exist) ? 'IF NOT EXISTS ' : '';
-            $sql .= $tdo->tableName().' (';
-            $sql .= 'id integer PRIMARY KEY AUTOINCREMENT';
+            $defs = array();
             while ($col = $tdo->fetchColumn()) {
                 if(!isset(self::$DATA_TYPES[strtoupper($col['type'])])) {
-                    throw new PDOException("Inviled data type specified :".$col['type'], 1);
+                    // ここの例外クラスは自作必要？
+                    throw new RuntimeException("Inviled data type specified :".$col['type'], 1);
                 }
-                $sql .= ', '.$col['name'].' '.$col['type'];
-                if ($col['default'] !== null) {
+                $sql = $col['name'].' '.$col['type'];
+                // TODO:Default値のSQLエスケープはどうすれば？
+                if (isset($col['default'])) {
                     $sql .= ' DEFAULT ';
                     if ($col['default'] === false) {
-                        $sql .= 'false';
+                        $sql .= '"false"';
                     } else {
-                        $sql .= $col['default'];
+                        $sql .= '"'.$col['default'].'"';
                     }
+                }
+                if ($col['primery']) {
+                    $sql .= ' PRIMARY KEY';
                 }
                 if ($col['uniq']) {
                     $sql .= ' UNIQUE';
@@ -153,17 +197,22 @@ class SQLiteHandler {
                 if ($col['not_null']) {
                     $sql .= ' NOT NULL';
                 }
+                if ($col['increment']) {
+                    $sql .= ' AUTOINCREMENT';
+                }
                 if ($col['foreign']) {
                     $sql .= ' REFERENCES '.$col['foreign']['ref'];
                     if (isset(self::$ON_DELETE[strtoupper($col['foreign']['del'])])) {
                         $sql .= ' on DELETE '.self::$ON_DELETE[strtoupper($col['foreign']['del'])];
                     } else {
-                       throw new PDOException("Inviled SQL keyword :".$col['foreign']['del'], 1);
+                        // ここの例外クラスは自作必要？
+                       throw new RuntimeException("Inviled SQL keyword :".$col['foreign']['del'], 1);
                     }
                 }
+                $defs[] = $sql;
             }
             while ($con = $tdo->fetchConstraint()) {
-                $sql .= ', ';
+                $sql = '';
                 switch (strtoupper($con['type'])) {
                     case 'UNIQ':
                         $sql .= ' UNIQUE('.implode(',', $con['targets']).')';
@@ -174,7 +223,12 @@ class SQLiteHandler {
                                     .implode(',', $con['references'][cols]).')';
                         break;
                 }
+                $defs[] = $sql;
             }
+            $sql = 'CREATE TABLE ';
+            $sql .= ($if_not_exist) ? 'IF NOT EXISTS ' : '';
+            $sql .= $tdo->tableName().' (';
+            $sql .= implode(',', $defs);
             $sql .= ');';
             $stmt = $this->pdo->prepare($sql);
             $result = $stmt->execute();
@@ -214,7 +268,7 @@ abstract class DTO {
     /**
     * 
     */
-    abstract public function getInsertSQL();
+    abstract function getTableName();
 
     /**
     * 
@@ -245,8 +299,11 @@ class TableDefineObject {
     /**
     * 
     */
-    function __construct($tbl_name, $colmuns = null) {
+    function __construct($tbl_name, $colmuns = null, $auto_primery = true) {
         $this->tbl_name = $tbl_name;
+        if ($auto_primery) {
+            $this->appendColumn('id', 'integer', ['primery' => true]);
+        }
     }
 
     /**
@@ -264,8 +321,10 @@ class TableDefineObject {
             'name' => $col_name,
             'type' => $type,
             'default' => (isset($constraints['default'])) ? $constraints['default'] : null,
-            'uniq' => (isset($constraints['uniq'])) ? $constraints['uniq'] : false,
-            'not_null'=> (isset($constraints['not_null'])) ? $constraints['not_null'] : false,
+            'uniq' => (isset($constraints['uniq'])) ? !!$constraints['uniq'] : false,
+            'not_null'=> (isset($constraints['not_null'])) ? !!$constraints['not_null'] : false,
+            'primery' => (isset($constraints['primery'])) ? !!$constraints['primery'] : false,
+            'increment' => (isset($constraints['increment'])) ? !!$constraints['increment'] : false,
             'foreign' => (isset($constraints['foreign'])) ? $constraints['foreign'] : null // reference and on delete
         );
         $this->colmuns[] = $col_hash;

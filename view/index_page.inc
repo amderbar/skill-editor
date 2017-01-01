@@ -12,7 +12,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/common.css')?>">
 	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/fonts.css')?>">
 	<link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/index.css')?>">
-	<title>Editor on Browser</title>
+	<title><?=APP_NAME?></title>
 </head>
 <body>
 	<header class="with-btns">
@@ -38,10 +38,10 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 			<iframe name="side_menu" src="side_menu.php" scrolling="no" frameborder="no"></iframe>
 		</nav>
 		<article>
-			<iframe name="editor_area" src="editor_area.php<?=(isset($proj_id))?'?id='.$proj_id:''?>" scrolling="no" frameborder="no"></iframe>
+			<iframe name="editor_area" src="editor_area.php<?=(isset($proj_id))?'?pid='.$proj_id:''?>" scrolling="no" frameborder="no"></iframe>
 		</article>
 	</main>
-	<footer><strong id="top-title">Data Editor on Browser</strong> <?=VERSION?></footer>
+	<footer><strong id="top-title"><?=APP_NAME?></strong> <?=VERSION?></footer>
 	<section class="modal-content" id="new-proj">
 		<form action="<?=$_SERVER["REQUEST_URI"]?>" method="POST">
 			<fieldset>

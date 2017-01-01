@@ -19,6 +19,10 @@ class EditorServlet extends Servlet {
      */
     public function doGet($req='') {
         $REQ_SCOPE = array();
+        // リクエストパラメータpidがセットされている時、そのpidのプロジェクトが開かれる
+        // ただしProject ID は常に0より大なので、0も含め空なら何もせずに画面表示に転送する
+        if (!empty($_GET['pid'])) {
+            $current_proj_id = intval($_GET['pid']);
             if($this->db_editor->open($current_proj_id) === false){
                 return $this->redirect($_SERVER['PHP_SELF']);
             }
@@ -28,34 +32,56 @@ class EditorServlet extends Servlet {
             if (isset($_GET['tab'])) {
                 $opened_tab = ($_GET['tab'] == 'new') ? 'new' : intval($_GET['tab']);
             } else {
-                $opened_tab = 0;
+                $opened_tab = null;
             }
             if (empty($table_list) || ($opened_tab === 'new')) {
             // テーブル新規作成タブを開く
                 $REQ_SCOPE['new_tab'] = true;
-                $REQ_SCOPE['data_types'] = DBEditor::getDateTypeList();
+                $REQ_SCOPE['data_types'] = DBEditor::getDataTypeList();
                 $REQ_SCOPE['form_types'] = HTMLHandler::$FROM_TYPES;
                 $REQ_SCOPE['opened_tab'] = null;
                 $REQ_SCOPE['proj_name'] = $this->db_editor->projName($current_proj_id);
                 $tmpl_list = $this->db_editor->getAllTemplates();
+                $REQ_SCOPE['col_list'] = array('This Table' => ['-1' => 'ID']);
+                // 列リストデータ
                 foreach ($table_list as $tbl_num => $tbl_name) {
                     $REQ_SCOPE['col_list'][$tbl_name] = array();
                     $col_list = $this->db_editor->listColumns($current_proj_id, $tbl_num);
+                    foreach ($col_list as $colnum) {
+                        $REQ_SCOPE['col_list'][$tbl_name][$colnum['id']] = $colnum['col_name'];
                     }
                 }
+                // モック生成 CHECK制約リスト
+                $REQ_SCOPE['chk_list'] = array(
+                    'for String' => [
+                        'maxlen' => 'N文字以内',
+                        'minlen' => 'N文字以上'
+                    ],
+                    'for Numelic' => [
+                        'odd' => '奇数',
+                        'even' => '偶数',
+                        'primery' => '素数'
+                    ],
+                    'for Datetime' => [
+                        'past' => '今より過去'
+                    ]
+                );
                 $REQ_SCOPE['tbl_tmpls'] = ['default' => full_path('resources/templates/default_template.php')];
                 foreach ($tmpl_list as $tmpl) {
                     $REQ_SCOPE['tbl_tmpls'][$tmpl['tmpl_name']]
                      = full_path(sprintf('resources/templates/proj%03d/', $tmpl['proj_id']).$tmpl['tmpl_name']);
                 }
                 $REQ_SCOPE['tbl_data'] = array(
-                    ['id' => 1, 'Nameless' => ''],
-                    ['id' => 2, 'Nameless' => ''],
-                    ['id' => 3, 'Nameless' => '']
+                    ['rid' => 1, 'Nameless' => ''],
+                    ['rid' => 2, 'Nameless' => ''],
+                    ['rid' => 3, 'Nameless' => '']
                 );
             } else {
             // 既存テーブルのタブを開く
-                $teble_data = $this->db_editor->listData($current_proj_id, $table_list[$opened_tab]);
+                if (is_null($opened_tab)) {
+                    $opened_tab = current(array_keys($table_list));
+                }
+                $teble_data = $this->db_editor->listData($current_proj_id, $opened_tab);
                 $tmpl_list = $this->db_editor->getTemplates($current_proj_id);
                 // 先頭要素のキーを取得
                 $selected_tmpl = key($tmpl_list);
@@ -76,15 +102,26 @@ class EditorServlet extends Servlet {
      * 
      */
     public function doPost($req='') {
+        // Project ID は常に0より大なので、0も含め空なら何もせずに画面表示に転送する
+        if (!empty($_POST['pid'])) {
+            // テーブルの新規作成時
             // 本当はここで入力値チェックをする
-            // $_POST
-            // self::$db_editor->addUserTable($proj_id, $_POST['tbl_name'], $prop_hash);
+            $proj_id = isset($_POST['pid']) ? intval($_POST['pid']) : null;
+            if($this->db_editor->open($proj_id) === false){
+                return $this->redirect(getMyTopURL());
+            }
+            $tbl_name =  $_POST['tbl_name'];
+            unset($_POST['save']);
+            unset($_POST['pid']);
+            unset($_POST['tbl_name']);
+            $def_cols = $_POST['def_cols'];
+            $tbl_id = $this->db_editor->addUserTable($proj_id, $tbl_name, $def_cols);
+            $redirect_url = HTMLHandler::sanitizeUrl(getMyTopURL(), ['pid' => $proj_id, 'tab' => $tbl_id]);
+        } else {
+            $redirect_url = getMyTopURL();
         }
-    }
-            // $this->db_editor->addUserTable($proj_id, $tbl_name, $def_tbl);
-        }
-        return $this->foward('view/editor_pain.inc', $REQ_SCOPE);
-        // return $this->redirect($_SERVER["REQUEST_URI"]);
+        // return $this->foward('view/editor_pain.inc', $REQ_SCOPE);
+        return $this->redirect($redirect_url);
     }
 }
 

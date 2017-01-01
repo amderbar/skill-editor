@@ -27,9 +27,9 @@ $(function(){
             $(this).replaceWith($('<h2>', {'text': proj_name}));
             $.post("index.php",
                 { 'proj-name': proj_name }
-            ).done(function(id){
+            ).done(function(pid){
                 location.reload(true);
-                changeEditor(id);
+                changeEditor(pid);
             }).fail(function(data){
                 alert('error!!!');
             });
@@ -40,7 +40,7 @@ $(function(){
      * 疑似submitボタン押下時の処理
      */
     $('.submit').click(function(eve) {
-        var proj_id = $(this).closest('form').find('input[name="id"]').val();
+        var proj_id = $(this).closest('form').find('input[name="pid"]').val();
         var f_mode = $(this).find('input[name="fMode"]').val();
         switch (f_mode) {
             case 'del-prj':
@@ -48,7 +48,7 @@ $(function(){
                 var proj_name = $(this).closest('.with-btns').find('h2').text();
                 if (confirm("プロジェクト「" + proj_name + "」を削除してもよろしいですか？")) {
                     $.post(location.pathname,
-                        { 'id': proj_id, 'fMode': f_mode }
+                        { 'pid': proj_id, 'fMode': f_mode }
                     ).done(function(){
                             location.reload(true);
                             changeEditor();
@@ -64,10 +64,10 @@ $(function(){
     });
 });
 
-function changeEditor(id, tab) {
+function changeEditor(pid, tab) {
     var return_val = true;
-    if (id != null) {
-        var query_str = '?id=' + id;
+    if (pid != null) {
+        var query_str = '?pid=' + pid;
         if (tab != null) {
             query_str += '&tab=' + tab;
             return_val = false;

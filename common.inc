@@ -6,6 +6,7 @@ require_once(full_path('gatekeeper.inc'));
 /**
 * Definition of constants and global valiables.
 */
+define('APP_NAME', 'DB Editor on Browser');
 define('VERSION', 'ver.0.0.0');
 define('ENCODE', 'UTF-8');
 // mb_internal_encoding(ENCODE);
@@ -15,6 +16,13 @@ define('ENCODE', 'UTF-8');
 * load library and common functions
 */
 require_once(full_path('models/html_handler.inc'));
+
+/**
+* 
+*/
+function getMyTopURL() {
+    return parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+}
 
 /**
 * return file full path of argument string
@@ -39,6 +47,13 @@ function pre_dump($var) {
     var_dump($var);
     echo '</pre>';
     return $var;
+}
+
+/**
+* 
+*/
+function var_export_log($var) {
+    error_log(var_export($var, true));
 }
 
 /**

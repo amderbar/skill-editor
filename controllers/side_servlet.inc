@@ -22,6 +22,9 @@ class SideServlet extends Servlet {
         $proj_list = $this->db_editor->listDB();
         $REQ_SCOPE['proj_list'] = $proj_list;
         $tmpl_list = null;
+        // リクエストパラメータpidがセットされている時、そのpidのプロジェクトが開かれる
+        if (isset($_GET['pid']) && $_GET['pid'] != '') {
+            $current_proj_id = intval($_GET['pid']);
             if($this->db_editor->open($current_proj_id) === false){
                 return $this->redirect($_SERVER['PHP_SELF']);
             }
@@ -43,7 +46,7 @@ class SideServlet extends Servlet {
                 // プロジェクト削除時
                 // 本当はここで入力値チェックをする
                 // CSRF対策のトークンチェックも必要
-                $proj_id = isset($_POST['id']) ? intval($_POST['id']) : null;
+                $proj_id = isset($_POST['pid']) ? intval($_POST['pid']) : null;
                 if ($proj_id) {
                     $this->db_editor->deleteDB($proj_id);
                 }
