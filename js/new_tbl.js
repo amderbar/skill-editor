@@ -7,7 +7,7 @@ $(function() {
 	 */
 	$('#add-col').click(function () {
         var tbody = $('#def-tbl tbody');
-        var jdx = $('.col-h').length;
+        var jdx = $('.col-h').length + 1;
 		tbody.children('tr').each(function(idx, elem){
             var clone = $(elem).children().last().clone();
             var inputs = clone.find('input,select');
@@ -22,7 +22,7 @@ $(function() {
         initColumn(jdx, true);
         // 外部キー参照先選択セレクトボックスに反映
         tbody.find('select[name*="ref_dist"]').each(function (idx, ref_dist) {
-            $(ref_dist).find('optgroup').first().append($('<option/>', {value: -jdx}));
+            $(ref_dist).find('optgroup').first().append($('<option/>', {value: -jdx}).text('Nameless' + jdx));
         });
         // プレビューに反映
         $('#preview .data-table').each(function (idx, tbl) {
@@ -96,6 +96,7 @@ function preventSubmit(event) {
  * 列定義を初期化する関数
  */
 function initColumn(col_num, complete) {
+	col_num --;
     var tbody = $('#def-tbl tbody');
     tbody.find('select[name*="form_type"]').eq(col_num).siblings('div').prop('hidden', true);
     tbody.find('input[name*="step"]').eq(col_num).val(1).prop('disabled', true);
@@ -123,16 +124,15 @@ function initColumn(col_num, complete) {
  * カラム削除関数
  */
 function deleteCol(self) {
+    var tbody = $('#def-tbl tbody');
     var text = $(self).find('label').text();
-    var index = $('.col-h').index(self);
-    index = index + 2;
+    var index = $('.col-h').index(self) + 1;
     if (confirm(text + index + "を削除してもよろしいですか？")) {
-        $('#def-tbl tbody').children('tr').each(function(idx, row){
+    	tbody.children('tr').each(function(idx, row){
             // name属性の添え字付け替え
             var cols = $(row).children();
             var new_jdx = index - 1;
             for (var jdx = index + 1; jdx < cols.length; jdx++) {
-                console.log(new_jdx);
                 $(cols[jdx]).find('input,select').each(function (kdx, input) {
                     var name = $(input).attr('name');
                     $(input).attr('name', name.replace(/\[\d+\]/, '[' + new_jdx + ']'));
@@ -140,20 +140,27 @@ function deleteCol(self) {
                 new_jdx = jdx - 1;
             }
             // 削除実行
-            cols.eq(index).remove();
+            cols.eq(index + 1).remove();
         });
         $(self).remove();
         if ($('.col-h').length < 2) {
             $('.col-h').off();
         }
-        // 外部キー参照先選択セレクトボックスにも反映が必要
+        // 外部キー参照先選択セレクトボックスに反映
+        tbody.find('select[name*="ref_dist"]').each(function (idx, ref_dist) {
+            var options = $(ref_dist).find('optgroup').first().children('option');
+            for (var jdx = index + 1; jdx < options.length; jdx++) {
+                $(options[jdx]).val(-jdx + 1);
+            }
+            // 削除実行
+            options.eq(index).remove();
+        });
         // プレビューに反映
         $('#preview .data-table').each(function (idx, tbl) {
             $(tbl).find('tr').each(function(jdx, row){
                 $(row).children().eq(index).remove();
             });
         });
-
     }
 }
 
@@ -164,7 +171,7 @@ function updateColumn(eve) {
     var tbody = $('#def-tbl tbody');
     var idx = tbody.find('select[name*="form_type"]').index(eve.target);
     // いったん初期化
-    initColumn(idx, false);
+    initColumn(idx + 1, false);
     // 変更の適用
     var form_type = $(eve.target).val();
     var default_input = tbody.find('[name*="default"]').eq(idx);
@@ -250,23 +257,23 @@ function updateColumn(eve) {
 function updateForms(eve) {
     var name = $(eve.target).attr('name');
     name = name.match(/\[\d+\]\[(.+)\]/)[1];
-    var index = $('#def-tbl tbody input[name*="' + name.replace(/\[\d\]/, '') + '"]').index(eve.target) + 1;
+    var tbody = $('#def-tbl tbody');
+    var index = tbody.find('input[name*="' + name.replace(/\[\d\]/, '') + '"]').index(eve.target) + 1;
     var val = $(eve.target).val();
     switch (name) {
         case 'col_name':
             // 外部キー参照先選択セレクトボックスにも反映が必要
             if (!val) {
-                val = 'Nameless';
-            } else {
-                $('#def-tbl tbody select[name*="ref_dist"]').each(function (idx, ref_dist) {
-                    $(ref_dist).find('optgroup').first().children('[value="-' + (index + 1) + '"]').text(val);
-                });
+                val = 'Nameless' + (index + 1);
             }
+            tbody.find('select[name*="ref_dist"]').each(function (idx, ref_dist) {
+                $(ref_dist).find('optgroup').first().children('[value="-' + index + '"]').text(val);
+            });
             $('#preview .data-table').each(function (idx, tbl) {
                 $(tbl).find('tr').first().find('th').eq(index).text(val);
             });
             break;
-    
+
         case 'form_type':
             $('#preview .data-table').each(function (idx, tbl) {
                 $(tbl).find('tr').each(function(jdx, row){
@@ -274,7 +281,7 @@ function updateForms(eve) {
                 });
             });
             break;
-    
+
         case 'step':
         case 'max':
         case 'min':
@@ -285,7 +292,7 @@ function updateForms(eve) {
             });
             $('#def-tbl tbody [name*="default"]').eq(index).attr(name, val);
             break;
-    
+
         case 'multiple':
             $('#preview .data-table').each(function (idx, tbl) {
                 $(tbl).find('tr').each(function(jdx, row){
@@ -294,19 +301,19 @@ function updateForms(eve) {
             });
             $('#def-tbl tbody [name*="default"]').eq(index).prop('multiple', true);
             break;
-    
+
         case 'ref_dist':
             break;
-    
+
         case 'default':
             break;
-    
+
         case 'uniq':
             break;
-    
+
         case 'not_null':
             break;
-    
+
         case 'foreign':
             break;
     }

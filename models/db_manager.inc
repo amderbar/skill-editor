@@ -1,12 +1,12 @@
 <?php
-/**
-* 
-*/
+
 require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
+require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/models/data_transfer_objects.inc');
 
 /**
-* 
-*/
+ * @author amderbar
+ *
+ */
 class SQLiteHandler {
     /** */
     private $pdo = null;
@@ -27,14 +27,14 @@ class SQLiteHandler {
     );
 
     /**
-    * 
+    *
     */
     function __construct($db_name) {
         $this->connect($db_name);
     }
 
     /**
-    * 
+    *
     */
     public function connect($db_name) {
         $dsn = 'sqlite:' . $db_name;
@@ -49,61 +49,154 @@ class SQLiteHandler {
     }
 
     /**
-    * 
+    *
     */
-    public function load($id) {
-        # code...
+    public function load(string $table, int $id, array $target_col = array()) :?array {
+        try {
+            // $tableと$columnのエスケープ処理が必要
+            if (empty($target_col)) {
+                $stmt = $this->pdo->query('PRAGMA table_info('.$table.')');
+                $target_col = array_column($stmt->fetchAll(), 'name');
+            }
+            $sql = 'SELECT '.implode(',', $target_col).' FROM '.$table.' WHERE id = ?;';
+
+            $stmt = $this->pdo->prepare($sql);
+            if ( $stmt->execute( [$id] ) ) {
+                $result = $stmt->fetchAll();
+                return array_shift($result);
+            }
+            return null;
+        } catch (PDOException $e) {
+            if (isset($sql)) {
+                $e->queryString = $sql;
+            }
+            throw $e;
+        }
     }
 
     /**
-    * 
+    *
     */
-    public function fetchAll($table, $column='') {
-        // $tableと$columnのエスケープ処理が必要
-        if (! $column) {
-            $stmt = $this->pdo->query('PRAGMA table_info('.$table.')');
-            $names = array();
-            while ($row = $stmt->fetch()) {
-                $names[] = $row['name'];
+    public function fetchAll(string $table, $target_col='') {
+        try {
+            // $tableと$columnのエスケープ処理が必要
+            if (! $target_col) {
+            	$stmt = $this->pdo->query('PRAGMA table_info('.$table.')');
+            	$target_col = array_column($stmt->fetchAll(), 'name');
+            	$target_col = implode(',', $target_col);
             }
-            $column = implode(',', $names);
+            $stmt = $this->pdo->prepare('SELECT '.$target_col.' FROM '.$table.';');
+            if ($stmt->execute()) {
+                return $stmt->fetchAll();
+            }
+            return false;
+        } catch (PDOException $e){
+            if (isset($sql)) {
+                $e->queryString = $sql;
+            }
+            throw $e;
         }
-        $stmt = $this->pdo->prepare('SELECT '.$column.' FROM '.$table.';');
-        if ($stmt->execute()) {
-            return $stmt->fetchAll();
-        }
-        return false;
     }
 
     /**
-    * 
-    */
-    public function findByKey($table, $key_col, $value, $column = null) {
+     * @param string $table
+     * @param array $condition [colmun_name => value] format array
+     * @param array $target_col
+     * @return array
+     */
+    public function findByKey(string $table, array $condition, $target_col = array()) :?array {
         // $tableと$columnのエスケープ処理が必要
-        if (empty($column)) {
+        if (empty($target_col)) {
             $stmt = $this->pdo->query('PRAGMA table_info('.$table.')');
-            $column = array();
-            while ($row = $stmt->fetch()) {
-                $column[] = $row['name'];
-            }
+            $target_col = array_column($stmt->fetchAll(), 'name');
+        }
+        $key_cols = array();
+        foreach (array_keys($condition) as $col) {
+        	$key_cols[] = $col.'= ?';
         }
         $stmt = $this->pdo->prepare(
-            'SELECT '.implode(',', $column).' FROM '.$table.' WHERE '.$key_col.'= ?;');
-        if ($stmt->execute(array($value))) {
+            'SELECT '.implode(',', $target_col).' FROM '.$table.' WHERE '.implode(' AND ', $key_cols).';'
+        );
+        if ($stmt->execute(array_values($condition))) {
             return $stmt->fetchAll();
         }
-        return false;
+        return null;
     }
 
     /**
-    * 
+     * @param array $join_tbls  [ tbl_name, tbl_name => [ [tbl_name => col_name, tbl_name => col_name], ... ], ... ]
+     * @param array $condition  [ tbl_name => [col_name => value], ... ]
+     * @param array $target_col [ tbl_name => [col_name, ... ], ... ]
+     * @return array
+     */
+    public function findByKeyWithJoin(array $join_tbls, array $condition, $target_col = array()) :?array {
+        try {
+            // $tableと$columnのエスケープ処理が必要
+
+            if (empty($target_col)) {
+                $target_col = array();
+                foreach ($join_tbls as $tbl_name => $join_ons) {
+                    $stmt = $this->pdo->query('PRAGMA table_info('.$tbl_name.')');
+                    $target_col[$tbl_name] = array_column($stmt->fetchAll(), 'name');
+                }
+            }
+            $target = array();
+            foreach ($target_col as $tbl_name => $col_names) {
+                foreach ($col_names as $col_name) {
+                    $target[] = $tbl_name.'.'.$col_name;
+                }
+            }
+
+            $table = array( array_shift($join_tbls) );
+            foreach ($join_tbls as $tbl_name => $join_condisions) {
+                $join_on = array();
+                foreach ($join_condisions as $eq_pair) {
+                    $on_equation = '';
+                    var_export_log($eq_pair);
+                    foreach ($eq_pair as $on_tbl => $on_col) {
+                        $on_equation .= ($on_equation) ? ' = ' : '';
+                        $on_equation .= $on_tbl.'.'.$on_col;
+                    }
+                    $join_on[] = $on_equation;
+                }
+                $table[] = $tbl_name.' on '.implode(' AND ', $join_on);
+            }
+
+            $key_cols = array();
+            $cond_vals = array();
+            foreach ($condition as $tbl_name => $col_val) {
+                foreach ($col_val as $col_name => $value) {
+                    $key_cols[] = $tbl_name.'.'.$col_name.'= ?';
+                    $cond_vals[] = $value;
+                }
+            }
+
+            $stmt = $this->pdo->prepare(
+                    'SELECT '.implode(','     , $target)
+                    .' FROM ' .implode(' join ', $table)
+                    .' WHERE '.implode(' AND ' , $key_cols).';'
+                    );
+            if ($stmt->execute($cond_vals)) {
+                return $stmt->fetchAll();
+            }
+            return null;
+        } catch (PDOException $e){
+            if (isset($sql)) {
+                $e->queryString = $sql;
+            }
+            throw $e;
+        }
+    }
+
+    /**
+    *
     */
     public function insert($dto, $if_redundant = false) {
         try {
             $place_holders = array_keys($dto->getParms());
             $colnames = array();
             foreach ($place_holders as $colname) {
-                $colnames[] = mb_ereg_replace('^:', '', $colname); 
+                $colnames[] = mb_ereg_replace('^:', '', $colname);
             }
             $sql = 'INSERT INTO '.$dto->getTableName();
             $sql .= '('.implode(',', $colnames).') VALUES ('.implode(',', $place_holders).');';
@@ -118,44 +211,54 @@ class SQLiteHandler {
                     $colname = array_pop($colname);
                     $parms = $dto->getParms();
                     $row = $this->findByKey(
-                        $dto->getTableName(), $colname, $parms[':'.$colname]);
+                        $dto->getTableName(), [ $colname => $parms[':'.$colname] ]);
                     return $row[0]['id'];
                 } else {
                     return false;
                 }
             } else {
+                if (isset($sql)) {
+                    $e->queryString = $sql;
+                }
                 throw $e;
             }
         }
     }
 
     /**
-    * 
+    *
     */
     public function update($dto, $conditions = null) {
-        $place_holders = array_keys($dto->getParms());
-        $settings = array();
-        foreach ($place_holders as $colname) {
-            $settings[] = mb_ereg_replace('^:', '', $colname).'='.$colname; 
-        }
-        $parms = $dto->getParms();
-        $sql = 'UPDATE '.$dto->getTableName();
-        $sql .= ' SET '.implode(',', $settings);
-        if (!empty($condition)) {
-            $sql .= ' WHERE ';
-            $place_holders = array();
-            foreach ($condition as $colname => $value) {
-                $place_holders[] = $colname.'=:condition_'.$colname;
-                $parms[':condition_'.$colname] = $value;
+        try {
+            $place_holders = array_keys($dto->getParms());
+            $settings = array();
+            foreach ($place_holders as $colname) {
+                $settings[] = mb_ereg_replace('^:', '', $colname).'='.$colname;
             }
-            $sql .= implode(' AND ', $place_holders);
+            $parms = $dto->getParms();
+            $sql = 'UPDATE '.$dto->getTableName();
+            $sql .= ' SET '.implode(',', $settings);
+            if (!empty($conditions)) {
+                $sql .= ' WHERE ';
+                $place_holders = array();
+                foreach ($conditions as $colname => $value) {
+                    $place_holders[] = $colname.'=:condition_'.$colname;
+                    $parms[':condition_'.$colname] = $value;
+                }
+                $sql .= implode(' AND ', $place_holders);
+            }
+            $stmt = $this->pdo->prepare($sql.';');
+            return $stmt->execute($parms);
+        } catch (PDOException $e){
+            if (isset($sql)) {
+                $e->queryString = $sql;
+            }
+            throw $e;
         }
-        $stmt = $this->pdo->prepare($sql.';');
-        return $stmt->execute($parms);
     }
 
     /**
-    * 
+    *
     */
     public function delete($table, $key_col, $value) {
         try {
@@ -163,14 +266,17 @@ class SQLiteHandler {
                 'DELETE FROM '.$table.' WHERE '.$key_col.'= ?;');
             return $stmt->execute(array($value));
         } catch (PDOException $e){
+            if (isset($sql)) {
+                $e->queryString = $sql;
+            }
             throw $e;
         }
     }
 
     /**
-    * 
+    *
     */
-    public function createTable($tdo, $if_not_exist = false) {
+    public function createTable(TableDefineObject $tdo, bool $if_not_exist = false) :bool {
         try {
             $defs = array();
             while ($col = $tdo->fetchColumn()) {
@@ -234,13 +340,17 @@ class SQLiteHandler {
             $result = $stmt->execute();
             return $result;
         } catch (PDOException $e){
-            error_log($e->getMessage() . "\n");
+            if (isset($sql)) {
+                $e->queryString = $sql;
+            } else {
+                $e->queryString = '';
+            }
             throw $e;
         }
     }
 
     /**
-    * 
+    *
     */
     public function execSQL($sql, $parms = array()) {
         try {
@@ -253,108 +363,11 @@ class SQLiteHandler {
             }
             return false;
         } catch (PDOException $e){
-            die('PDOException throwen:'. $e->getMessage());
+            if (isset($sql)) {
+                $e->queryString = $sql;
+            }
+            throw $e;
         }
     }
 }
 
-/**
- * 
- */
-abstract class DTO {
-    /**  */
-    private $parms = array();
-
-    /**
-    * 
-    */
-    abstract function getTableName();
-
-    /**
-    * 
-    */
-    public function getParms() {
-        return $this->parms;
-    }
-
-    /**
-    * 
-    */
-    public function setParm($parm, $value) {
-        $this->parms[$parm] = $value;
-    }
-}
-
-/**
- * 
- */
-class TableDefineObject {
-    /**  */
-    private $tbl_name = "";
-    /**  */
-    private $colmuns = array();
-    /** */
-    private $constraints = array();
-
-    /**
-    * 
-    */
-    function __construct($tbl_name, $colmuns = null, $auto_primery = true) {
-        $this->tbl_name = $tbl_name;
-        if ($auto_primery) {
-            $this->appendColumn('id', 'integer', ['primery' => true]);
-        }
-    }
-
-    /**
-    * 
-    */
-    public function tableName() {
-        return $this->tbl_name;
-    }
-
-    /**
-    * 
-    */
-    public function appendColumn($col_name, $type, $constraints = array()) {
-        $col_hash = array(
-            'name' => $col_name,
-            'type' => $type,
-            'default' => (isset($constraints['default'])) ? $constraints['default'] : null,
-            'uniq' => (isset($constraints['uniq'])) ? !!$constraints['uniq'] : false,
-            'not_null'=> (isset($constraints['not_null'])) ? !!$constraints['not_null'] : false,
-            'primery' => (isset($constraints['primery'])) ? !!$constraints['primery'] : false,
-            'increment' => (isset($constraints['increment'])) ? !!$constraints['increment'] : false,
-            'foreign' => (isset($constraints['foreign'])) ? $constraints['foreign'] : null // reference and on delete
-        );
-        $this->colmuns[] = $col_hash;
-    }
-
-    /**
-    * 
-    */
-    public function fetchColumn() {
-        return array_shift($this->colmuns);
-    }
-
-    /**
-    * 
-    */
-    public function appendConstraint($con_name, $targets, $references = null) {
-        $con_hash = array(
-            'type' => $con_name,
-            'targets' => $targets, // constraint target columins (itselfs)
-            'references' => $references // foreign key constraint references columins
-        );
-        $this->constraints[] = $con_hash;
-    }
-
-    /**
-    * 
-    */
-    public function fetchConstraint() {
-        return array_shift($this->constraints);
-    }
-}
-
-?>

@@ -17,6 +17,9 @@ if (array_depth($tbl_data) == 2) {
     echo '<tr>'.PHP_EOL;
     echo '<th>ID</th>';
     foreach ($column_names as $key) {
+        if ($key == 'rid') {
+            continue;
+        }
         echo '<th>'.HTMLHandler::escape($key).'</th>';
     }
     echo PHP_EOL.'</tr>';
@@ -25,6 +28,9 @@ if (array_depth($tbl_data) == 2) {
         $hidden = (isset($primary_colmun[$key])) ? HTMLHandler::hidden('rid[]', $primary_colmun[$key]) : '';
         echo '<th>'.$hidden.HTMLHandler::escape($key + 1).'</th>';
         foreach ($column_names as $column_name) {
+            if ($column_name == 'rid') {
+                continue;
+            }
             echo '<td>';
             if (isset($row[$column_name])) {
                 echo HTMLHandler::escape($row[$column_name]);

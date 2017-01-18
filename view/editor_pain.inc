@@ -90,7 +90,7 @@ if (isset($proj_id)) {
         $forms['open_form'] = HTMLHandler::startForm($URL, ['pid' => $proj_id, 'tab' => 'new'], 'POST', ['id' => 'tbl-def']);
         $forms['tbl_name'] = HTMLHandler::textbox('tbl_name', 'untitled', ['required' => true, 'autofocus' => true]);
         $forms['proj_name'] = HTMLHandler::escape($proj_name);
-        $forms['col_name'] = HTMLHandler::textbox('def_cols[0][col_name]', '', ['required' => true]);
+        $forms['col_name'] = HTMLHandler::textbox('def_cols[1][col_name]', '', ['required' => true]);
         echo <<< _HTML_
         {$forms['open_form']}
             <header>
@@ -110,33 +110,33 @@ if (isset($proj_id)) {
                     <tr><th>列名</th><td>ID</td><td>{$forms['col_name']}</td></tr>
 _HTML_;
         echo '<tr><th>入力形式</th><td>--</td><td>'.PHP_EOL;
-        echo HTMLHandler::selectbox('def_cols[0][form_type]', $form_types).PHP_EOL;
+        echo HTMLHandler::selectbox('def_cols[1][form_type]', $form_types).PHP_EOL;
         echo '<div name="step" hidden><label>刻み幅:'
-        .HTMLHandler::number('def_cols[0][step]', 1, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
+        .HTMLHandler::number('def_cols[1][step]', 1, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
         echo '<div name="max" hidden><label>最大値:'
-        .HTMLHandler::number('def_cols[0][max]', null, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
+        .HTMLHandler::number('def_cols[1][max]', null, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
         echo '<div name="min" hidden><label>最小値:'
-        .HTMLHandler::number('def_cols[0][min]', null, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
+        .HTMLHandler::number('def_cols[1][min]', null, null, ['disabled' => true]).'</label></div>'.PHP_EOL;
         echo '<div name="multi" hidden><label>'
-        .HTMLHandler::radiocheck('checkbox', 'def_cols[0][multiple]', 1, null, ['disabled' => true]).'複数選択をする</label></div>'.PHP_EOL;
+        .HTMLHandler::radiocheck('checkbox', 'def_cols[1][multiple]', 1, null, ['disabled' => true]).'複数選択をする</label></div>'.PHP_EOL;
         echo '<div name="ref" hidden><label>選択肢<br>'
-        .HTMLHandler::selectbox('def_cols[0][ref_dist]', $col_list, null, false, ['disabled' => true]).'</label></div>'.PHP_EOL;
+        .HTMLHandler::selectbox('def_cols[1][ref_dist]', $col_list, [0], false, ['disabled' => true]).'</label></div>'.PHP_EOL;
         echo '</td></tr>'.PHP_EOL;
-        echo '<tr><th>初期値</th><td>自動</td><td>'.HTMLHandler::textbox('def_cols[0][default]', '').'</td></tr>'.PHP_EOL;
+        echo '<tr><th>初期値</th><td>自動</td><td>'.HTMLHandler::textbox('def_cols[1][default]', '').'</td></tr>'.PHP_EOL;
         echo '<tr><th>一意</th><td>'
             .HTMLHandler::radiocheck('checkbox', '', 1, 1, ['disabled' => true])
             .'</td><td>'
-            .HTMLHandler::radiocheck('checkbox', 'def_cols[0][uniq]', 1)
+            .HTMLHandler::radiocheck('checkbox', 'def_cols[1][uniq]', 1)
             .'</td></tr>'.PHP_EOL;
         echo '<tr><th>非Null</th><td>'
             .HTMLHandler::radiocheck('checkbox', '', 1, 1, ['disabled' => true])
             .'</td><td>'
-            .HTMLHandler::radiocheck('checkbox', 'def_cols[0][not_null]', 1)
+            .HTMLHandler::radiocheck('checkbox', 'def_cols[1][not_null]', 1)
             .'</td></tr>'.PHP_EOL;
         // TODO:CHECK制約に相当する部分の実装
         // echo '<tr><th>その他</th><td></td><td><label>'
-        // .HTMLHandler::radiocheck('checkbox', 'def_cols[0][add_chk]', 1, null).'条件を追加する</label><div>'
-        // .HTMLHandler::selectbox('def_cols[0][check]', $chk_list, null, true).'</div></td></tr>'.PHP_EOL;
+        // .HTMLHandler::radiocheck('checkbox', 'def_cols[1][add_chk]', 1, null).'条件を追加する</label><div>'
+        // .HTMLHandler::selectbox('def_cols[1][check]', $chk_list, null, true).'</div></td></tr>'.PHP_EOL;
         echo <<< _HTML_
                 </tbody>
             </table>
@@ -151,7 +151,7 @@ _HTML_;
 //                     <tr><th>制約タイプ</th><th>ID列</th><th class="col-h"><label>列</labal></th><th id="add-col">列追加</th></tr>
 //                 </thead>
 //                 <tbody>
-                    
+
 //                 </tbody>
 //             </table>
 //             </fieldset>

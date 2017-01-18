@@ -5,17 +5,17 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 
 /**
-* 
+*
 */
 require_once(full_path('controllers/servlet.inc'));
 
 /**
- * 
+ *
  */
 class SideServlet extends Servlet {
 
     /**
-    * 
+    *
     */
     public function doGet($req='') {
         $REQ_SCOPE = array();
@@ -25,7 +25,7 @@ class SideServlet extends Servlet {
         // リクエストパラメータpidがセットされている時、そのpidのプロジェクトが開かれる
         if (isset($_GET['pid']) && $_GET['pid'] != '') {
             $current_proj_id = intval($_GET['pid']);
-            if($this->db_editor->open($current_proj_id) === false){
+            if( is_null( $this->db_editor->open( $current_proj_id ) ) ){
                 return $this->redirect($_SERVER['PHP_SELF']);
             }
             $table_list = $this->db_editor->listUsrTables($current_proj_id);
@@ -37,7 +37,7 @@ class SideServlet extends Servlet {
     }
 
     /**
-    * 
+    *
     */
     public function doPost($req='') {
         pre_dump($_POST);

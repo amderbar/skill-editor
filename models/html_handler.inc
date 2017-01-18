@@ -1,6 +1,6 @@
 <?php
 /**
-* 
+*
 */
 require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 
@@ -47,7 +47,7 @@ class HTMLHandler {
     public static function escape($str) {
         return htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE, ENCODE);
     }
-    
+
     /**
     * Helper function for sanitize url. this is not yet complete.
     * @param $url
@@ -130,7 +130,7 @@ class HTMLHandler {
         $tag_str .= self::escape($value) .'"'.self::attr($additional).'>';
         return $tag_str;
     }
-    
+
     /**
     * Helper function for print hidden tag.
     * @param string $element_name
@@ -284,7 +284,7 @@ class HTMLHandler {
         foreach ($options as $option => $label) {
             $tag_str .= '<option value="' . self::escape($option) . '"';
             if (isset($selected[$option])) {
-                $tag_str .= ' selected="selected"';
+                $tag_str .= ' selected';
             }
             $tag_str .= '>' . self::escape($label) . '</option>'.PHP_EOL;
         }
