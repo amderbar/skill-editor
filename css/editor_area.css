@@ -45,6 +45,7 @@
 .data-table {
 	margin: 0 auto;
     border-collapse:collapse;
+   	counter-reset: row-num;
 }
 .data-table th, .data-table td {
 	padding: 3px;
@@ -52,6 +53,16 @@
 }
 .data-table, .data-table th, .data-table td {
     border: 1px LightGrey solid;
+}
+th.id-col span::after {
+	counter-increment: row-num;
+	content: counter(row-num);
+}
+#new-rec {
+	cursor: pointer;
+}
+#new-rec::after {
+	content: 'null';
 }
 
 .draggable {

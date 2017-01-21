@@ -1,41 +1,22 @@
 <?php
-$primary_colmun = array();
-foreach ($tbl_data as $key => $row) {
-    if (isset($row['rid'])) {
-        $primary_colmun[$key] = $row['rid'];
-        unset($tbl_data[$key]['rid']);
-    } else {
-        $primary_colmun[$key] = null;
-    }
-}
-if (array_depth($tbl_data) == 2) {
-    $column_names = array();
-    foreach ($tbl_data as $key => $row) {
-        $column_names += array_keys($row);
-    }
+if (array_depth($tbl_data['data']) == 2) {
+    $tbl_keys = array_keys( $tbl_data['col_name'] );
     echo '<table class="data-table">'.PHP_EOL;
     echo '<tr>'.PHP_EOL;
-    echo '<th>ID</th>';
-    foreach ($column_names as $key) {
-        if ($key == 'rid') {
-            continue;
-        }
-        echo '<th>'.HTMLHandler::escape($key).'</th>';
+    foreach ( $tbl_keys as $key ) {
+        echo '<th>'.HTMLHandler::escape( $tbl_data['col_name'][$key] ).'</th>';
     }
     echo PHP_EOL.'</tr>';
-    foreach ($tbl_data as $key => $row) {
+    foreach ( $tbl_data['data'] as $row ) {
         echo '<tr>'.PHP_EOL;
-        $hidden = (isset($primary_colmun[$key])) ? HTMLHandler::hidden('rid[]', $primary_colmun[$key]) : '';
-        echo '<th>'.$hidden.HTMLHandler::escape($key + 1).'</th>';
-        foreach ($column_names as $column_name) {
-            if ($column_name == 'rid') {
-                continue;
+        foreach ( $tbl_keys as $key ) {
+            if ( $key == 'id' ) {
+                $id_attr = ( is_null( $row[$key] ) ) ? ' id="new-rec"' : '';
+                $cont = '<span'.$id_attr.'>'.HTMLHandler::hidden( 'id[]', $row[$key] ).'</span>';
+                echo '<th class="id-col">'.$cont.'</th>';
+            } else {
+                echo '<td>'.HTMLHandler::escape( $row[$key] ).'</td>';
             }
-            echo '<td>';
-            if (isset($row[$column_name])) {
-                echo HTMLHandler::escape($row[$column_name]);
-            }
-            echo '</td>';
         }
         echo PHP_EOL.'</tr>';
     }

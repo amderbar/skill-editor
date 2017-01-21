@@ -154,7 +154,7 @@ class DBEditor {
             $db_con = $this->open( $proj_id, true );
             // system_admin tables
             $tdo = new TableDefineObject( SYSTEM_TBL );
-            $tdo->appendColumn( 'tbl_name', 'text', [ 'uniq' => true, 'not_null' => true ] );
+            $tdo->appendColumn( 'tbl_name', 'text', [ 'not_null' => true ] );
             $tdo->appendColumn( 'actual_name', 'text', [ 'uniq' => true, 'not_null' => true ] );
             $db_con->createTable( $tdo, true );
 
@@ -320,7 +320,7 @@ class DBEditor {
             // システムテーブルに表名を登録
             $tbl_id = $this->insertData( $proj_id, SYSTEM_TBL, [
                     'tbl_name' => $tbl_name,
-                    'actual_name' => 'u_' . fnv132( $tbl_name )
+                    'actual_name' => $this->generateActualTblName(  $proj_id, $tbl_name )
             ] );
             // システムテーブルに列情報を登録
             $this->registerUserColumn( $proj_id, $tbl_id, $cols_hash, $constraints_hash );
@@ -401,7 +401,7 @@ class DBEditor {
         $col_id_arr = array();
         $col_id_arr[] = $this->insertData( $proj_id, SYSTEM_COL, [
                 'tbl_id' => $tbl_id,
-                'col_name' => 'rid',
+                'col_name' => 'ID',
                 'actual_name' => 'id',
                 'form_type' => '',
                 'multiple' => false
@@ -411,7 +411,7 @@ class DBEditor {
 
         foreach ( $cols_hash as $def_hash ) {
 
-            $actual_name = 'c_'.fnv132( $def_hash['col_name'] );
+            $actual_name = $this->generateActualColName( $proj_id, $def_hash['col_name'] );
             $col_id = $this->insertData( $proj_id, SYSTEM_COL, [
                 'tbl_id' => $tbl_id,
                 'col_name' => $def_hash['col_name'],
@@ -463,36 +463,53 @@ class DBEditor {
     }
 
     /**
+     * ハッシュ化したユーザー入力表名にprefixと一意なsuffixを付けて、重複しない実名を返す
+     *
+     * @param string $tbl_name
+     * @return string
+     */
+    private function generateActualTblName(int $proj_id, string $tbl_name) :string {
+        $max_id = $this->con[$proj_id]->fetchAll( SYSTEM_TBL, 'max(id) as id' );
+        $max_id = current($max_id);
+        return 'u_' . fnv132( $tbl_name ).'_'.($max_id['id'] + 1);
+    }
+
+    /**
+     * ハッシュ化したユーザー入力列名にprefixと表内で一意なsuffixを付けて、重複しない実名を返す
+     *
+     * @param string $tbl_name
+     * @return string
+     */
+    private function generateActualColName(int $proj_id, string $col_name) :string {
+        static $max_id;
+        $max_id = $max_id ?? 0;
+        $max_id++;
+        var_export_log($max_id);
+        return 'u_' . fnv132( $col_name ).'_'.$max_id;
+    }
+
+    /**
+     *
+     *
      * @param int $proj_id
      * @param int $tbl_id
      * @return array
      */
     public function listData(int $proj_id, int $tbl_id): array {
         try {
-            $tmp_table = $this->con[$proj_id]->fetchAll( $this->tblName( $proj_id, $tbl_id, true ) );
-            $list_data = array ();
+            $list_data = $this->con[$proj_id]->fetchAll( $this->tblName( $proj_id, $tbl_id, true ) );
             $col_names = array ();
-            foreach ( $tmp_table as $row ) {
+            foreach ( $this->listColumns( $proj_id, $tbl_id ) as $col ) {
+                $col_names[ $col['actual_name'] ] = $col['col_name'];
+            }
+            if ( empty( $list_data ) ) {
                 $tmp_row = array ();
-                foreach ( $row as $col => $value ) {
-                    if (! isset( $col_names[$col] )) {
-                        $tmp = $this->con[$proj_id]->findByKey( SYSTEM_COL, [
-                                'actual_name' => $col
-                        ], [
-                                'col_name'
-                        ] );
-                        $col_names[$col] = $tmp[0]['col_name'];
-                    }
-                    $tmp_row[$col_names[$col]] = $value;
+                foreach ( array_keys( $col_names ) as $col_key ) {
+                    $tmp_row[ $col_key ] = null;
                 }
                 $list_data[] = $tmp_row;
             }
-            $tmp_row = array ();
-            foreach ( $this->listColumns( $proj_id, $tbl_id ) as $col ) {
-                $tmp_row[$col['col_name']] = null;
-            }
-            $list_data[] = $tmp_row;
-            return $list_data;
+            return ['col_name' => $col_names, 'data' => $list_data];
         } catch ( PDOException $e ) {
             die( 'PDOException throwen:' . $e->getMessage() );
         }
@@ -693,7 +710,6 @@ class DBEditor {
             // project table
             $tdo = new TableDefineObject( 'projects' );
             $tdo->appendColumn( 'proj_name', 'text', [
-                    'uniq' => true,
                     'not_null' => true
             ] );
             $this->con[ROOT_DB_ID]->createTable( $tdo, true );

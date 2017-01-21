@@ -74,6 +74,32 @@ class SQLiteHandler {
         }
     }
 
+    public function isExists(string $table, array $condition) :bool {
+        try {
+            // $tableと$columnのエスケープ処理が必要
+            $key_cols = array();
+            $key_vals = array();
+            foreach ($condition as $col => $val) {
+                $key_cols[] = $col.'= ?';
+                $key_vals[] = $val;
+            }
+            $sql = 'SELECT EXISTS( SELECT id FROM '.$table.'WHERE '.implode(' AND ', $key_cols).') AS judge;';
+
+            $stmt = $this->pdo->prepare($sql);
+            if ( $stmt->execute( $key_vals ) ) {
+                $result = $stmt->fetch();
+                return boolval($result['judge']);
+            } else {
+                throw new DBManageExeption( 'Execute Prepared statement Failed.' );
+            }
+        } catch (PDOException | DBManageExeption $e) {
+            if (isset($sql)) {
+                $e->queryString = $sql;
+            }
+            throw $e;
+        }
+    }
+
     /**
     *
     */

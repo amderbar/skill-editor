@@ -75,9 +75,16 @@ class EditorServlet extends Servlet {
                 }
                 // プレビュー用ダミーデータ
                 $REQ_SCOPE['tbl_data'] = array(
-                    ['rid' => 1, 'Nameless' => ''],
-                    ['rid' => 2, 'Nameless' => ''],
-                    ['rid' => 3, 'Nameless' => '']
+                        'col_name' => array(
+                                'id' => 'ID',
+                                'col' => 'Nameless'
+                        ),
+                        'data' => array(
+                                ['id' => 1, 'col' => ''],
+                                ['id' => 2, 'col' => ''],
+                                ['id' => 3, 'col' => ''],
+                                ['id' => null, 'col' => null]
+                        )
                 );
 
             } else { // 既存テーブルのタブを開く
