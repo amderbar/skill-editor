@@ -3,7 +3,7 @@
 /**
  *
  */
-abstract class DTO {
+abstract class DataTransfarObject {
 	/**  */
 	private $parms = array();
 
@@ -60,10 +60,10 @@ class TableDefineObject {
 				'name' => $col_name,
 				'type' => $type,
 				'default' => $constraints['default'] ?? null,
-				'uniq' => (isset($constraints['uniq'])) ? (bool)$constraints['uniq'] : false,
-				'not_null'=> (isset($constraints['not_null'])) ? (bool)$constraints['not_null'] : false,
-				'primery' => (isset($constraints['primery'])) ? (bool)$constraints['primery'] : false,
-				'increment' => (isset($constraints['increment'])) ? (bool)$constraints['increment'] : false,
+				'uniq' => boolval( $constraints['uniq'] ?? null ),
+				'not_null'=> boolval( $constraints['not_null'] ?? null ),
+				'primery' => boolval( $constraints['primery'] ?? null ),
+				'increment' => boolval( $constraints['increment'] ?? null ),
 				'foreign' => $constraints['foreign'] ?? null // reference and on delete
 		);
 		$this->colmuns[] = $col_hash;

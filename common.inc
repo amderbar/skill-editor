@@ -16,9 +16,10 @@ define('ENCODE', 'UTF-8');
 * load library and common functions
 */
 require_once(full_path('models/html_handler.inc'));
+require_once(full_path('models/exception.inc'));
 
 /**
-* 
+*
 */
 function getMyTopURL() {
     return parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
@@ -61,6 +62,19 @@ function var_export_log($var) {
 */
 function fnv132($str) {
     return hash('fnv132', $str);
+}
+
+function implodeAssoc(string $glue, array $asoc) :array {
+    $result = array();
+    foreach ($asoc as $key => $child_arr) {
+        if ( !is_array( $child_arr ) ) {
+            $child_arr = array( $child_arr );
+        }
+        foreach ($child_arr as $val) {
+            $result[] = "{$key}{$glue}{$val}";
+        }
+    }
+    return $result;
 }
 
 /**

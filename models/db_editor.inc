@@ -152,6 +152,7 @@ class DBEditor {
                 mkdir( $tmpl_dir, 0666 );
             }
             $db_con = $this->open( $proj_id, true );
+
             // system_admin tables
             $tdo = new TableDefineObject( SYSTEM_TBL );
             $tdo->appendColumn( 'tbl_name', 'text', [ 'not_null' => true ] );
@@ -200,7 +201,7 @@ class DBEditor {
         if (isset( $this->con[$proj_id] )) {
             $this->close( $proj_id );
         }
-        $this->con[ROOT_DB_ID]->delete( 'projects', 'id', $proj_id );
+        $this->con[ROOT_DB_ID]->delete( 'projects', [ 'id' => $proj_id ] );
         if ($tmpl_dir = full_path( sprintf( 'resources/templates/proj%03d', $proj_id ) )) {
             if ($handle = opendir( $tmpl_dir )) {
                 while ( false !== ($tmpl = readdir( $handle )) ) {
@@ -221,10 +222,10 @@ class DBEditor {
      */
     public function registerTemplate($proj_id, $tmpl_name) {
         try {
-            $dto = new class( $proj_id, $tmpl_name ) extends DTO {
+            $dto = new class( $proj_id, $tmpl_name ) extends DataTransfarObject {
                 function __construct($proj_id, $tmpl_name) {
-                    $this->setParm( ':proj_id', $proj_id );
-                    $this->setParm( ':tmpl_name', $tmpl_name );
+                    $this->setParm( 'proj_id', $proj_id );
+                    $this->setParm( 'tmpl_name', $tmpl_name );
                 }
                 public function getInsertSQL() {
                     return 'INSERT INTO templates(proj_id, tmpl_name) VALUES (:proj_id, :tmpl_name);';
@@ -273,7 +274,7 @@ class DBEditor {
     public function listUsrTables($proj_id) {
         try {
             $table_list = array ();
-            foreach ( $this->con[$proj_id]->fetchAll( SYSTEM_TBL, 'id, tbl_name' ) as $row ) {
+            foreach ( $this->con[$proj_id]->fetchAll( SYSTEM_TBL, ['id', 'tbl_name'] ) as $row ) {
                 $table_list[$row['id']] = $row['tbl_name'];
             }
             return $table_list;
@@ -469,7 +470,7 @@ class DBEditor {
      * @return string
      */
     private function generateActualTblName(int $proj_id, string $tbl_name) :string {
-        $max_id = $this->con[$proj_id]->fetchAll( SYSTEM_TBL, 'max(id) as id' );
+        $max_id = $this->con[$proj_id]->fetchAll( SYSTEM_TBL, ['max(id) as id'] );
         $max_id = current($max_id);
         return 'u_' . fnv132( $tbl_name ).'_'.($max_id['id'] + 1);
     }
@@ -523,12 +524,12 @@ class DBEditor {
      * @return unknown
      */
     public function insertData($proj_id, $table, $parms, $if_redundant = false) {
-        $dto = new class( $table, $parms ) extends DTO {
+        $dto = new class( $table, $parms ) extends DataTransfarObject {
             private $table = '';
             function __construct($table, $parms) {
                 $this->table = $table;
                 foreach ( $parms as $colname => $value ) {
-                    $this->setParm( ':' . $colname, $value );
+                    $this->setParm( $colname, $value );
                 }
             }
             public function getTableName() {
@@ -552,12 +553,12 @@ class DBEditor {
      * @return unknown
      */
     public function updateData($proj_id, $table, $parms, $conditions = null) {
-        $dto = new class( $table, $parms ) extends DTO {
+        $dto = new class( $table, $parms ) extends DataTransfarObject {
             private $table = '';
             function __construct($table, $parms) {
                 $this->table = $table;
                 foreach ( $parms as $colname => $value ) {
-                    $this->setParm( ':' . $colname, $value );
+                    $this->setParm( $colname, $value );
                 }
             }
             public function getTableName() {
@@ -594,13 +595,13 @@ class DBEditor {
             // 外部キーの要素を登録し、rowidに変換
             foreach ( $foreign_keys as $key => $colname ) {
                 $colname = $colname ? $colname : $key;
-                $dto = new class( $key, $colname, $parms[$key] ) extends DTO {
+                $dto = new class( $key, $colname, $parms[$key] ) extends DataTransfarObject {
                     private $table = '';
                     private $colname = '';
                     function __construct($key, $colname, $parm) {
                         $this->table = $key . 's';
                         $this->colname = $colname;
-                        $this->setParm( ':' . $colname, $parm );
+                        $this->setParm( $colname, $parm );
                     }
                     public function getInsertSQL() {
                         return 'INSERT INTO ' . $this->table . '(' . $this->colname . ') VALUES (:' . $this->colname . ');';
@@ -621,20 +622,20 @@ class DBEditor {
                 $parms[$key] = $row_id;
             }
             // スキルデータ本体を登録
-            $dto = new class( $parms ) extends DTO {
+            $dto = new class( $parms ) extends DataTransfarObject {
                 private $table = 'skills';
                 private $colname = '';
                 function __construct($parm) {
                     $this->colname = array_keys( $parm );
                     foreach ( $parm as $key => $value ) {
-                        $this->setParm( ':' . $key, $value );
+                        $this->setParm( $key, $value );
                     }
                 }
                 public function getInsertSQL() {
                     $columns = implode( ',', $this->colname );
                     $places = array ();
                     foreach ( $this->colname as $column ) {
-                        $places[] = ':' . $column;
+                        $places[] = $column;
                     }
                     $places = implode( ',', $places );
                     return 'INSERT INTO ' . $this->table . '(' . $columns . ') VALUES (' . $places . ');';
@@ -658,9 +659,9 @@ class DBEditor {
                 $preconditions = array ();
                 // 個々の条件を登録
                 foreach ( $conditions as $condition ) {
-                    $dto = new class( $condition ) extends DTO {
+                    $dto = new class( $condition ) extends DataTransfarObject {
                         function __construct($parm) {
-                            $this->setParm( ':condition', $parm );
+                            $this->setParm( 'condition', $parm );
                         }
                         public function getInsertSQL() {
                             return 'INSERT INTO conditions(condition) VALUES (:condition);';
@@ -684,10 +685,10 @@ class DBEditor {
                 }
                 // 各条件をスキルデータと関連付け
                 foreach ( $preconditions as $pair ) {
-                    $dto = new class( $pair ) extends DTO {
+                    $dto = new class( $pair ) extends DataTransfarObject {
                         function __construct($parm) {
-                            $this->setParm( ':skill_id', $parm[0] );
-                            $this->setParm( ':condition_id', $parm[1] );
+                            $this->setParm( 'skill_id', $parm[0] );
+                            $this->setParm( 'condition_id', $parm[1] );
                         }
                         public function getInsertSQL() {
                             return 'INSERT INTO preconditions(skill_id,condition_id) VALUES (:skill_id,:condition_id);';
