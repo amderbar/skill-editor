@@ -87,11 +87,8 @@ class DBEditor {
      * @return string
      */
     public function projName(int $proj_id): ?string {
-        $row = $this->con[ROOT_DB_ID]->findByKey( 'projects',
-                [ 'id' => $proj_id ],
-                [ 'proj_name']
-          );
-        return $row[0]['proj_name'] ?? null;
+        $row = $this->con[ROOT_DB_ID]->load( 'projects', $proj_id , [ 'proj_name'] );
+        return $row['proj_name'] ?? null;
     }
 
     /**
@@ -102,29 +99,20 @@ class DBEditor {
      */
     public function tblName(int $proj_id, int $tbl_id, bool $is_actual = false): ?string {
         $target = ($is_actual) ? 'actual_name' : 'tbl_name';
-        $row = $this->con[$proj_id]->findByKey( SYSTEM_TBL, [
-                'id' => $tbl_id
-        ], [
-                $target
-        ] );
-        return $row[0][$target] ?? null;
+        $row = $this->con[$proj_id]->load( SYSTEM_TBL, $tbl_id, [ $target ] );
+        return $row[$target] ?? null;
     }
 
     /**
      * @param int $proj_id
-     * @param int $tbl_id
      * @param int $col_id
      * @param bool $is_actual
      * @return string
      */
-    public function colName(int $proj_id, int $tbl_id, int $col_id, bool $is_actual = false): ?string {
+    public function colName(int $proj_id, int $col_id, ?bool $is_actual = false): ?string {
         $target = ($is_actual) ? 'actual_name' : 'col_name';
-        $row = $this->con[$proj_id]->findByKey( SYSTEM_COL, [
-                'id' => $tbl_id
-        ], [
-                $target
-        ] );
-        return $row[0][$target] ?? null;
+        $row = $this->con[$proj_id]->load( SYSTEM_COL, $col_id, [ $target ] );
+        return $row[$target] ?? null;
     }
 
     /**
@@ -133,7 +121,7 @@ class DBEditor {
     public function listDB(): array {
         try {
             $proj_list = array ();
-            foreach ( $this->con[ROOT_DB_ID]->fetchAll( 'projects' ) as $row ) {
+            foreach ( $this->con[ROOT_DB_ID]->fetchAll( 'projects', null, ['id'] ) as $row ) {
                 $proj_list[$row['id']] = $row['proj_name'];
             }
             return $proj_list;
@@ -142,9 +130,11 @@ class DBEditor {
         }
     }
 
+
+
     /**
      */
-    public function registerDB($proj_name) {
+    public function registerDB(string $proj_name) :int {
         try {
             $proj_id = $this->insertData( ROOT_DB_ID, 'projects', [ 'proj_name' => $proj_name ], true );
             $tmpl_dir = full_path( sprintf( 'resources/templates/proj%03d', $proj_id ), true );
@@ -274,7 +264,7 @@ class DBEditor {
     public function listUsrTables($proj_id) {
         try {
             $table_list = array ();
-            foreach ( $this->con[$proj_id]->fetchAll( SYSTEM_TBL, ['id', 'tbl_name'] ) as $row ) {
+            foreach ( $this->con[$proj_id]->fetchAll( SYSTEM_TBL, ['id', 'tbl_name'], null, ['id]'] ) as $row ) {
                 $table_list[$row['id']] = $row['tbl_name'];
             }
             return $table_list;
@@ -287,7 +277,7 @@ class DBEditor {
      */
     public function listColumns($proj_id, $tbl_id) {
         try {
-            return $this->con[$proj_id]->findByKey( SYSTEM_COL, [ 'tbl_id' => $tbl_id ] );
+            return $this->con[$proj_id]->findByKey( SYSTEM_COL, [ 'tbl_id' => $tbl_id ], null, ['id'] );
         } catch ( PDOException $e ) {
             die( 'PDOException throwen:' . $e->getMessage() );
         }
@@ -498,7 +488,7 @@ class DBEditor {
      */
     public function listData(int $proj_id, int $tbl_id): array {
         try {
-            $list_data = $this->con[$proj_id]->fetchAll( $this->tblName( $proj_id, $tbl_id, true ) );
+            $list_data = $this->con[$proj_id]->fetchAll( $this->tblName( $proj_id, $tbl_id, true ), null, ['id'] );
             $col_names = array ();
             foreach ( $this->listColumns( $proj_id, $tbl_id ) as $col ) {
                 $col_names[ $col['actual_name'] ] = $col['col_name'];

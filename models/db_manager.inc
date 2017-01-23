@@ -73,7 +73,7 @@ class SQLiteHandler {
             $target_col = $this->getColumnList( $table );
         }
         $sql = 'SELECT '.implode(',', $target_col).' FROM '.$table.' WHERE id = ?;';
-        $stmt = $this->prepareExecute ( $sql, [$id] );
+        $stmt = $this->prepareExecute( $sql, [$id] );
         return $stmt->fetch();
     }
 
@@ -102,32 +102,38 @@ class SQLiteHandler {
 
 
     /**
-     * TODO: Order by を指定できるようにする
      *
      * @param string $table
      * @param array $target_col
+     * @param array $order_by
      * @return array
      */
-    public function fetchAll( string $table, ?array $target_col = [] ) :array {
-        // $tableと$columnのエスケープ処理が必要
+    public function fetchAll( string $table, ?array $target_col = [], ?array $order_by = [] ) :array {
+        // FIXME: $tableと$columnのエスケープ処理が必要
         if ( empty( $target_col ) ) {
             $target_col = $this->getColumnList( $table );
         }
-        $sql = 'SELECT '.implode(',', $target_col).' FROM '.$table.';';
-        $stmt = $this->prepareExecute( $sql );
+        $sql = 'SELECT '.implode(',', $target_col).' FROM '.$table;
+        if ( !empty( $order_by ) ) {
+            $sql .= ' ORDER BY '.implode(', ', $order_by);
+        }
+
+        $stmt = $this->prepareExecute( $sql.';' );
         return $stmt->fetchAll();
     }
 
 
 
     /**
+     *
      * @param string $table
      * @param array $condition [colmun_name => value] format array
      * @param array $target_col
+     * @param array $order_by
      * @return array
      */
-    public function findByKey( string $table, array $condition, ?array $target_col = [] ) :array {
-        // $tableと$columnのエスケープ処理が必要
+    public function findByKey( string $table, array $condition, ?array $target_col = [], ?array $order_by = [] ) :array {
+        // FIXME: $tableと$columnのエスケープ処理が必要
         if ( empty( $target_col ) ) {
             $target_col = $this->getColumnList( $table );
         }
@@ -137,22 +143,27 @@ class SQLiteHandler {
             $key_cols[] = $col.'= ?';
             $key_vals[] = $val;
         }
-        $sql = 'SELECT '.implode(',', $target_col).' FROM '.$table.' WHERE '.implode(' AND ', $key_cols).';';
+        $sql = 'SELECT '.implode(',', $target_col).' FROM '.$table.' WHERE '.implode(' AND ', $key_cols);
+        if ( !empty( $order_by ) ) {
+            $sql .= ' ORDER BY '.implode(', ', $order_by);
+        }
 
-        $stmt = $this->prepareExecute( $sql, $key_vals );
+        $stmt = $this->prepareExecute( $sql.';', $key_vals );
         return $stmt->fetchAll();
     }
 
 
 
     /**
+     *
      * @param array $join_tbls  [ tbl_name, tbl_name => [ [tbl_name => col_name, tbl_name => col_name], ... ], ... ]
      * @param array $condition  [ tbl_name => [col_name => value], ... ]
      * @param array $target_col [ tbl_name => [col_name, ... ], ... ]
+     * @param array $order_by   [ tbl_name.col_name, tbl_name.col_name, ... ]
      * @return array
      */
-    public function findByKeyWithJoin( array $join_tbls, array $condition, ?array $target_col = [] ) :array {
-        // $tableと$columnのエスケープ処理が必要
+    public function findByKeyWithJoin( array $join_tbls, array $condition, ?array $target_col = [], ?array $order_by = []  ) :array {
+        // FIXME: $tableと$columnのエスケープ処理が必要
 
         if ( empty( $target_col ) ) {
             $target_col = array();
@@ -173,7 +184,7 @@ class SQLiteHandler {
                 }
                 $join_on[] = $on_equation;
             }
-            $table[] = $tbl_name.' on '.implode(' AND ', $join_on);
+            $table[] = $tbl_name.' ON '.implode(' AND ', $join_on);
         }
 
         $key_cols = array();
@@ -186,8 +197,12 @@ class SQLiteHandler {
         }
 
         $sql = 'SELECT '.implode(','     , $target)
-                .' FROM ' .implode(' join ', $table)
+                .' FROM ' .implode(' JOIN ', $table)
                 .' WHERE '.implode(' AND ' , $key_cols).';';
+        if ( !empty( $order_by ) ) {
+            $sql .= ' ORDER BY '.implode(', ', $order_by);
+        }
+
         $stmt = $this->prepareExecute( $sql, $cond_vals );
         return $stmt->fetchAll();
     }
