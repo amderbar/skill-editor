@@ -130,6 +130,7 @@ class EditorServlet extends Servlet {
             $redirect_url = getMyTopURL();
 
         }
+        // TODO: 表の新規作成と同時にサイドバーも更新する
         // return $this->foward('view/editor_pain.inc', $REQ_SCOPE);
         return $this->redirect($redirect_url);
     }

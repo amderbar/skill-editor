@@ -5,6 +5,9 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/models/data_transfer_objec
 
 
 /**
+ *
+ * TODO: DBMS変更の際も修正を最小限にするような設計
+ *
  * @author amderbar
  *
  */
@@ -68,7 +71,7 @@ class SQLiteHandler {
      * @return array
      */
     public function load( string $table, int $id, ?array $target_col = [] ) :array {
-        // $tableと$columnのエスケープ処理が必要
+        // FIXME: $tableと$columnのエスケープ処理が必要
         if ( empty($target_col) ) {
             $target_col = $this->getColumnList( $table );
         }
@@ -85,7 +88,7 @@ class SQLiteHandler {
      * @return bool
      */
     public function isExists(string $table, array $condition) :bool {
-        // $tableと$columnのエスケープ処理が必要
+        // FIXME: $tableと$columnのエスケープ処理が必要
         $key_cols = array();
         $key_vals = array();
         foreach ($condition as $col => $val) {

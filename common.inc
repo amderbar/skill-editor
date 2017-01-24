@@ -1,4 +1,13 @@
 <?php
+// TODO: ワークスペース引っ越し
+// ローカルの別の場所にユニットテストも含めた開発用ディレクトリを作成し、そこに移動。
+// 実行用のドキュメントルートはそのディレクトリの中の一部をシンボリックリンクして設置するようにする
+
+// TODO: ORDER BY 対応
+// リスト表示をする部分の並び順を一定にするように見直し
+
+// FIXME: CSRF対策、二度押し対策の整備
+
 /**
 * session check.
 */
@@ -41,7 +50,7 @@ function full_path($path='', $newfile=false) {
 }
 
 /**
-* 
+*
 */
 function pre_dump($var) {
     echo '<pre>';
@@ -51,14 +60,14 @@ function pre_dump($var) {
 }
 
 /**
-* 
+*
 */
 function var_export_log($var) {
     error_log(var_export($var, true));
 }
 
 /**
-* 
+*
 */
 function fnv132($str) {
     return hash('fnv132', $str);

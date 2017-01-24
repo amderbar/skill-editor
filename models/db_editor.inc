@@ -37,6 +37,10 @@ define( 'FORM_TO_DATA', [
 ] );
 
 /**
+ *
+ * TODO: システムDBを編集するものとユーザーDBを編集するものとでクラスを分けたい
+ * TODO: 例外処理の統一
+ *
  * @author amderbar
  *
  */
@@ -133,6 +137,10 @@ class DBEditor {
 
 
     /**
+     * TODO: 列の表示並び順を保存できるようにする
+     *
+     * @param string $proj_name
+     * @return int
      */
     public function registerDB(string $proj_name) :int {
         try {
@@ -399,6 +407,7 @@ class DBEditor {
        ] );
 
         // TODO: multiple == true のときの扱い
+        // 中間表を作ることになるが、その管理用の表も必要か？
 
         foreach ( $cols_hash as $def_hash ) {
 
