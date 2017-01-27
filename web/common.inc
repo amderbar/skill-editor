@@ -1,8 +1,4 @@
 <?php
-// TODO: ワークスペース引っ越し
-// ローカルの別の場所にユニットテストも含めた開発用ディレクトリを作成し、そこに移動。
-// 実行用のドキュメントルートはそのディレクトリの中の一部をシンボリックリンクして設置するようにする
-
 // TODO: ORDER BY 対応
 // リスト表示をする部分の並び順を一定にするように見直し
 
@@ -46,6 +42,7 @@ function full_path($path='', $newfile=false) {
     if ((! $newfile) || (realpath($path))) {
         $path = realpath($path);
     }
+    var_export_log($path);
     return str_replace(DIRECTORY_SEPARATOR, '/', $path);
 }
 

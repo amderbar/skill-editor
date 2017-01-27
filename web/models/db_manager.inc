@@ -52,6 +52,7 @@ class SQLiteHandler {
     */
     public function connect( string $db_name ) {
         $dsn = 'sqlite:' . $db_name;
+        var_export_log($dsn);
         try {
             $this->pdo = new PDO($dsn);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -395,7 +396,7 @@ class SQLiteHandler {
      * @throws Ambigous <PDOException, DBManageExeption>
      * @return array
      */
-    private function prepareExecute( string $sql, ?array $parms = [], ?PDOStatement &$stmt = null ) :PDOStatement {
+    private function prepareExecute( string $sql, ?array $parms = null, ?PDOStatement &$stmt = null ) :PDOStatement {
         try {
             $stmt = $stmt ?? $this->pdo->prepare( $sql );
             if ( $stmt->execute( $parms ) ) {
