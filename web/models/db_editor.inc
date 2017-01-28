@@ -39,7 +39,6 @@ define( 'FORM_TO_DATA', [
 /**
  *
  * TODO: システムDBを編集するものとユーザーDBを編集するものとでクラスを分けたい
- * TODO: 例外処理の統一
  *
  * @author amderbar
  *
@@ -129,8 +128,8 @@ class DBEditor {
                 $proj_list[$row['id']] = $row['proj_name'];
             }
             return $proj_list;
-        } catch ( PDOException $e ) {
-            die( 'PDOException throwen:' . $e->getMessage() );
+        } catch ( PDOException | DBManageExeption $e ) {
+            $this->handleException( $e );
         }
     }
 
@@ -182,13 +181,8 @@ class DBEditor {
 
             $db_con->createTable( $tdo, true );
             return $proj_id;
-        } catch ( PDOException $e ) {
-            error_log(
-                    $e->getMessage() . PHP_EOL
-                    . $e->queryString . PHP_EOL
-                    . $e->getTraceAsString()
-                );
-            die();
+        } catch ( PDOException | DBManageExeption $e ) {
+            $this->handleException( $e );
         }
     }
 
@@ -235,8 +229,8 @@ class DBEditor {
                 return $tmpl_id;
             }
             return false;
-        } catch ( PDOException $e ) {
-            die( 'PDOException throwen:' . $e->getMessage() );
+        } catch ( PDOException | DBManageExeption $e ) {
+            $this->handleException( $e );
         }
     }
 
@@ -245,8 +239,8 @@ class DBEditor {
     public function getAllTemplates() {
         try {
             return $this->con[ROOT_DB_ID]->fetchAll( 'templates' );
-        } catch ( PDOException $e ) {
-            die( 'PDOException throwen:' . $e->getMessage() );
+        } catch ( PDOException | DBManageExeption $e ) {
+            $this->handleException( $e );
         }
     }
 
@@ -262,8 +256,8 @@ class DBEditor {
                 $tmpl_list[$row['id']] = $row['tmpl_name'];
             }
             return $tmpl_list;
-        } catch ( PDOException $e ) {
-            die( 'PDOException throwen:' . $e->getMessage() );
+        } catch ( PDOException | DBManageExeption $e ) {
+            $this->handleException( $e );
         }
     }
 
@@ -276,8 +270,8 @@ class DBEditor {
                 $table_list[$row['id']] = $row['tbl_name'];
             }
             return $table_list;
-        } catch ( PDOException $e ) {
-            die( 'PDOException throwen:' . $e->getMessage() );
+        } catch ( PDOException | DBManageExeption $e ) {
+            $this->handleException( $e );
         }
     }
 
@@ -286,8 +280,8 @@ class DBEditor {
     public function listColumns($proj_id, $tbl_id) {
         try {
             return $this->con[$proj_id]->findByKey( SYSTEM_COL, [ 'tbl_id' => $tbl_id ], null, ['id'] );
-        } catch ( PDOException $e ) {
-            die( 'PDOException throwen:' . $e->getMessage() );
+        } catch ( PDOException | DBManageExeption $e ) {
+            $this->handleException( $e );
         }
     }
 
@@ -361,14 +355,11 @@ class DBEditor {
             // テーブル作成
             $this->con[$proj_id]->createTable( $tdo );
             return $tbl_id;
-        } catch ( PDOException $e ) {
-            $err_str = $e->getMessage() . PHP_EOL;
-            $err_str .= $e->queryString . PHP_EOL;
-            $err_str .= $e->getTraceAsString();
-            error_log($err_str);
-            die();
+        } catch ( PDOException | DBManageExeption $e ) {
+            $this->handleException( $e );
         }
     }
+
 
     /**
      * 処理内容メモ
@@ -509,8 +500,8 @@ class DBEditor {
                 $list_data[] = $tmp_row;
             }
             return ['col_name' => $col_names, 'data' => $list_data];
-        } catch ( PDOException $e ) {
-            die( 'PDOException throwen:' . $e->getMessage() );
+        } catch ( PDOException | DBManageExeption $e ) {
+            $this->handleException( $e );
         }
     }
 
@@ -537,9 +528,8 @@ class DBEditor {
         try {
             // トランザクション処理必要
             return $this->con[$proj_id]->insert( $dto, $if_redundant );
-        } catch ( PDOException $e ) {
-            error_log( $e->getMessage() );
-            die();
+        } catch ( PDOException | DBManageExeption $e ) {
+            $this->handleException( $e );
         }
     }
 
@@ -566,9 +556,8 @@ class DBEditor {
         try {
             // トランザクション処理必要
             return $this->con[$proj_id]->update( $dto, $conditions );
-        } catch ( PDOException $e ) {
-            error_log( $e->getMessage() );
-            die();
+        } catch ( PDOException | DBManageExeption $e ) {
+            $this->handleException( $e );
         }
     }
 
@@ -750,9 +739,22 @@ class DBEditor {
                         'type' => $type
                 ], true );
             }
-        } catch ( PDOException $e ) {
-            die( 'PDOException throwen:' . $e->getMessage() );
+        } catch ( PDOException | DBManageExeption $e ) {
+            $this->handleException( $e );
         }
+    }
+
+     /**
+      * @param RuntimeException $e
+      * @throws RuntimeException
+      */
+     private function handleException( RuntimeException $e ) {
+         $err_str = get_class( $e ).' throwen:' . $e->getMessage() . PHP_EOL;
+         $err_str .= ( $e->queryString ?? '' ) . PHP_EOL;
+         $err_str .= var_export( ( $e->bindedParam ?? '' ), true ) . PHP_EOL;
+         $err_str .= $e->getTraceAsString();
+         error_log( $err_str );
+         throw $e;
     }
 
     /**
