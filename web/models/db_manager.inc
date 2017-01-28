@@ -52,7 +52,6 @@ class SQLiteHandler {
     */
     public function connect( string $db_name ) {
         $dsn = 'sqlite:' . $db_name;
-        var_export_log($dsn);
         try {
             $this->pdo = new PDO($dsn);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -378,13 +377,21 @@ class SQLiteHandler {
      * @return array
      */
     private function getColumnList( string $table ) :array {
-        static $stmt_cache;
-        if ( is_null($stmt_cache) ) {
-            $stmt_cache = array();
+        static $cache;
+        if ( !isset( $cache ) ) {
+            $cache = array();
         }
-//         $stmt_cache[ $table ] = $stmt_cache[ $table ] ?? null;
-        $stmt = $this->prepareExecute( 'PRAGMA table_info('.$table.')', [], $stmt_cache[ $table ] );
-        return array_column($stmt->fetchAll(), 'name');
+        if ( !isset( $cache[ $table ] ) ) {
+            // 一度検索したテーブルの列名リストはキャッシュに保存
+            $stmt = $this->prepareExecute( 'PRAGMA table_info('.$table.')' );
+            $cache[ $table ] = array_column($stmt->fetchAll(), 'name');
+        }
+        if ( count( $cache ) > 5 ) {
+            // キャッシュサイズの調整
+            // 一定以上の長さであれば、先頭を削除
+            array_shift( $cache );
+        }
+        return $cache[ $table ];
     }
 
 
@@ -396,9 +403,9 @@ class SQLiteHandler {
      * @throws Ambigous <PDOException, DBManageExeption>
      * @return array
      */
-    private function prepareExecute( string $sql, ?array $parms = null, ?PDOStatement &$stmt = null ) :PDOStatement {
+    private function prepareExecute( string $sql, ?array $parms = null ) :PDOStatement {
         try {
-            $stmt = $stmt ?? $this->pdo->prepare( $sql );
+            $stmt = $this->pdo->prepare( $sql );
             if ( $stmt->execute( $parms ) ) {
                 return $stmt;
             } else {

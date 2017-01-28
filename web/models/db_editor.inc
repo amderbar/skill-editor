@@ -56,7 +56,7 @@ class DBEditor {
      */
     public function __construct() {
         $this->open( ROOT_DB_ID );
-        $this->setupSystemDB();
+//         $this->setupSystemDB();
         foreach ($this->con[ROOT_DB_ID]->fetchAll( 'form_master' ) as $row) {
             $this->form_id[ $row['type'] ] = $row['id'];
         }
@@ -484,7 +484,6 @@ class DBEditor {
         static $max_id;
         $max_id = $max_id ?? 0;
         $max_id++;
-        var_export_log($max_id);
         return 'u_' . fnv132( $col_name ).'_'.$max_id;
     }
 

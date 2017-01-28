@@ -42,7 +42,6 @@ function full_path($path='', $newfile=false) {
     if ((! $newfile) || (realpath($path))) {
         $path = realpath($path);
     }
-    var_export_log($path);
     return str_replace(DIRECTORY_SEPARATOR, '/', $path);
 }
 
