@@ -54,9 +54,8 @@ class DBEditor {
      *
      */
     public function __construct() {
-        $this->open( ROOT_DB_ID );
-//         $this->setupSystemDB();
-        foreach ($this->con[ROOT_DB_ID]->fetchAll( 'form_master' ) as $row) {
+        $db_con = $this->open( ROOT_DB_ID ) ?? $this->setupSystemDB();
+        foreach ($db_con->fetchAll( 'form_master' ) as $row) {
             $this->form_id[ $row['type'] ] = $row['id'];
         }
     }
@@ -693,7 +692,7 @@ class DBEditor {
     /**
      *
      */
-    private function setupSystemDB() {
+    private function setupSystemDB() :SQLiteHandler {
         try {
             $db_con = $this->con[ ROOT_DB_ID ] ?? $this->open( ROOT_DB_ID, true );
             // project table
@@ -739,6 +738,7 @@ class DBEditor {
                         'type' => $type
                 ], true );
             }
+            return $db_con;
         } catch ( PDOException | DBManageExeption $e ) {
             $this->handleException( $e );
         }
