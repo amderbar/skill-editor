@@ -407,8 +407,8 @@ class DBEditor {
                 'col_name' => $def_hash['col_name'],
                 'actual_name' => $actual_name,
                 'form_type' => $this->form_id[$def_hash['form_type']],
-                'multiple' => ( isset( $def_hash['multiple'] ) ) ? ( bool ) $def_hash['multiple'] : false
-          ] );
+                'multiple' => boolval( $def_hash['multiple'] ?? false )
+            ] );
 
             if ( isset( $def_hash['step'] ) && isset( $def_hash['max'] ) && isset( $def_hash['min'] ) ) {
                 $this->insertData( $proj_id, NUM_SETTINGS, [
@@ -435,17 +435,30 @@ class DBEditor {
                 case 'select':
                 case 'radio':
                 case 'multicheck':
-                    if (isset( $def_hash['ref_dist'] )) { // 自表または既存表の列を参照する場合
-                        if ($def_hash['ref_dist'] < 1) {
-                            $def_hash['ref_dist'] = $col_id_arr[ -$def_hash['ref_dist'] ];
-                        }
-                        $this->updateData( $proj_id, SYSTEM_COL,
-                                ['ref_col' => $def_hash['ref_dist'] ],
-                                ['id' => $col_id_arr[$i] ]
-                        );
-                    } else { // 追加で新しく表を作ってそれを参照する場合
-                        // TODO: 新しく表を作る
+                    if ( !isset( $def_hash['ref_dist'] ) ) {
+                        // 追加で新しく表を作ってそれを参照する場合
+                        $tbl_name = '[マスタ]'.$def_hash['col_name'];
+                        $def_cols = array(
+                            1 => array(
+                                'col_name' => $def_hash['col_name'],
+                                'form_type' => 'text',
+                                'uniq' => true,
+                                'not_null' => true
+                        ));
+                        $mstr_tbl = $this->addUserTable($proj_id, $tbl_name, $def_cols);
+                        $mstr_id = $this->con[$proj_id]->findByKey(
+                            SYSTEM_COL, [ 'tbl_id' => $mstr_tbl, 'actual_name' => 'id' ], ['id'] );
+                        $def_hash['ref_dist'] = $mstr_id[0]['id'];
+
+                    } else if ($def_hash['ref_dist'] < 1) {
+                        // 自表の列を参照する場合
+                        $def_hash['ref_dist'] = $col_id_arr[ -$def_hash['ref_dist'] ];
                     }
+
+                    $this->updateData( $proj_id, SYSTEM_COL,
+                        ['ref_col' => $def_hash['ref_dist'] ],
+                        ['id' => $col_id_arr[$i] ]
+                      );
                     break;
             }
 
@@ -461,7 +474,7 @@ class DBEditor {
     private function generateActualTblName(int $proj_id, string $tbl_name) :string {
         $max_id = $this->con[$proj_id]->fetchAll( SYSTEM_TBL, ['max(id) as id'] );
         $max_id = current($max_id);
-        return 'u_' . fnv132( $tbl_name ).'_'.($max_id['id'] + 1);
+        return 'ut_' . fnv132( $tbl_name ).'_'.($max_id['id'] + 1);
     }
 
     /**
@@ -474,7 +487,7 @@ class DBEditor {
         static $max_id;
         $max_id = $max_id ?? 0;
         $max_id++;
-        return 'u_' . fnv132( $col_name ).'_'.$max_id;
+        return 'uc_' . fnv132( $col_name ).'_'.$max_id;
     }
 
     /**

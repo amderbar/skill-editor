@@ -258,18 +258,18 @@ class SQLiteHandler {
         $key_cols = array();
         $key_vals = array();
         foreach ( $dto->getParms() as $col_name => $value ) {
-            $key_cols[] = $colname.' = ?';
+            $key_cols[] = $col_name.' = ?';
             $key_vals[] = $value;
         }
 
         $cond_cols = array();
         foreach ( $conditions as $col_name => $value ) {
-            $cond_cols[] = $colname.' = ?';
+            $cond_cols[] = $col_name.' = ?';
             $key_vals[] = $value;
         }
 
         $sql = 'UPDATE '.$dto->getTableName();
-        $sql .= ' SET '.implode( ',', $$key_cols );
+        $sql .= ' SET '.implode( ',', $key_cols );
 
         if ( !empty( $cond_cols ) ) {
             $sql .= ' WHERE '.implode(' AND ', $cond_cols);
