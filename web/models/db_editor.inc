@@ -344,8 +344,9 @@ class DBEditor {
                         $this->createInternalTbl($proj_id, $ref_src, $tbl_col);
                         continue;
                     } else {
+                        // 単一参照の場合 => 常に参照先表のid列を外部キーに指定
                         $col_constraints['foreign'] = [
-                                'ref' => $tbl_col['tbl_name'].'('.$tbl_col['col_name'].')',
+                                'ref' => $tbl_col['tbl_name'].'(id)',
                                 'del' => 'null'
                         ];
                     }
@@ -430,11 +431,6 @@ class DBEditor {
 
             $col_id_arr[] = $col_id;
         }
-
-        // TODO: 参照先がマスタ表などの場合の外部参照先の指定
-        // 選択肢で表示したいのはデータ列だけど参照はID列にしたい(Form上での選択と実際の指定が異なる)
-        // しかし指定した通りの列を参照先としたい場合もある
-        // 参照先の表の列数に応じて切り替える？
 
         foreach ( $cols_hash as $i => $def_hash ) {
 
