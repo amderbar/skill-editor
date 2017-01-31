@@ -310,20 +310,22 @@ class DBEditor {
         try {
             // トランザクション処理必要
             // システムテーブルに表名を登録
+            $actual_tbl_name = $this->generateActualTblName(  $proj_id, $tbl_name );
             $tbl_id = $this->insertData( $proj_id, SYSTEM_TBL, [
                     'tbl_name' => $tbl_name,
-                    'actual_name' => $this->generateActualTblName(  $proj_id, $tbl_name )
+                    'actual_name' => $actual_tbl_name
             ] );
             // システムテーブルに列情報を登録
-            $this->registerUserColumn( $proj_id, $tbl_id, $cols_hash, $constraints_hash );
+            $this->registerUserColumns( $proj_id, $tbl_id, $cols_hash, $constraints_hash );
 
             // SQL前駆体の作成
             $form_type = array_flip($this->form_id);
-            $tdo = new TableDefineObject( $this->tblName( $proj_id, $tbl_id, true ) );
+            $tdo = new TableDefineObject( $actual_tbl_name );
             foreach ($this->listColumns($proj_id, $tbl_id) as $col) {
                 if ($col['actual_name'] == 'id') {
                     continue;
                 }
+                $col_constraints = array();
                 if ( isset( $col['ref_col'] ) ) {
                     $ref_tbl_id = $this->con[$proj_id]->load(SYSTEM_COL, $col['ref_col'], ['tbl_id']);
                     $ref_tbl_id = array_shift($ref_tbl_id);
@@ -333,10 +335,20 @@ class DBEditor {
                             [ SYSTEM_TBL => ['actual_name as tbl_name'], SYSTEM_COL => ['actual_name as col_name'] ]
                     );
                     $tbl_col = array_shift($tbl_col);
-                    $col_constraints['foreign'] = [
-                            'ref' => $tbl_col['tbl_name'].'('.$tbl_col['col_name'].')',
-                            'del' => 'null'
-                    ];
+                    if ( $col['multiple'] ) {
+                        // 複数選択列の場合 => 中間表を作成し、実際には列を作らない
+                        $ref_src = array(
+                                'tbl_name' => $actual_tbl_name,
+                                'col_name' => $col['actual_name']
+                        );
+                        $this->createInternalTbl($proj_id, $ref_src, $tbl_col);
+                        continue;
+                    } else {
+                        $col_constraints['foreign'] = [
+                                'ref' => $tbl_col['tbl_name'].'('.$tbl_col['col_name'].')',
+                                'del' => 'null'
+                        ];
+                    }
                 }
                 $col_constraints['default'] = ($col['default_val'] === '') ? null : $col['default_val'];
                 $col_constraints['not_null'] = $col['not_null'] ?? null;
@@ -385,7 +397,7 @@ class DBEditor {
      * @param array $cols_hash
      * @return string
      */
-    private function registerUserColumn(int $proj_id, int $tbl_id, array $cols_hash, array $constraints_hash = array()): void {
+    private function registerUserColumns(int $proj_id, int $tbl_id, array $cols_hash, array $constraints_hash = array()): void {
 
         $col_id_arr = array();
         $col_id_arr[] = $this->insertData( $proj_id, SYSTEM_COL, [
@@ -395,9 +407,6 @@ class DBEditor {
                 'form_type' => '',
                 'multiple' => false
        ] );
-
-        // TODO: multiple == true のときの扱い
-        // 中間表を作ることになるが、その管理用の表も必要か？
 
         foreach ( $cols_hash as $def_hash ) {
 
@@ -464,6 +473,34 @@ class DBEditor {
 
         }
     }
+
+
+    /**
+     * @param int   $proj_id
+     * @param array $ref_src   ['tbl_name' => tbl_name, 'col_name' => col_name]
+     * @param array $ref_dest  ['tbl_name' => tbl_name, 'col_name' => col_name]
+     */
+    private function createInternalTbl( int $proj_id, array $ref_src, array $ref_dest ) :void {
+        $tdo = new TableDefineObject( $ref_src['col_name'].'_'.$ref_src['tbl_name'] );
+        $col_constraints = array();
+        $col_constraints['foreign'] = [
+                'ref' => $ref_src['tbl_name'].'('.'id'.')',
+                'del' => 'cascade'
+        ];
+        $col_constraints['not_null'] = true;
+        $tdo->appendColumn( $ref_src['col_name'].'_id', 'integer', $col_constraints );
+
+        $col_constraints = array();
+        $col_constraints['foreign'] = [
+                'ref' => $ref_dest['tbl_name'].'('.'id'.')',
+                'del' => 'cascade'
+        ];
+        $col_constraints['not_null'] = true;
+        $tdo->appendColumn( $ref_dest['col_name'].'_id', 'integer', $col_constraints );
+        $this->con[$proj_id]->createTable( $tdo );
+    }
+
+
 
     /**
      * ハッシュ化したユーザー入力表名にprefixと一意なsuffixを付けて、重複しない実名を返す
