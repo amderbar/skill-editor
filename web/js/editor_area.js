@@ -2,6 +2,11 @@
  * Editor on Browser: client script.
  */
 $(function() {
+	$('#new-rec').children('td').each(function(idx, cell) {
+		var col_name = $(cell).attr('data');
+		$(cell).append($('#' + col_name)[0].content);
+	}, this);
+
 	/**
 	 * イベントリスナー設置
 	 */
@@ -264,7 +269,7 @@ function putHandlers() {
 // 		// Read in the source file as a Text.
 // 		reader.readAsText(f);
 // 	}
-// 	// document.getElementById('fileName').innerHTML = '<ul>' + output.join('') + '</ul>';	
+// 	// document.getElementById('fileName').innerHTML = '<ul>' + output.join('') + '</ul>';
 // }
 // function handleFileDragOver(evt) {
 // 	evt.stopPropagation();

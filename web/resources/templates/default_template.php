@@ -1,5 +1,5 @@
 <?php
-if (array_depth($tbl_data['data']) == 2) {
+if ( array_depth( $tbl_data['data'] ) == 2 ) {
     $tbl_keys = array_keys( $tbl_data['col_name'] );
     echo '<table class="data-table">'.PHP_EOL;
     echo '<tr>'.PHP_EOL;
@@ -8,20 +8,19 @@ if (array_depth($tbl_data['data']) == 2) {
     }
     echo PHP_EOL.'</tr>';
     foreach ( $tbl_data['data'] as $row ) {
-        echo '<tr>'.PHP_EOL;
+        $id_attr = ( is_null( $row['id'] ) ) ? ' id="new-rec"' : '';
+        echo '<tr'.$id_attr.'>'.PHP_EOL;
         foreach ( $tbl_keys as $key ) {
             if ( $key == 'id' ) {
-                $id_attr = ( is_null( $row[$key] ) ) ? ' id="new-rec"' : '';
-                $cont = '<span'.$id_attr.'>'.HTMLHandler::hidden( 'id[]', $row[$key] ).'</span>';
-                echo '<th class="id-col">'.$cont.'</th>';
+                echo '<th class="id-col">'.HTMLHandler::hidden( 'id[]', $row[$key] ).'</th>';
             } else {
-                echo '<td>'.HTMLHandler::escape( $row[$key] ).'</td>';
+                echo '<td class="editable" data="'.HTMLHandler::escape( $key ).'">'.HTMLHandler::escape( $row[$key] ).'</td>';
             }
         }
         echo PHP_EOL.'</tr>';
     }
     echo PHP_EOL.'</table>'.PHP_EOL;
 } else {
-    pre_dump($tbl_data);
+    pre_dump( $tbl_data );
 }
 ?>

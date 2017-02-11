@@ -36,77 +36,23 @@ class EditorServlet extends Servlet {
                 $opened_tab = null;
             }
 
-            if ( empty( $REQ_SCOPE['tbl_list'] ) || ($opened_tab === 'new') ) { // テーブル新規作成タブを開く
+            if ( empty( $REQ_SCOPE['tbl_list'] ) || ( $opened_tab === 'new' ) ) {
+                // テーブル新規作成タブを開く
+                $REQ_SCOPE += $this->makeNewTblParmArr( $current_proj_id, $REQ_SCOPE['tbl_list'] );
 
-                $REQ_SCOPE['new_tab'] = true;
-                $REQ_SCOPE['data_types'] = DBEditor::getDataTypeList();
-                $REQ_SCOPE['form_types'] = HTMLHandler::$FROM_TYPES;
-                $REQ_SCOPE['opened_tab'] = null;
-                $REQ_SCOPE['proj_name'] = $this->db_editor->projName($current_proj_id);
-                $REQ_SCOPE['col_list'] = array('This Table' => ['0' => 'ID', '-1' => 'Nameless1']);
-                // 列リストデータ
-                foreach ($REQ_SCOPE['tbl_list'] as $tbl_num => $tbl_name) {
-                    $REQ_SCOPE['col_list'][$tbl_name] = array();
-                    $col_list = $this->db_editor->listColumns($current_proj_id, $tbl_num);
-                    foreach ($col_list as $colnum) {
-                        $REQ_SCOPE['col_list'][$tbl_name][$colnum['id']] = $colnum['col_name'];
-                    }
-                }
-                // モック生成 CHECK制約リスト
-                $REQ_SCOPE['chk_list'] = array(
-                    'for String' => [
-                        'maxlen' => 'N文字以内',
-                        'minlen' => 'N文字以上'
-                    ],
-                    'for Numelic' => [
-                        'odd' => '奇数',
-                        'even' => '偶数',
-                        'primery' => '素数'
-                    ],
-                    'for Datetime' => [
-                        'past' => '今より過去'
-                    ]
-                );
-                // プレビュー用表示テンプレート
-                $REQ_SCOPE['tbl_tmpls'] = ['default' => full_path('resources/templates/default_template.php')];
-                foreach ( $this->db_editor->getAllTemplates() as $tmpl ) {
-                    $REQ_SCOPE['tbl_tmpls'][$tmpl['tmpl_name']]
-                     = full_path(sprintf('resources/templates/proj%03d/', $tmpl['proj_id']).$tmpl['tmpl_name']);
-                }
-                // プレビュー用ダミーデータ
-                $REQ_SCOPE['tbl_data'] = array(
-                        'col_name' => array(
-                                'id' => 'ID',
-                                'col' => 'Nameless'
-                        ),
-                        'data' => array(
-                                ['id' => 1, 'col' => ''],
-                                ['id' => 2, 'col' => ''],
-                                ['id' => 3, 'col' => ''],
-                                ['id' => null, 'col' => null]
-                        )
-                );
-
-            } else { // 既存テーブルのタブを開く
-
-                if (is_null($opened_tab)) {
-                    $opened_tab = current(array_keys($REQ_SCOPE['tbl_list']));
-                }
-                $tmpl_list = $this->db_editor->getTemplates($current_proj_id);
-                $selected_tmpl = key($tmpl_list); // とりあえず先頭要素のキーを取得して選択されているものとする
-                // リクエストスコープ相当の配列にデータを格納
-                $REQ_SCOPE['tbl_data'] = $this->db_editor->listData($current_proj_id, $opened_tab);
-                $REQ_SCOPE['tbl_tmpl'] = ($REQ_SCOPE['tbl_list'][$opened_tab] == 'skills_view') ?
-                    full_path(sprintf('resources/templates/proj%03d/', $current_proj_id).$tmpl_list[$selected_tmpl]) :
-                    full_path('resources/templates/default_template.php');
-                $REQ_SCOPE['opened_tab'] = $opened_tab;
-                // 肝心のデータはセッションスコープにも入れておく
-                $_SESSION['proj'.$current_proj_id][$opened_tab] = $REQ_SCOPE['tbl_data'];
+            } else {
+                // 既存テーブルのタブを開く
+                $opened_tab = $opened_tab ?? current( array_keys( $REQ_SCOPE['tbl_list'] ) );
+                $REQ_SCOPE += $this->makeExistingTblParmArr( $current_proj_id, $opened_tab );
 
             }
         }
+
         return $this->foward('view/editor_pain.inc', $REQ_SCOPE);
+
     }
+
+
 
     /**
      *
@@ -122,8 +68,8 @@ class EditorServlet extends Servlet {
             }
             $tbl_name =  $_POST['tbl_name'];
             $def_cols = $_POST['def_cols'];
-            $tbl_id = $this->db_editor->addUserTable($proj_id, $tbl_name, $def_cols);
-            $redirect_url = HTMLHandler::sanitizeUrl(getMyTopURL(), ['pid' => $proj_id, 'tab' => $tbl_id]);
+            $tbl_info = $this->db_editor->addUserTable($proj_id, $tbl_name, $def_cols);
+            $redirect_url = HTMLHandler::sanitizeUrl(getMyTopURL(), ['pid' => $proj_id, 'tab' => $tbl_info['tbl_id'] ]);
 
         } else {
 
@@ -134,6 +80,102 @@ class EditorServlet extends Servlet {
         // return $this->foward('view/editor_pain.inc', $REQ_SCOPE);
         return $this->redirect($redirect_url);
     }
+
+
+
+    /**
+     * @param int $proj_id
+     * @param array $tbl_list
+     * @return array
+     */
+    private function makeNewTblParmArr( int $proj_id, array $tbl_list ) :array {
+
+        $parm_arr = array();
+        $parm_arr['new_tab'] = true;
+        $parm_arr['data_types'] = DBEditor::getDataTypeList();
+        $parm_arr['form_types'] = HTMLHandler::$FROM_TYPES;
+        $parm_arr['opened_tab'] = null;
+        $parm_arr['proj_name'] = $this->db_editor->projName($proj_id);
+
+        // 列リストデータ
+        $parm_arr['col_list'] = array( 'This Table' => [ '0' => 'ID', '-1' => 'Nameless1' ] );
+        foreach ( $tbl_list as $tbl_num => $tbl_name ) {
+            $parm_arr[ 'col_list' ][ $tbl_name ] = array();
+            $col_list = $this->db_editor->listColumns( $proj_id, $tbl_num );
+            foreach ( $col_list as $colnum ) {
+                if ( $colnum['actual_name'] == 'id' ) {
+                    continue;
+                }
+                $parm_arr['col_list'][ $tbl_name ][ $colnum['id'] ] = $colnum['col_name'];
+            }
+        }
+
+        // モック生成 CHECK制約リスト
+        $parm_arr['chk_list'] = array(
+                'for String' => [
+                        'maxlen' => 'N文字以内',
+                        'minlen' => 'N文字以上'
+                ],
+                'for Numelic' => [
+                        'odd' => '奇数',
+                        'even' => '偶数',
+                        'primery' => '素数'
+                ],
+                'for Datetime' => [
+                        'past' => '今より過去'
+                ]
+        );
+
+        // プレビュー用表示テンプレート
+        $parm_arr['tbl_tmpls'] = [ 'default' => full_path('resources/templates/default_template.php') ];
+        foreach ( $this->db_editor->getAllTemplates() as $tmpl ) {
+            $parm_arr['tbl_tmpls'][ $tmpl[ 'tmpl_name' ] ]
+            = full_path( sprintf('resources/templates/proj%03d/', $tmpl['proj_id'] ).$tmpl['tmpl_name'] );
+        }
+
+        // プレビュー用ダミーデータ
+        $parm_arr['tbl_data'] = array(
+                'col_name' => array(
+                        'id' => 'No.',
+                        'col' => 'Nameless'
+                ),
+                'data' => array(
+                        ['id' => 1, 'col' => ''],
+                        ['id' => 2, 'col' => ''],
+                        ['id' => null, 'col' => null]
+                )
+        );
+
+        return $parm_arr;
+
+    }
+
+
+
+    /**
+     * @param int $proj_id
+     * @param int $tbl_id
+     * @return array
+     */
+    private function makeExistingTblParmArr( int $proj_id, int $tbl_id ) :array {
+        // TODO: レコードの追加・編集機能の実装
+        // TODO: 表示テンプレートの実装
+        $tmpl_list = $this->db_editor->getTemplates( $proj_id );
+        $selected_tmpl = key( $tmpl_list ); // とりあえず先頭要素のキーを取得して選択されているものとする
+        $parm_arr['tbl_tmpl'] = //( $parm_arr['tbl_list'][$tbl_id] == 'skills_view' ) ?
+//             full_path( sprintf( 'resources/templates/proj%03d/', $proj_id ).$tmpl_list[ $selected_tmpl ] ) :
+            full_path( 'resources/templates/default_template.php' );
+
+        // リクエストスコープ相当の配列にデータを格納
+        $parm_arr['opened_tab'] = $tbl_id;
+        $parm_arr['tbl_data'] = $this->db_editor->listData( $proj_id, $tbl_id );
+
+        // 肝心のデータはセッションスコープにも入れておく
+        $_SESSION['proj'.$proj_id][$tbl_id] = $parm_arr['tbl_data'];
+
+        return $parm_arr;
+    }
+
 }
 
 ?>

@@ -167,16 +167,18 @@ class SQLiteHandler {
      */
     public function findByKeyWithJoin( array $join_tbls, array $condition, ?array $target_col = [], ?array $order_by = []  ) :array {
         // FIXME: $tableと$columnのエスケープ処理が必要
+        $table = array_shift( $join_tbls );
 
         if ( empty( $target_col ) ) {
             $target_col = array();
-            foreach ( $join_tbls as $tbl_name => $join_ons ) {
+            foreach ( array_keys( $join_tbls ) as $tbl_name ) {
                 $target_col[ $tbl_name ] = $this->getColumnList( $tbl_name );
             }
+            $target_col[ $table ] = $this->getColumnList( $table );
         }
         $target = implodeAssoc( '.', $target_col );
 
-        $table = array( array_shift( $join_tbls ) );
+        $table = array( $table );
         foreach ( $join_tbls as $tbl_name => $join_condisions ) {
             $join_on = array();
             foreach ( $join_condisions as $eq_pair ) {
@@ -200,13 +202,13 @@ class SQLiteHandler {
         }
 
         $sql = 'SELECT '.implode(','     , $target)
-                .' FROM ' .implode(' JOIN ', $table)
-                .' WHERE '.implode(' AND ' , $key_cols).';';
+                .' FROM ' .implode(' LEFT JOIN ', $table)
+                .' WHERE '.implode(' AND ' , $key_cols);
         if ( !empty( $order_by ) ) {
             $sql .= ' ORDER BY '.implode(', ', $order_by);
         }
 
-        $stmt = $this->prepareExecute( $sql, $cond_vals );
+        $stmt = $this->prepareExecute( $sql.';', $cond_vals );
         return $stmt->fetchAll();
     }
 

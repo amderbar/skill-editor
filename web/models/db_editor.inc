@@ -33,7 +33,8 @@ define( 'FORM_TO_DATA', [
         'radio' => 'NUMERIC',
         'checkbox' => 'BOOLEAN',
         'file' => 'BLOB',
-        'image' => 'BLOB'
+        'image' => 'BLOB',
+        'hidden' => 'BLOB'
 ] );
 
 /**
@@ -115,6 +116,21 @@ class DBEditor {
         $target = ($is_actual) ? 'actual_name' : 'col_name';
         $row = $this->con[$proj_id]->load( SYSTEM_COL, $col_id, [ $target ] );
         return $row[$target] ?? null;
+    }
+
+    /**
+     * @param int $proj_id
+     * @param int $col_id
+     * @param bool $is_actual
+     * @return array
+     */
+    public function getTblColNameFromColid( int $proj_id, int $col_id, ?bool $is_actual = false ) :?array {
+        $result = $this->con[ $proj_id ]->findByKeyWithJoin(
+             [ SYSTEM_TBL, SYSTEM_COL => [ [SYSTEM_TBL => 'id', SYSTEM_COL => 'tbl_id'] ] ],
+             [ SYSTEM_COL => ['id' => $col_id ] ],
+             [ SYSTEM_TBL => ['actual_name as tbl_name'], SYSTEM_COL => ['actual_name as col_name'] ]
+         );
+        return array_shift( $result );
     }
 
     /**
@@ -278,7 +294,11 @@ class DBEditor {
      */
     public function listColumns($proj_id, $tbl_id) {
         try {
-            return $this->con[$proj_id]->findByKey( SYSTEM_COL, [ 'tbl_id' => $tbl_id ], null, ['id'] );
+            return $this->con[ $proj_id ]->findByKeyWithJoin(
+                [ SYSTEM_COL, NUM_SETTINGS => [ [NUM_SETTINGS => 'col_id', SYSTEM_COL => 'id'] ] ],
+                [ SYSTEM_COL => ['tbl_id' => $tbl_id ] ],
+                null, [ SYSTEM_COL.'.id' ]
+            );
         } catch ( PDOException | DBManageExeption $e ) {
             $this->handleException( $e );
         }
@@ -306,7 +326,7 @@ class DBEditor {
      *            表制約の情報
      * @return int
      */
-    public function addUserTable(int $proj_id, string $tbl_name, array $cols_hash, array $constraints_hash = array()): int {
+    public function addUserTable(int $proj_id, string $tbl_name, array $cols_hash, array $constraints_hash = array()): array {
         try {
             // トランザクション処理必要
             // システムテーブルに表名を登録
@@ -316,7 +336,7 @@ class DBEditor {
                     'actual_name' => $actual_tbl_name
             ] );
             // システムテーブルに列情報を登録
-            $this->registerUserColumns( $proj_id, $tbl_id, $cols_hash, $constraints_hash );
+            $col_info = $this->registerUserColumns( $proj_id, $tbl_id, $cols_hash, $constraints_hash );
 
             // SQL前駆体の作成
             $form_type = array_flip($this->form_id);
@@ -327,14 +347,7 @@ class DBEditor {
                 }
                 $col_constraints = array();
                 if ( isset( $col['ref_col'] ) ) {
-                    $ref_tbl_id = $this->con[$proj_id]->load(SYSTEM_COL, $col['ref_col'], ['tbl_id']);
-                    $ref_tbl_id = array_shift($ref_tbl_id);
-                    $tbl_col = $this->con[$proj_id]->findByKeyWithJoin(
-                            [ SYSTEM_TBL, SYSTEM_COL => [ [SYSTEM_TBL => 'id', SYSTEM_COL => 'tbl_id'] ] ],
-                            [ SYSTEM_TBL => ['id' => $ref_tbl_id ], SYSTEM_COL => ['id' => $col['ref_col']] ],
-                            [ SYSTEM_TBL => ['actual_name as tbl_name'], SYSTEM_COL => ['actual_name as col_name'] ]
-                    );
-                    $tbl_col = array_shift($tbl_col);
+                    $tbl_col = $this->getTblColNameFromColid( $proj_id, $col['ref_col'], true );
                     if ( $col['multiple'] ) {
                         // 複数選択列の場合 => 中間表を作成し、実際には列を作らない
                         $ref_src = array(
@@ -344,7 +357,7 @@ class DBEditor {
                         $this->createInternalTbl($proj_id, $ref_src, $tbl_col);
                         continue;
                     } else {
-                        // 単一参照の場合 => 常に参照先表のid列を外部キーに指定
+                        // 単一参照の場合 => 実際の列定義では常に参照先表のid列を外部キーに指定
                         $col_constraints['foreign'] = [
                                 'ref' => $tbl_col['tbl_name'].'(id)',
                                 'del' => 'null'
@@ -366,11 +379,12 @@ class DBEditor {
             }
             // テーブル作成
             $this->con[$proj_id]->createTable( $tdo );
-            return $tbl_id;
+            return [ 'tbl_id' => $tbl_id, 'col_id' => $col_info ];
         } catch ( PDOException | DBManageExeption $e ) {
             $this->handleException( $e );
         }
     }
+
 
 
     /**
@@ -396,16 +410,16 @@ class DBEditor {
      * @param int $proj_id
      * @param int $tbl_id
      * @param array $cols_hash
-     * @return string
+     * @return array
      */
-    private function registerUserColumns(int $proj_id, int $tbl_id, array $cols_hash, array $constraints_hash = array()): void {
+    private function registerUserColumns(int $proj_id, int $tbl_id, array $cols_hash, array $constraints_hash = array()): array {
 
         $col_id_arr = array();
         $col_id_arr[] = $this->insertData( $proj_id, SYSTEM_COL, [
                 'tbl_id' => $tbl_id,
-                'col_name' => 'ID',
+                'col_name' => 'No.',
                 'actual_name' => 'id',
-                'form_type' => '',
+                'form_type' => $this->form_id['hidden'],
                 'multiple' => false
        ] );
 
@@ -416,7 +430,7 @@ class DBEditor {
                 'tbl_id' => $tbl_id,
                 'col_name' => $def_hash['col_name'],
                 'actual_name' => $actual_name,
-                'form_type' => $this->form_id[$def_hash['form_type']],
+                'form_type' => $this->form_id[ $def_hash['form_type'] ],
                 'multiple' => boolval( $def_hash['multiple'] ?? false )
             ] );
 
@@ -451,9 +465,7 @@ class DBEditor {
                                 'not_null' => true
                         ));
                         $mstr_tbl = $this->addUserTable($proj_id, $tbl_name, $def_cols);
-                        $mstr_id = $this->con[$proj_id]->findByKey(
-                            SYSTEM_COL, [ 'tbl_id' => $mstr_tbl, 'actual_name' => 'id' ], ['id'] );
-                        $def_hash['ref_dist'] = $mstr_id[0]['id'];
+                        $def_hash['ref_dist'] = $mstr_tbl['col_id'][ 1 ];
 
                     } else if ($def_hash['ref_dist'] < 1) {
                         // 自表の列を参照する場合
@@ -468,6 +480,8 @@ class DBEditor {
             }
 
         }
+
+        return $col_id_arr;
     }
 
 
@@ -532,11 +546,35 @@ class DBEditor {
      */
     public function listData(int $proj_id, int $tbl_id): array {
         try {
-            $list_data = $this->con[$proj_id]->fetchAll( $this->tblName( $proj_id, $tbl_id, true ), null, ['id'] );
-            $col_names = array ();
+            $form_type = array_flip( $this->form_id );
+            $col_names = array();
+            $col_forms = array();
             foreach ( $this->listColumns( $proj_id, $tbl_id ) as $col ) {
-                $col_names[ $col['actual_name'] ] = $col['col_name'];
+                $actual_name = $col[ 'actual_name' ];
+                $col_names[ $actual_name ] = $col[ 'col_name'];
+                $col_forms[ $actual_name ] = array(
+                        'type'     => $form_type[ $col[ 'form_type'] ],
+                        'default'  => $col[ 'default_val'],
+                        'multiple' => boolval( $col[ 'multiple'] )
+                );
+                if ( isset( $col[ 'step'] ) || isset( $col[ 'max'] ) || isset( $col[ 'min'] ) ) {
+                    $col_forms[ $actual_name ]['step'] = $col[ 'step'] ?? 1;
+                    $col_forms[ $actual_name ]['max']  = $col[ 'max'] ?? null;
+                    $col_forms[ $actual_name ]['min']  = $col[ 'min'] ?? null;
+                }
+                if ( isset( $col[ 'ref_col'] ) ) {
+                    $ref_tbl_col = $this->getTblColNameFromColid( $proj_id, $col[ 'ref_col'], true );
+                    $col_forms[ $actual_name ]['ref'] = array();
+                    $ref_data = $this->con[$proj_id]->fetchAll( $ref_tbl_col['tbl_name'], ['id', $ref_tbl_col['col_name'] ], ['id'] );
+                    foreach ( $ref_data as $row) {
+                        $col_forms[ $actual_name ]['ref'][ $row['id'] ] = $row[ $ref_tbl_col['col_name'] ];
+                    }
+                    if ( empty( $col_forms[ $actual_name ]['ref'] ) ) {
+                        $col_forms[ $actual_name ]['ref'] = [];
+                    }
+                }
             }
+            $list_data = $this->con[$proj_id]->fetchAll( $this->tblName( $proj_id, $tbl_id, true ), null, ['id'] );
             if ( empty( $list_data ) ) {
                 $tmp_row = array ();
                 foreach ( array_keys( $col_names ) as $col_key ) {
@@ -544,7 +582,7 @@ class DBEditor {
                 }
                 $list_data[] = $tmp_row;
             }
-            return ['col_name' => $col_names, 'data' => $list_data];
+            return ['col_name' => $col_names, 'form' => $col_forms, 'data' => $list_data];
         } catch ( PDOException | DBManageExeption $e ) {
             $this->handleException( $e );
         }

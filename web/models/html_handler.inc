@@ -37,7 +37,8 @@ class HTMLHandler {
             'multicheck' => '選択チェックボックス',
             'radio' => 'ラジオボタン',
             'file' => 'ファイル添付',
-            'image' => '画像ボタン'
+            'image' => '画像ボタン',
+            'hidden' => ''
     );
 
     /**
@@ -116,18 +117,18 @@ class HTMLHandler {
     public static function startForm($url, $query = null, $method = 'POST', $additional = null) {
         $href = self::sanitizeUrl($url, $query);
         return '<form action="'.$href.'" method="'.$method.'" '.self::attr($additional).'>';
-        return $tag_str;
     }
 
     /**
     * Helper function for print text-box like form.
     * @param string $element_name
-    * @param mixed $value
+    * @param mixed $val
     * @param mixed hash $additional
     */
-    public static function inputForm($type, $element_name, $value = '', $additional = null) {
-        $tag_str = '<input type="'.self::escape($type).'" name="'.self::escape($element_name).'" value="';
-        $tag_str .= self::escape($value) .'"'.self::attr($additional).'>';
+    public static function input($type, $element_name, $val = null, $additional = null) {
+        $value = ( isset($val) ) ? ' value="'.self::escape($val).'"' : '';
+        $tag_str = '<input type="'.self::escape($type).'" name="'.self::escape($element_name).'"'.$value;
+        $tag_str .= self::attr($additional).'>';
         return $tag_str;
     }
 
@@ -138,7 +139,7 @@ class HTMLHandler {
     * @param mixed hash $additional
     */
     public static function hidden($element_name, $value, $additional = null) {
-        return self::inputForm('hidden', $element_name, $value, $additional);
+        return self::input('hidden', $element_name, $value, $additional);
     }
 
     /**
@@ -148,7 +149,7 @@ class HTMLHandler {
     * @param mixed hash $additional
     */
     public static function textbox($element_name, $value = '', $additional = null) {
-        return self::inputForm('text', $element_name, $value, $additional);
+        return self::input('text', $element_name, $value, $additional);
     }
 
     /**
@@ -161,7 +162,7 @@ class HTMLHandler {
         if (isset($step)) {
             $additional['step'] = $step;
         }
-        return self::inputForm('number', $element_name, $value, $additional);
+        return self::input('number', $element_name, $value, $additional);
     }
 
     /**
@@ -180,45 +181,40 @@ class HTMLHandler {
     /**
     * Helper function for print the textarea.
     * @param $element_name
-    * @param $values
+    * @param $value
     */
-    public static function textarea($element_name, $values) {
-        $tag_str = '<textarea name="'.self::escape($element_name).'">';
-        $tag_str .= self::escape($values[$element_name]) . '</textarea>';
+    public static function textarea($element_name, $value = null, $additional = null) {
+        $tag_str = '<textarea name="'.self::escape($element_name).'" '.self::attr($additional).'>';
+        $tag_str .= self::escape($value[$element_name]) . '</textarea>';
         return $tag_str;
     }
 
     /**
     * radio button or check box.
-    * @param $type
+    * @param $type 'checkbox' or 'radio'
     * @param $element_name
     * @param $values is an array has checkbox value as key and label text as value of array.
     * @param $checked_values
     */
-    public static function radiocheck ($type, $element_name, $values, $checked_values = null, $additional = null) {
-        $tag_str_common = '<input type="'.self::escape($type).'" name="'.self::escape($element_name).'" value="';
-        if (!is_array($values)) {
-            $values = array($values => null);
+    public static function radiocheck( string $type, string $element_name, array $values, array $checked_values = array(), ?array $additional = null ) {
+        $expected_type = [ 'checkbox' => true, 'radio' => true ];
+        if ( !isset( $expected_type[$type] ) ) {
+            throw new RuntimeException($type.' is not expected type attribute.');
         }
-        if (!is_array($checked_values)) {
-            $checked_values = (isset($checked_values)) ? array($checked_values => true) : array();
-        }
+        $chked = array_flip( $checked_values );
+        $html_collection = array();
         foreach ($values as $value => $label) {
-            if ($label) {
-                $tag_str = '<label>' . $tag_str_common;
-            } else {
-                $tag_str = $tag_str_common;
+            $add_each = $additional;
+            if ( isset( $chked[ $value ] ) ) {
+                $add_each['checked'] = true;
             }
-            $tag_str .= self::escape($value) . '" ';
-            if (isset($checked_values[$value])) {
-                $tag_str .= ' checked="checked"';
+            $tag_str = self::input( $type, $element_name, $value, $add_each );
+            if ( $label || $label === 0) {
+                $tag_str = '<label>'.$tag_str.self::escape($label).'</label>';
             }
-            $tag_str .= self::attr($additional).'>';
-            if ($label) {
-                $tag_str .= self::escape($label).'</label>';
-            }
-            return $tag_str.PHP_EOL;
+            $html_collection[] = $tag_str;
         }
+        return implode(PHP_EOL, $html_collection);
     }
 
     /**
@@ -292,22 +288,15 @@ class HTMLHandler {
     }
 
     /**
-    * data list
-    * @param $id_name
-    * @param $selected
-    * @param $options
-    * @param bool $multiple
-    */
-    public static function datalist($id_name,$options) {
-        $options = call_user_func_array('array_map',array_merge(array(null),$options));
-            if (array_depth($options) > 1) {
-                $options = $options[1];
-            }
-        $tag_str = '<datalist id="'.self::escape($id_name).'">'.PHP_EOL;
+     * @param string $id_name
+     * @param array $options
+     * @return string
+     */
+    public static function datalist( string $id_name, array $options ) :string {
+        $tag_str = '<datalist id="'.self::escape( $id_name ).'">'.PHP_EOL;
         foreach ($options as $value) {
             $tag_str .= '<option value="'.self::escape($value).'">'.PHP_EOL;
         }
-        $tag_str .= '<option value="--">'.PHP_EOL;
         $tag_str .= '</datalist>'.PHP_EOL;
         return $tag_str;
     }

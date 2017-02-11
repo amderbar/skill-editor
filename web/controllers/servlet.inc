@@ -39,13 +39,13 @@ abstract class Servlet {
     /**
     * 
     */
-    protected function foward($dist, $REQ_SCOPE = null) {
+    protected function foward($dest, $REQ_SCOPE = null) {
         $URL = getMyTopURL();
         if (isset($REQ_SCOPE)) {
             extract($REQ_SCOPE);
             unset($REQ_SCOPE);
         }
-        return include(full_path($dist));
+        return include(full_path($dest));
     }
 
     /**
