@@ -6,62 +6,322 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/models/data_transfer_objec
 
 /**
  *
- * TODO: DBMS変更の際も修正を最小限にするような設計
  *
  * @author amderbar
  *
  */
-class SQLiteHandler {
 
-
-    /** */
-    private $pdo = null;
-
+class SQLiteHandler extends PDOHandlar {
 
     /** */
-    static public $DATA_TYPES = array(
-        'TEXT' => '文字列',
-        'INTEGER' => '整数値',
-        'REAL' => '実数値',
-        'DATETIME' => '日付時刻',
-        'BOOLEAN' => '真偽値',
-        'NUMERIC' => '数値',
-        'BLOB' => 'その他なんでも'
+    static private $DATA_TYPES = array(
+            'text' => 'text'
+            , 'serial' => 'integer autoincrement'
+            , 'integer' => 'integer'
+            , 'real' => 'real'
+            , 'datetime' => 'datetime'
+            , 'boolean' => 'boolean'
+            , 'numeric' => 'numeric'
+            , 'blob' => 'blob'
     );
 
+
+
+    /**
+     * {@inheritDoc}
+     * @see PDOHandlar::newPDO()
+     */
+    protected function newPDO( string $db_name ) :PDO {
+
+        return new PDO('sqlite:' . $db_name);
+    }
+
+
+
+    /**
+     * {@inheritDoc}
+     * @see PDOHandlar::setupPDO()
+     */
+    protected function setupPDO( PDO $data_obj ) :PDO {
+
+        $data_obj->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $data_obj->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $data_obj->exec('PRAGMA foreign_keys = true;');
+
+        return $data_obj;
+    }
+
+
+
+    /**
+     * {@inheritDoc}
+     * @see PDOHandlar::getColumnList()
+     */
+    protected function getColumnList( string $table, string $identifier = null ) :array {
+        static $cache;
+
+        if ( !isset( $cache ) ) {
+            $cache = array();
+        }
+        $identifier = $identifier ?? $this->getLastFocus();
+
+        if ( !isset( $cache[ $identifier ] ) ) {
+            $cache[ $identifier ] = array();
+        }
+
+        if ( !isset( $cache[ $identifier ][ $table ] ) ) {
+            $stmt = $this->query( 'PRAGMA table_info('.$table.')', [], $identifier );
+
+            // 一度検索したテーブルの列名リストはキャッシュに保存
+            $cache[ $identifier ][ $table ] = array_column( $stmt->fetchAll(), 'name' );
+        }
+
+        if ( count( $cache[ $identifier ] ) > 5 ) {
+            // キャッシュサイズの調整 一定以上の長さであれば、先頭を削除
+            array_shift( $cache[ $identifier ] );
+        }
+        return $cache[ $identifier ][ $table ];
+    }
+
+
+
+    /**
+     * {@inheritDoc}
+     * @see PDOHandlar::getPrimaryColumnName()
+     */
+    protected function getPrimaryColumnName( string $table, string $identifier = null ) :string {
+        return 'id';
+    }
+
+
+
+    /**
+     * {@inheritDoc}
+     * @see DataBaseHandlar::getDataTypeDictionary()
+     */
+    public function getDataTypeDictionary() :array {
+        return self::$DATA_TYPES;
+    }
+
+
+
+    /**
+     * @param array $join_tbls  [ tbl_name, tbl_name => [ [tbl_name => col_name, tbl_name => col_name], ... ], ... ]
+     * @param array $condition  [ tbl_name => [col_name => value], ... ]
+     * @param array $target_col [ tbl_name => [col_name, ... ], ... ]
+     * @param array $order_by   [ tbl_name.col_name, tbl_name.col_name, ... ]
+     * @return array
+     */
+    public function findByKeyWithJoin(
+        array $join_tbls, array $condition, ?array $target_col = [], ?array $order_by = [], string $identifier = null ) :array {
+
+            // FIXME: $tableと$columnのエスケープ処理が必要
+            $table = array_shift( $join_tbls );
+
+            if ( empty( $target_col ) ) {
+                $target_col = array();
+                foreach ( array_keys( $join_tbls ) as $tbl_name ) {
+
+                    $target_col[ $tbl_name ] = $this->getColumnList( $tbl_name );
+                }
+                $target_col[ $table ] = $this->getColumnList( $table );
+            }
+            $target = implodeAssoc( '.', $target_col );
+
+            $table = array( $table );
+            foreach ( $join_tbls as $tbl_name => $join_condisions ) {
+
+                $join_on = array();
+                foreach ( $join_condisions as $eq_pair ) {
+
+                    $on_equation = '';
+                    foreach ( $eq_pair as $on_tbl => $on_col ) {
+
+                        $on_equation .= ( $on_equation ) ? ' = ' : '';
+                        $on_equation .= $on_tbl.'.'.$on_col;
+                    }
+                    $join_on[] = $on_equation;
+                }
+                $table[] = $tbl_name.' ON '.implode(' AND ', $join_on);
+            }
+
+            $key_cols = array();
+            $cond_vals = array();
+            foreach ( $condition as $tbl_name => $col_val ) {
+
+                foreach ( $col_val as $col_name => $value ) {
+
+                    $key_cols[] = $tbl_name.'.'.$col_name.'= :'.$tbl_name.'_'.$col_name;
+                    $cond_vals[':'.$tbl_name.'_'.$col_name ] = $value;
+                }
+            }
+
+            $sql = 'SELECT '.implode(','     , $target)
+            .' FROM ' .implode(' LEFT JOIN ', $table)
+            .' WHERE '.implode(' AND ' , $key_cols);
+            if ( !empty( $order_by ) ) {
+                $sql .= ' ORDER BY '.implode(', ', $order_by);
+            }
+
+            $identifier = $identifier ?? $this->getLastFocus();
+            $stmt = $this->query( $sql.';', $cond_vals, $identifier );
+            return $stmt->fetchAll();
+    }
+
+    public static function getDataType() :array {
+        return self::$DATA_TYPES;
+    }
+
+}
+
+
+
+/**
+ * @author amderbar
+ *
+ */
+abstract class PDOHandlar {
 
     /** */
     static public $ON_DELETE = array(
-        'NULL' => 'SET NULL',
-        'CASCADE' => 'CASCADE'
+        'null' => 'set null',
+        'cascade' => 'cascade'
     );
 
-
+    /**
+     * @var array
+     */
+    private $con = array();
 
     /**
-    *
-    */
-    public function __construct( string $db_name ) {
-        $this->connect( $db_name );
+     * @var unknown
+     */
+    private $focus_histry;
+
+    /**
+     * @return string
+     */
+    public function getLastFocus() :string {
+        return $this->focus_histry->last();
+    }
+
+    /**
+     * constructer
+     *
+     * @param string $db_name
+     * @param string $identifier
+     */
+    public final function __construct( string $db_name, string $identifier = null ) {
+
+        /**
+         * @var PDOHandlar $focus_histry
+         */
+        $this->focus_histry  = new class {
+            /**
+             * @var integer
+             */
+            private $buffer_size = 5;
+            /**
+             * @var array
+             */
+            private $histry = array();
+            /**
+             * @param string $log
+             * @return string
+             */
+            public function rec( string $log ) :string {
+                if ( array_push( $this->histry, $log ) > $this->buffer_size ) {
+                    array_shift( $this->histry );
+                }
+                return $log;
+            }
+            /**
+             * @return string
+             */
+            public function last() :string {
+                return end( $this->histry );
+            }
+            /**
+             * @param string $target
+             * @return int
+             */
+            public function clear( string $target = null ) :int {
+                $this->histry = array_filter( $this->histry, function ( $log ) use ( $target ) {
+                    return $log != ( $target ?? true );
+                });
+                    return count( $this->histry );
+            }
+        };
+
+        $this->connect( $db_name, $identifier );
     }
 
 
-
     /**
-    *
-    */
-    public function connect( string $db_name ) {
-        $dsn = 'sqlite:' . $db_name;
+     * create new connection to db
+     *
+     * @param string $db_name
+     * @param string $identifier
+     * @throws PDOException
+     * @return string
+     */
+    public final function connect( string $db_name, string $identifier = null ) :string {
         try {
-            $this->pdo = new PDO($dsn);
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-            $this->pdo->exec('PRAGMA foreign_keys = true;');
+            $identifier = $identifier ?? uniqid('pdo');
+            $this->con[ $identifier ] = $this->setupPDO( $this->newPDO( $db_name ) );
+
+            return ( $this->focus_histry->rec( $identifier ) );
+
         } catch (PDOException $e){
-            die('Connection failed:'. $e->getMessage());
+
+            error_log('Connection failed:'. $e->getMessage());
+            throw $e;
         }
     }
 
+
+    /**
+     * @param string $db_name
+     * @return PDO
+     */
+    abstract protected function newPDO( string $db_name ) :PDO;
+
+
+    /**
+     * @param PDO $data_obj
+     * @return PDO
+     */
+    abstract protected function setupPDO( PDO $data_obj ) :PDO;
+
+
+
+    /**
+     * disconnect db
+     *
+     * @param string $identifier
+     */
+    public function disconnect( string $identifier = null ) :void {
+
+        $identifier = $identifier ?? $this->getLastFocus();
+        unset( $this->con[ $identifier ] );
+        $this->focus_histry->clear( $identifier );
+    }
+
+
+
+    /**
+     * disconnect all db
+     */
+    public function disconnectAll() :void {
+
+        $this->con = array();
+    }
+
+
+    abstract protected function getColumnList( string $table, string $identifier = null ) :array ;
+
+
+    abstract protected function getPrimaryColumnName( string $table, string $identifier = null ) :string ;
 
 
     /**
@@ -70,13 +330,18 @@ class SQLiteHandler {
      * @param array $target_col
      * @return array
      */
-    public function load( string $table, int $id, ?array $target_col = [] ) :array {
+    public function load( string $table, $id, ?array $target_col = [], string $identifier = null ) :array {
+
         // FIXME: $tableと$columnのエスケープ処理が必要
-        if ( empty($target_col) ) {
+        if ( empty( $target_col ) ) {
             $target_col = $this->getColumnList( $table );
+
         }
-        $sql = 'SELECT '.implode(',', $target_col).' FROM '.$table.' WHERE id = ?;';
-        $stmt = $this->prepareExecute( $sql, [$id] );
+        $identifier = $identifier ?? $this->getLastFocus();
+        $id_name = $this->getPrimaryColumnName( $table, $identifier );
+        $sql = 'select '.implode( ',', $target_col ).' from '.$table.' where '.$id_name.' = :id;';
+
+        $stmt = $this->prepareExecute( $identifier, $sql, [ ':id' => $id] );
         return $stmt->fetch();
     }
 
@@ -87,18 +352,22 @@ class SQLiteHandler {
      * @param array $condition
      * @return bool
      */
-    public function isExists(string $table, array $condition) :bool {
+    public function isExists( string $table, array $condition, string $identifier = null ) :bool {
+
         // FIXME: $tableと$columnのエスケープ処理が必要
         $key_cols = array();
         $key_vals = array();
-        foreach ($condition as $col => $val) {
-            $key_cols[] = $col.'= ?';
-            $key_vals[] = $val;
-        }
-        $sql = 'SELECT EXISTS( SELECT id FROM '.$table.'WHERE '.implode(' AND ', $key_cols).') AS judge;';
+        foreach ( $condition as $col => $val ) {
 
-        $stmt = $this->prepareExecute( $sql, $key_vals );
+            $key_cols[] = $col.'= :'.$col;
+            $key_vals[ ':'.$col_name ] = $val;
+        }
+        $sql = 'select exists( select id from '.$table.'where '.implode(' and ', $key_cols).') as judge;';
+
+        $identifier = $identifier ?? $this->getLastFocus();
+        $stmt = $this->prepareExecute( $identifier, $sql, $key_vals );
         $result = $stmt->fetch();
+
         return boolval($result['judge']);
     }
 
@@ -111,17 +380,20 @@ class SQLiteHandler {
      * @param array $order_by
      * @return array
      */
-    public function fetchAll( string $table, ?array $target_col = [], ?array $order_by = [] ) :array {
+    public function fetchAll( string $table, ?array $target_col = [], ?array $order_by = [], string $identifier = null ) :array {
+
         // FIXME: $tableと$columnのエスケープ処理が必要
         if ( empty( $target_col ) ) {
             $target_col = $this->getColumnList( $table );
         }
-        $sql = 'SELECT '.implode(',', $target_col).' FROM '.$table;
+
+        $sql = 'select '.implode(',', $target_col).' from '.$table;
         if ( !empty( $order_by ) ) {
-            $sql .= ' ORDER BY '.implode(', ', $order_by);
+            $sql .= ' order by '.implode(', ', $order_by);
         }
 
-        $stmt = $this->prepareExecute( $sql.';' );
+        $identifier = $identifier ?? $this->getLastFocus();
+        $stmt = $this->prepareExecute( $identifier, $sql.';' );
         return $stmt->fetchAll();
     }
 
@@ -135,117 +407,70 @@ class SQLiteHandler {
      * @param array $order_by
      * @return array
      */
-    public function findByKey( string $table, array $condition, ?array $target_col = [], ?array $order_by = [] ) :array {
+    public function findByKey( string $table, array $condition, ?array $target_col = [], array $order_by = [], string $identifier = null ) :array {
+
         // FIXME: $tableと$columnのエスケープ処理が必要
         if ( empty( $target_col ) ) {
             $target_col = $this->getColumnList( $table );
         }
+
         $key_cols = array();
         $key_vals = array();
         foreach ($condition as $col => $val) {
-            $key_cols[] = $col.'= ?';
-            $key_vals[] = $val;
-        }
-        $sql = 'SELECT '.implode(',', $target_col).' FROM '.$table.' WHERE '.implode(' AND ', $key_cols);
-        if ( !empty( $order_by ) ) {
-            $sql .= ' ORDER BY '.implode(', ', $order_by);
+
+            $key_cols[] = $col.'= :'.$col;
+            $key_vals[ ':'.$col ] = $val;
         }
 
-        $stmt = $this->prepareExecute( $sql.';', $key_vals );
+        $sql = 'select '.implode(',', $target_col).' from '.$table.' where '.implode(' and ', $key_cols);
+        if ( !empty( $order_by ) ) {
+            $sql .= ' order by '.implode(', ', $order_by);
+        }
+
+        $identifier = $identifier ?? $this->getLastFocus();
+        $stmt = $this->prepareExecute( $identifier, $sql.';', $key_vals );
         return $stmt->fetchAll();
     }
 
 
 
     /**
-     *
-     * @param array $join_tbls  [ tbl_name, tbl_name => [ [tbl_name => col_name, tbl_name => col_name], ... ], ... ]
-     * @param array $condition  [ tbl_name => [col_name => value], ... ]
-     * @param array $target_col [ tbl_name => [col_name, ... ], ... ]
-     * @param array $order_by   [ tbl_name.col_name, tbl_name.col_name, ... ]
-     * @return array
-     */
-    public function findByKeyWithJoin( array $join_tbls, array $condition, ?array $target_col = [], ?array $order_by = []  ) :array {
-        // FIXME: $tableと$columnのエスケープ処理が必要
-        $table = array_shift( $join_tbls );
-
-        if ( empty( $target_col ) ) {
-            $target_col = array();
-            foreach ( array_keys( $join_tbls ) as $tbl_name ) {
-                $target_col[ $tbl_name ] = $this->getColumnList( $tbl_name );
-            }
-            $target_col[ $table ] = $this->getColumnList( $table );
-        }
-        $target = implodeAssoc( '.', $target_col );
-
-        $table = array( $table );
-        foreach ( $join_tbls as $tbl_name => $join_condisions ) {
-            $join_on = array();
-            foreach ( $join_condisions as $eq_pair ) {
-                $on_equation = '';
-                foreach ( $eq_pair as $on_tbl => $on_col ) {
-                    $on_equation .= ( $on_equation ) ? ' = ' : '';
-                    $on_equation .= $on_tbl.'.'.$on_col;
-                }
-                $join_on[] = $on_equation;
-            }
-            $table[] = $tbl_name.' ON '.implode(' AND ', $join_on);
-        }
-
-        $key_cols = array();
-        $cond_vals = array();
-        foreach ( $condition as $tbl_name => $col_val ) {
-            foreach ( $col_val as $col_name => $value ) {
-                $key_cols[] = $tbl_name.'.'.$col_name.'= ?';
-                $cond_vals[] = $value;
-            }
-        }
-
-        $sql = 'SELECT '.implode(','     , $target)
-                .' FROM ' .implode(' LEFT JOIN ', $table)
-                .' WHERE '.implode(' AND ' , $key_cols);
-        if ( !empty( $order_by ) ) {
-            $sql .= ' ORDER BY '.implode(', ', $order_by);
-        }
-
-        $stmt = $this->prepareExecute( $sql.';', $cond_vals );
-        return $stmt->fetchAll();
-    }
-
-
-
-    /**
-     * @param DataTransfarObject $dto
+     * @param string $table
+     * @param array $parms
      * @param bool $if_redundant
-     * @throws Ambigous <PDOException, DBManageExeption>
+     * @param string $identifier
+     * @throws PDOException
      * @return int
      */
-    public function insert( DataTransfarObject $dto, ?bool $if_redundant = false) :int {
+    public function insert( string $table, array $parms, bool $if_redundant = false, string $identifier = null ) :int {
         try {
-            $key_cols = array();
+            $key_cols = array_keys( $parms );
             $place_holders = array();
             $key_vals = array();
-            foreach ( $dto->getParms() as $col_name => $value ) {
-                $key_cols[] = $col_name;
-                $place_holders[] = '?';
-                $key_vals[] = $value;
-            }
-            $sql = 'INSERT INTO '.$dto->getTableName();
-            $sql .= '('.implode(',', $key_cols).') VALUES ('.implode(',', $place_holders).');';
+            foreach ( $parms as $col_name => $value ) {
 
-            $stmt = $this->prepareExecute( $sql, $key_vals );
-            return $this->pdo->lastInsertId();
+                $place_holders[] = ':'.$col_name;
+                $key_vals[':'.$col_name ] = $value;
+            }
+
+            $sql = 'insert into '.$table;
+            $sql .= '('.implode(',', $key_cols).') values ('.implode(',', $place_holders).');';
+
+            $identifier = $identifier ?? $this->getLastFocus();
+            $stmt = $this->prepareExecute( $identifier, $sql, $key_vals );
+
+            return $this->con[ $identifier ]->lastInsertId();
 
         } catch ( PDOException $e) {
+
             if ( $if_redundant && ( $e->getCode() == 23000 ) ) { // 19 UNIQUE constraint failed
                 $err_arr = explode( ' ', $e->getMessage() );
                 $colname = explode( '.', array_pop( $err_arr ) );
                 $colname = array_pop( $colname );
-                $parms = $dto->getParms();
-                $row = $this->findByKey(
-                    $dto->getTableName(), [ $colname => $parms[ $colname ] ]);
+                $row = $this->findByKey( $table, [ $colname => $parms[ $colname ] ]);
                 return $row[0]['id'];
             }
+
             throw $e;
         }
     }
@@ -253,31 +478,38 @@ class SQLiteHandler {
 
 
     /**
-     * @param DataTransfarObject $dto
+     * @param string $table
+     * @param array $parms
      * @param array $conditions
+     * @param string $identifier
+     * @return int
      */
-    public function update( DataTransfarObject $dto, ?array $conditions = [] ) :void {
+    public function update( string $table, array $parms, array $conditions = [], string $identifier = null ) :int {
         $key_cols = array();
         $key_vals = array();
-        foreach ( $dto->getParms() as $col_name => $value ) {
-            $key_cols[] = $col_name.' = ?';
-            $key_vals[] = $value;
+        foreach ( $parms as $col_name => $value ) {
+
+            $key_cols[] = $col_name.' = :'.$col_name;
+            $key_vals[ ':'.$col_name ] = $value;
         }
 
         $cond_cols = array();
         foreach ( $conditions as $col_name => $value ) {
-            $cond_cols[] = $col_name.' = ?';
-            $key_vals[] = $value;
+
+            $cond_cols[] = $col_name.' = :'.$col_name;
+            $key_vals[ ':'.$col_name ] = $value;
         }
 
-        $sql = 'UPDATE '.$dto->getTableName();
-        $sql .= ' SET '.implode( ',', $key_cols );
+        $sql = 'update '.$dto->getTableName();
+        $sql .= ' set '.implode( ',', $key_cols );
 
         if ( !empty( $cond_cols ) ) {
-            $sql .= ' WHERE '.implode(' AND ', $cond_cols);
+            $sql .= ' where '.implode(' and ', $cond_cols);
         }
-        $stmt = $this->prepareExecute( $sql.';', $key_vals );
-        return;
+        $identifier = $identifier ?? $this->getLastFocus();
+        $stmt = $this->prepareExecute( $identifier, $sql.';', $key_vals );
+
+        return $stmt->rowCount();
     }
 
 
@@ -285,18 +517,22 @@ class SQLiteHandler {
     /**
      * @param string $table
      * @param array $condition
+     * @param string $identifier
+     * @return int
      */
-    public function delete( string $table, ?array $condition = [] ) :void {
+    public function delete( string $table, array $condition = [], string $identifier = null ) :int {
         $key_cols = array();
         $key_vals = array();
         foreach ($condition as $col => $val) {
-            $key_cols[] = $col.'= ?';
-            $key_vals[] = $val;
+            $key_cols[] = $col.'= :'.$col_name;
+            $key_vals[ ':'.$col_name ] = $value;
         }
-        $sql = 'DELETE FROM '.$table.' WHERE '.implode(' AND ', $key_cols).';';
+        $sql = 'delete from '.$table.' where '.implode(' and ', $key_cols).';';
 
-        $stmt = $this->prepareExecute( $sql, $key_vals );
-        return;
+        $identifier = $identifier ?? $this->getLastFocus();
+        $stmt = $this->prepareExecute( $identifier, $sql, $key_vals );
+
+        return $stmt->rowCount();
     }
 
 
@@ -306,114 +542,120 @@ class SQLiteHandler {
      * @param bool $if_not_exist
      * @throws DBManageExeption
      */
-    public function createTable(TableDefineObject $tdo, ?bool $if_not_exist = false) :void {
+    public function createTable( TableDefineObject $tdo, bool $if_not_exist = false, string $identifier = null ) :void {
+
+        $data_type_dictionary = $this->getDataTypeDictionary();
         $defs = array();
         while ( $col = $tdo->fetchColumn() ) {
-            if( !isset( self::$DATA_TYPES[ strtoupper( $col['type'] ) ] ) ) {
+
+            $dataType = $data_type_dictionary[ $col['type'] ];
+            if( isset( $dataType ) ) {
+                $sql = $col['name'].' '.$dataType;
+
+            } else {
                 throw new DBManageExeption( "Inviled data type specified :".$col['type'], 1 );
             }
-            $sql = $col['name'].' '.$col['type'];
             // TODO:Default値のSQLエスケープはどうすれば？
             if (isset($col['default'])) {
-                $sql .= ' DEFAULT ';
+                $sql .= ' default ';
+
                 if ($col['default'] === false) {
-                    $sql .= '"false"';
+                    $sql .= "'false'";
+
                 } else {
-                    $sql .= '"'.$col['default'].'"';
+                    $sql .= "'{$col['default']}'";
                 }
             }
-            $sql .= ($col['primery'])   ? ' PRIMARY KEY'   : '';
-            $sql .= ($col['uniq'])      ? ' UNIQUE'        : '';
-            $sql .= ($col['not_null'])  ? ' NOT NULL'      : '';
-            $sql .= ($col['increment']) ? ' AUTOINCREMENT' : '';
+            $sql .= ($col['primery'])   ? ' primary key'   : '';
+            $sql .= ($col['uniq'])      ? ' unique'        : '';
+            $sql .= ($col['not_null'])  ? ' not null'      : '';
+
             if ( $col['foreign'] ) {
-                $sql .= ' REFERENCES '.$col['foreign']['ref'];
-                if ( isset( self::$ON_DELETE[ strtoupper( $col['foreign']['del'] ) ] ) ) {
-                    $sql .= ' on DELETE '.self::$ON_DELETE[ strtoupper( $col['foreign']['del'] ) ];
+                $sql .= ' references '.$col['foreign']['ref'];
+
+                if ( isset( self::$on_delete[ mb_strtolower( $col['foreign']['del'] ) ] ) ) {
+                    $sql .= ' on delete '.self::$on_delete[ mb_strtolower( $col['foreign']['del'] ) ];
+
                 } else {
-                   throw new DBManageExeption( "Inviled SQL keyword :".$col['foreign']['del'], 1 );
+                    throw new DBManageExeption( "Inviled SQL keyword :".$col['foreign']['del'], 1 );
                 }
             }
             $defs[] = $sql;
         }
         while ( $con = $tdo->fetchConstraint() ) {
+
             $sql = '';
-            switch ( strtoupper( $con['type'] ) ) {
-                case 'UNIQ':
-                    $sql .= ' UNIQUE('.implode(',', $con['targets']).')';
+            switch ( mb_strtolower( $con['type'] ) ) {
+
+                case 'uniq':
+                    $sql .= ' unique('.implode(',', $con['targets']).')';
                     break;
-                case 'FOREIGN':
-                    $sql .= ' FOREIGN KEY '.implode(',', $con['targets']);
-                    $sql .= ' REFERENCES '.$con['references']['tbl'].'('
-                                .implode(',', $con['references'][cols]).')';
-                    break;
+
+                case 'foreign':
+                    $sql .= ' foreign key '.implode(',', $con['targets']);
+                    $sql .= ' references '.$con['references']['tbl'].'('
+                        .implode(',', $con['references'][cols]).')';
+                        break;
             }
             $defs[] = $sql;
         }
-        $sql = 'CREATE TABLE ';
-        $sql .= ($if_not_exist) ? 'IF NOT EXISTS ' : '';
-        $sql .= $tdo->tableName().' (';
+        $sql = 'create table ';
+        $sql .= ($if_not_exist) ? 'if not exists ' : '';
+        $sql .= $tdo->tablename().' (';
         $sql .= implode(',', $defs);
         $sql .= ');';
 
-        $stmt = $this->prepareExecute( $sql );
+        $identifier = $identifier ?? $this->getLastFocus();
+        $stmt = $this->prepareExecute( $identifier, $sql );
         return;
     }
 
 
 
     /**
+     * @return array
+     */
+    abstract public function getDataTypeDictionary() :array ;
+
+
+
+    /**
      * @param string $sql
      * @param array $parms
      * @return array
      */
-    public function execSQL( string $sql, ?array $parms = [] ) :array {
-        $stmt = $this->prepareExecute( $sql, $parms);
-        return $stmt->fetchAll();
+    public function query( string $sql, array $parms = [], string $identifier = null ) :PDOStatement {
+
+        $identifier = $identifier ?? $this->getLastFocus();
+        return $this->prepareExecute( $identifier, $sql, $parms);
     }
 
 
 
     /**
-     * @param string $table
-     * @return array
-     */
-    private function getColumnList( string $table ) :array {
-        static $cache;
-        if ( !isset( $cache ) ) {
-            $cache = array();
-        }
-        if ( !isset( $cache[ $table ] ) ) {
-            // 一度検索したテーブルの列名リストはキャッシュに保存
-            $stmt = $this->prepareExecute( 'PRAGMA table_info('.$table.')' );
-            $cache[ $table ] = array_column($stmt->fetchAll(), 'name');
-        }
-        if ( count( $cache ) > 5 ) {
-            // キャッシュサイズの調整
-            // 一定以上の長さであれば、先頭を削除
-            array_shift( $cache );
-        }
-        return $cache[ $table ];
-    }
-
-
-
-    /**
+     * execute prepared statement
+     *
      * @param string $sql
      * @param array $parms
      * @throws DBManageExeption
      * @throws Ambigous <PDOException, DBManageExeption>
      * @return array
      */
-    private function prepareExecute( string $sql, ?array $parms = null ) :PDOStatement {
+    private final function prepareExecute( string $identifier, string $sql, array $parms = null ) :PDOStatement {
+
+        $pdo = $this->con[ $this->focus_histry->rec( $identifier ) ];
         try {
-            $stmt = $this->pdo->prepare( $sql );
+            $stmt = $pdo->prepare( $sql );
+
             if ( $stmt->execute( $parms ) ) {
                 return $stmt;
+
             } else {
                 throw new DBManageExeption( 'Execute Prepared statement Failed.' );
+
             }
         } catch ( PDOException | DBManageExeption $e ) {
+
             $e->queryString = $sql ?? null;
             $e->bindedParam = $parms ?? null;
             throw $e;
@@ -421,5 +663,6 @@ class SQLiteHandler {
     }
 
 
-
 }
+
+

@@ -1,8 +1,10 @@
 <?php
-// TODO: ORDER BY 対応
+// FIXME: ORDER BY 対応
 // リスト表示をする部分の並び順を一定にするように見直し
 
 // FIXME: CSRF対策、二度押し対策の整備
+
+// FIXME: 入力値チェックの統一的な仕組み
 
 /**
 * session check.
@@ -69,6 +71,11 @@ function fnv132($str) {
     return hash('fnv132', $str);
 }
 
+/**
+ * @param string $glue
+ * @param array $asoc
+ * @return array
+ */
 function implodeAssoc(string $glue, array $asoc) :array {
     $result = array();
     foreach ($asoc as $key => $child_arr) {

@@ -267,9 +267,11 @@ function updateForms(eve) {
                 val = 'Nameless' + (index + 1);
             }
             tbody.find('select[name*="ref_dist"]').each(function (idx, ref_dist) {
+                    // TODO:出力文字列のエスケープ
                 $(ref_dist).find('optgroup').first().children('[value="-' + index + '"]').text(val);
             });
             $('#preview .data-table').each(function (idx, tbl) {
+                    // TODO:出力文字列のエスケープ
                 $(tbl).find('tr').first().find('th').eq(index).text(val);
             });
             break;

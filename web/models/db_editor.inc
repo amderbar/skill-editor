@@ -204,7 +204,7 @@ class DBEditor {
     /**
      */
     public function deleteDB($proj_id) {
-        // トランザクション処理必要
+        // FIXME: トランザクション処理必要
         if (isset( $this->con[$proj_id] )) {
             $this->close( $proj_id );
         }
@@ -281,7 +281,7 @@ class DBEditor {
     public function listUsrTables($proj_id) {
         try {
             $table_list = array ();
-            foreach ( $this->con[$proj_id]->fetchAll( SYSTEM_TBL, ['id', 'tbl_name'], null, ['id]'] ) as $row ) {
+            foreach ( $this->con[$proj_id]->fetchAll( SYSTEM_TBL, ['id', 'tbl_name'], ['id'] ) as $row ) {
                 $table_list[$row['id']] = $row['tbl_name'];
             }
             return $table_list;
@@ -328,7 +328,7 @@ class DBEditor {
      */
     public function addUserTable(int $proj_id, string $tbl_name, array $cols_hash, array $constraints_hash = array()): array {
         try {
-            // トランザクション処理必要
+            // FIXME: トランザクション処理必要
             // システムテーブルに表名を登録
             $actual_tbl_name = $this->generateActualTblName(  $proj_id, $tbl_name );
             $tbl_id = $this->insertData( $proj_id, SYSTEM_TBL, [
@@ -448,7 +448,7 @@ class DBEditor {
 
         foreach ( $cols_hash as $i => $def_hash ) {
 
-            switch ($def_hash['form_type']) {
+            switch ( $def_hash['form_type'] ) {
                 case 'listext':
                 case 'numlist':
                 case 'select':
@@ -514,6 +514,8 @@ class DBEditor {
 
     /**
      * ハッシュ化したユーザー入力表名にprefixと一意なsuffixを付けて、重複しない実名を返す
+     * FIXME: 現状では一意でない実名が返されることもありうる
+     * ⇒ 入力表名をハッシュ化するのではなく、それとは無関係にuniqid()を使用してはどうか。
      *
      * @param string $tbl_name
      * @return string
@@ -609,7 +611,7 @@ class DBEditor {
             }
         };
         try {
-            // トランザクション処理必要
+            // FIXME: トランザクション処理必要
             return $this->con[$proj_id]->insert( $dto, $if_redundant );
         } catch ( PDOException | DBManageExeption $e ) {
             $this->handleException( $e );
@@ -637,7 +639,7 @@ class DBEditor {
             }
         };
         try {
-            // トランザクション処理必要
+            // FIXME: トランザクション処理必要
             return $this->con[$proj_id]->update( $dto, $conditions );
         } catch ( PDOException | DBManageExeption $e ) {
             $this->handleException( $e );
@@ -844,7 +846,7 @@ class DBEditor {
     /**
      */
     public static function getDataTypeList() {
-        return SQLiteHandler::$DATA_TYPES;
+        return SQLiteHandler::getDataType();
     }
 }
 

@@ -23,6 +23,7 @@ class EditorServlet extends Servlet {
         // ただしProject ID は常に0より大なので、0も含め空なら何もせずに画面表示に転送する
         if ( !empty( $_GET['pid'] ) ) {
 
+            // FIXME: 本当はここで入力値チェックをする
             $current_proj_id = intval( $_GET['pid'] );
             if ( is_null( $this->db_editor->open( $current_proj_id ) ) ) {
                 return $this->redirect( $_SERVER['PHP_SELF'] );
@@ -61,7 +62,7 @@ class EditorServlet extends Servlet {
         // Project ID は常に0より大なので、0も含め空なら何もせずに画面表示に転送する
         if (!empty($_POST['pid'])) { // テーブルの新規作成時
 
-            // 本当はここで入力値チェックをする
+            // FIXME: 本当はここで入力値チェックをする
             $proj_id = intval($_POST['pid']);
             if( is_null( $this->db_editor->open( $proj_id ) ) ){
                 return $this->redirect(getMyTopURL());
@@ -93,6 +94,7 @@ class EditorServlet extends Servlet {
         $parm_arr = array();
         $parm_arr['new_tab'] = true;
         $parm_arr['data_types'] = DBEditor::getDataTypeList();
+        // FIXME: hiddenまで入力形式に出てる
         $parm_arr['form_types'] = HTMLHandler::$FROM_TYPES;
         $parm_arr['opened_tab'] = null;
         $parm_arr['proj_name'] = $this->db_editor->projName($proj_id);
@@ -106,6 +108,7 @@ class EditorServlet extends Servlet {
                 if ( $colnum['actual_name'] == 'id' ) {
                     continue;
                 }
+                // FIXME: 同名のテーブルがあるとそれらを区別できない
                 $parm_arr['col_list'][ $tbl_name ][ $colnum['id'] ] = $colnum['col_name'];
             }
         }

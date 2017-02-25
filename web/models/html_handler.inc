@@ -51,6 +51,7 @@ class HTMLHandler {
 
     /**
     * Helper function for sanitize url. this is not yet complete.
+    * FIXME: URLのきちんとしたサニタイズ
     * @param $url
     */
     public static function sanitizeUrl($url, $query = null) {
