@@ -11,30 +11,30 @@ define( 'SYSTEM_TBL', 's_admin_tbl' );
 define( 'SYSTEM_COL', 's_admin_col' );
 define( 'NUM_SETTINGS', 's_num_settings' );
 define( 'FORM_TO_DATA', [
-        'color' => 'TEXT',
-        'text' => 'TEXT',
-        'textarea' => 'TEXT',
-        'tel' => 'TEXT',
-        'url' => 'TEXT',
-        'email' => 'TEXT',
-        'password' => 'TEXT',
-        'datetime' => 'TEXT',
-        'date' => 'DATETIME',
-        'month' => 'DATETIME',
-        'week' => 'DATETIME',
-        'time' => 'DATETIME',
-        'datetime-local' => 'DATETIME',
-        'listext' => 'NUMERIC',
-        'number' => 'NUMERIC',
-        'numlist' => 'NUMERIC',
-        'range' => 'NUMERIC',
-        'select' => 'NUMERIC',
-        'multicheck' => 'NUMERIC',
-        'radio' => 'NUMERIC',
-        'checkbox' => 'BOOLEAN',
-        'file' => 'BLOB',
-        'image' => 'BLOB',
-        'hidden' => 'BLOB'
+        'color' => 'text',
+        'text' => 'text',
+        'textarea' => 'text',
+        'tel' => 'text',
+        'url' => 'text',
+        'email' => 'text',
+        'password' => 'text',
+        'datetime' => 'text',
+        'date' => 'datetime',
+        'month' => 'datetime',
+        'week' => 'datetime',
+        'time' => 'datetime',
+        'datetime-local' => 'datetime',
+        'listext' => 'numeric',
+        'number' => 'numeric',
+        'numlist' => 'numeric',
+        'range' => 'numeric',
+        'select' => 'numeric',
+        'multicheck' => 'numeric',
+        'radio' => 'numeric',
+        'checkbox' => 'boolean',
+        'file' => 'blob',
+        'image' => 'blob',
+        'hidden' => 'blob'
 ] );
 
 /**
@@ -598,21 +598,9 @@ class DBEditor {
      * @return unknown
      */
     public function insertData($proj_id, $table, $parms, $if_redundant = false) {
-        $dto = new class( $table, $parms ) extends DataTransfarObject {
-            private $table = '';
-            function __construct($table, $parms) {
-                $this->table = $table;
-                foreach ( $parms as $colname => $value ) {
-                    $this->setParm( $colname, $value );
-                }
-            }
-            public function getTableName() {
-                return $this->table;
-            }
-        };
         try {
             // FIXME: トランザクション処理必要
-            return $this->con[$proj_id]->insert( $dto, $if_redundant );
+            return $this->con[$proj_id]->insert( $table, $parms, $if_redundant );
         } catch ( PDOException | DBManageExeption $e ) {
             $this->handleException( $e );
         }

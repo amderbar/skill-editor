@@ -56,7 +56,7 @@ $js_file = ( isset( $new_tab ) ) ? 'js/new_tbl.js' : 'js/editor_area.js';
 </head>
 <body>
     <header id="tab-bar">
-        <a href="#" class="icon-list2" title="サイドメニューを閉じる" id="toggle_menu"></a>
+        <button type="button" title="サイドメニューを閉じる" id="toggle_menu"><span class="icon-list2"></span></button>
         <ul class="editor-tabs">
 <?php
     if ( isset( $proj_id ) ) {
