@@ -31,14 +31,9 @@
 }
 
 #tab-page {
-	position: absolute;
+	height: 100%;
 	width: inherit;
-	top: 30px;
-	bottom: 0px;
-	left: 0;
-	right: 0;
 	overflow: auto;
-    /*display: none;*/
 	padding: 5px 0 100px 0;
 }
 

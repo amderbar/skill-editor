@@ -1,8 +1,14 @@
+html, body {
+	height: 100%;
+}
 body{
 	font-family:'ヒラギノ角ゴ ProN W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,osaka,'ＭＳ Ｐゴシック',"Lucida Grande","segoe UI",geneva,verdana,sans-serif;
 	font-size: small;
 	padding:0px;
 	margin:0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 h1, h2 {
 	margin: 5px auto 5px 0;

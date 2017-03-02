@@ -1,9 +1,5 @@
 .side-menu {
-	position: absolute;
-	top: 30px;
-	bottom: 0px;
-	left: 0px;
-	right: 0px;
+	height: 100%;
 	overflow: auto;
 	display: flex;
 	flex-direction: column;
@@ -23,7 +19,7 @@
 }
 li.with-btns::before {
   content: "\26AC";
-  margin-right: 10px; 
+  margin-right: 10px;
 }
 .side-children {
 	padding-left: 30px;
