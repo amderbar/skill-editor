@@ -577,13 +577,12 @@ class DBEditor {
                 }
             }
             $list_data = $this->con[$proj_id]->fetchAll( $this->tblName( $proj_id, $tbl_id, true ), null, ['id'] );
-            if ( empty( $list_data ) ) {
-                $tmp_row = array ();
-                foreach ( array_keys( $col_names ) as $col_key ) {
-                    $tmp_row[ $col_key ] = null;
-                }
-                $list_data[] = $tmp_row;
+            // 新規データ用行を追加
+            $tmp_row = array ();
+            foreach ( array_keys( $col_names ) as $col_key ) {
+                $tmp_row[ $col_key ] = null;
             }
+            $list_data[] = $tmp_row;
             return ['col_name' => $col_names, 'form' => $col_forms, 'data' => $list_data];
         } catch ( PDOException | DBManageExeption $e ) {
             $this->handleException( $e );

@@ -14,7 +14,8 @@ if ( array_depth( $tbl_data['data'] ) == 2 ) {
             if ( $key == 'id' ) {
                 echo '<th class="id-col">'.HTMLHandler::hidden( 'id[]', $row[$key] ).'</th>';
             } else {
-                echo '<td class="editable" data="'.HTMLHandler::escape( $key ).'">'.HTMLHandler::escape( $row[$key] ).'</td>';
+                echo '<td class="editable" data-key="'.HTMLHandler::escape( $key ).'">'
+                    .HTMLHandler::escape( $row[$key] ).'</td>';
             }
         }
         echo PHP_EOL.'</tr>';

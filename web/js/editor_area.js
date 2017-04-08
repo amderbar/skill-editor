@@ -3,7 +3,7 @@
  */
 $(function() {
 	$('#new-rec').children('td').each(function(idx, cell) {
-		var col_name = $(cell).attr('data');
+		var col_name = $(cell).data('key');
 		$(cell).append($('#' + col_name)[0].content);
 	}, this);
 

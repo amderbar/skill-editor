@@ -4,15 +4,14 @@
 */
 require_once( $_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc' );
 
-// TODO: 保存せずにページ移動しようとしたときのダイアログ表示
-$js_file = ( isset( $new_tab ) ) ? 'js/new_tbl.js' : 'js/editor_area.js';
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 	<meta charset="UTF-8">
 	<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-    <script src="<?=addFilemtime( $js_file )?>"></script>
+	<!-- TODO:出来上がったら圧縮版を読み込むように変更する -->
+	<script src="https://unpkg.com/vue"></script>
     <script type="text/javascript">
     <!--//<?php/*エディタ部共通のJavaScript*/?>
         $(function() {
@@ -29,22 +28,12 @@ $js_file = ( isset( $new_tab ) ) ? 'js/new_tbl.js' : 'js/editor_area.js';
                 side_menu.toggle('fast');
             });
             /**
-             * ページ読み込み時とウィンドウリサイズ時にタブバーの高さを取得してタブページのtop位置を変更する関数
-             * リサイズ操作が止まった時にだけ実行するように工夫している。
+             * フォームの変更を検知して画面遷移時の確認ダイアログを出すようにする
              */
-            var timer = false;
-            function resetTop() {
-                var top_height = $('#tab-bar').height();
-                $('#tab-page').css('top', top_height + 10);
-            }
-            resetTop();
-            $(window).resize(function(){
-                if (timer !== false) {
-                    clearTimeout(timer);
-                }
-                timer = setTimeout(function() {
-                    resetTop();
-                }, 50);
+            $('#table-form').change(function(){
+                window.onbeforeunload = function(e) {
+                    return 'Are you sure?';
+                };
             });
         });
     //-->
@@ -76,6 +65,7 @@ $js_file = ( isset( $new_tab ) ) ? 'js/new_tbl.js' : 'js/editor_area.js';
         </ul>
     </header>
     <section id="tab-page">
+    <form action="<?=$URL?>" method="post" id="table-form">
 <?php
 if ( isset( $proj_id ) ) {
     if ( isset( $new_tab ) ) {
@@ -92,10 +82,14 @@ if ( isset( $proj_id ) ) {
         }
 
         include( $tbl_tmpl );
+
     }
+    $js_file = ( isset( $new_tab ) ) ? 'js/new_tbl.js' : 'js/editor_area.js';
 }
 ?>
+    </form>
     </section>
+    <script src="<?=addFilemtime( $js_file )?>"></script>
 </body>
 </html>
 
