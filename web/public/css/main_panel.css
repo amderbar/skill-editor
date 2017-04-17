@@ -1,0 +1,46 @@
+body{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+nav, main {
+    align-self: stretch;
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+nav {
+    border-right: 1px solid LightGrey;
+    min-width: 200px;
+}
+main {
+    flex-grow: 1;
+}
+
+ul.side-menu {
+    align-self: stretch;
+    flex-grow: 1;
+    overflow: auto;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+ul.side-menu > li {
+    border: 1px solid LightGrey;
+    padding: 0 0 5px 5px;
+}
+li.with-btns::before {
+  content: "\26AC";
+  margin-right: 10px;
+}
+.side-children {
+    padding-left: 30px;
+}
+.side-children > li ul {
+    visibility: hidden;
+}
+.side-children > li:hover ul {
+    visibility: inherit;
+}

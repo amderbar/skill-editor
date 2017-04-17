@@ -1,44 +1,33 @@
 <?php
-/**
-* session check.
-*/
-require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
-
-/**
-* 
-*/
-require_once(full_path('models/db_editor.inc'));
 
 /**
  * the super class for servlets.
  */
 abstract class Servlet {
-    /**  */
-    protected $db_editor = null;
 
     /**
     * initialize method for servlet.
     */
-    public function __construct($arg='') {
-        if ($this->db_editor == null) {
-            $this->db_editor = new DBEditor();
-            // $this->db_editor->dropRoot();
-        }
-    }
-    
+    public function __construct() {}
+
     /**
-    * 
-    */
+     *
+     * @param string $req
+     */
     abstract public function doGet($req='');
 
     /**
-    * 
-    */
+     *
+     * @param string $req
+     */
     abstract public function doPost($req='');
 
     /**
-    * 
-    */
+     *
+     * @param unknown $dest
+     * @param unknown $REQ_SCOPE
+     * @return unknown
+     */
     protected function foward($dest, $REQ_SCOPE = null) {
         $URL = getMyTopURL();
         if (isset($REQ_SCOPE)) {
@@ -49,8 +38,9 @@ abstract class Servlet {
     }
 
     /**
-    * 
-    */
+     *
+     * @param unknown $dist
+     */
     protected function redirect($dist = null) {
         if (empty($dist)) {
             $dist = getMyTopURL();

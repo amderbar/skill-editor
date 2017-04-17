@@ -1,10 +1,5 @@
 <?php
 /**
-*
-*/
-require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
-
-/**
  * Utility Class for making html form.
  *
  * User: amderbar

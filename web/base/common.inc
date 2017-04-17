@@ -9,42 +9,20 @@
 /**
 * session check.
 */
-require_once(full_path('gatekeeper.inc'));
-/**
-* Definition of constants and global valiables.
-*/
-define('APP_NAME', 'DB Editor on Browser');
-define('VERSION', 'ver.0.0.0');
-define('ENCODE', 'UTF-8');
-// mb_internal_encoding(ENCODE);
-// mb_regex_encoding();
+require_once(full_path('base/gatekeeper.inc'));
 
 /**
 * load library and common functions
 */
-require_once(full_path('models/html_handler.inc'));
-require_once(full_path('models/exception.inc'));
+require_once(full_path('base/libs/html_handler.inc'));
+require_once(full_path('base/libs/exception.inc'));
+require_once(full_path('base/controllers/servlet.inc'));
 
 /**
 *
 */
 function getMyTopURL() {
     return parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
-}
-
-/**
-* return file full path of argument string
-* if null arg, return the full path of directory.
-*/
-function full_path($path='', $newfile=false) {
-    if ($path && strpos($path,'/') !== 0) {
-        $path = '/' . $path;
-    }
-    $path = str_replace('/', DIRECTORY_SEPARATOR, __DIR__ . $path);
-    if ((! $newfile) || (realpath($path))) {
-        $path = realpath($path);
-    }
-    return str_replace(DIRECTORY_SEPARATOR, '/', $path);
 }
 
 /**
@@ -70,6 +48,26 @@ function var_export_log($var) {
 function fnv132($str) {
     return hash('fnv132', $str);
 }
+
+/**
+ * Returns an indication of the number of arguments accepted by a callable.
+ *
+ * @param callable $callable
+ * @return int|null
+ */
+function signature(callable $callable)
+{
+    if (is_array($callable) || (is_string($callable) && strpos($callable, '::') !== false)) {
+        list($class, $method) = is_string($callable) ? explode('::', $callable) : $callable;
+        $reflection = (new ReflectionClass($class))->getMethod($method);
+
+    } else {
+        $reflection = new ReflectionFunction($callable);
+
+    }
+    return $reflection->getParameters();
+}
+
 
 /**
  * @param string $glue

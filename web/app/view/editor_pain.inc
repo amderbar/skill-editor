@@ -44,26 +44,6 @@ require_once( $_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc' );
 	<title><?=APP_NAME?></title>
 </head>
 <body>
-    <header id="tab-bar">
-        <button type="button" title="サイドメニューを閉じる" id="toggle_menu"><span class="icon-list2"></span></button>
-        <ul class="editor-tabs">
-<?php
-    if ( isset( $proj_id ) ) {
-        foreach ( $tbl_list as $tbl_id => $tbl_name ) {
-            $tab_class = ( $tbl_id === $opened_tab ) ? ' class="editting"' : '';
-            echo '<li'.$tab_class.'>'.HTMLHandler::link($tbl_name, $URL, ['pid' => $proj_id, 'tab' => $tbl_id]).'</li>'.PHP_EOL;
-        }
-        if ( isset( $new_tab ) ) {
-            echo '<li class="editting"><span id="new-tab-name">Untitled</span></li>'.PHP_EOL;
-        } else {
-            echo HTMLHandler::link( '', $URL,
-                ['pid' => $proj_id, 'tab' => 'new'],
-                ['class' => ['icon-new-tab', 'btn'], 'title' => 'テーブルの追加'] );
-        }
-    }
-?>
-        </ul>
-    </header>
     <section id="tab-page">
     <form action="<?=$URL?>" method="post" id="table-form">
 <?php

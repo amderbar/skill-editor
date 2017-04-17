@@ -1,23 +1,22 @@
 <?php
-/**
-* session check.
-*/
-require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
 
 /**
-* 
-*/
-require_once(full_path('controllers/servlet.inc'));
-
-/**
- * 
+ *
  */
 class IndexServlet extends Servlet {
 
+    public function index() {
+
+        return 'Hello World';
+
+    }
+
+
     /**
-    * 
+    *
     */
-    public function doGet($req='') {
+    public function doGet($req='')
+    {
         $REQ_SCOPE = array();
         // リクエストパラメータpidがセットされている時、そのpidのプロジェクトが開かれる
         if (isset($_GET['pid']) && $_GET['pid']!='') {
@@ -28,9 +27,10 @@ class IndexServlet extends Servlet {
     }
 
     /**
-    * 
+    *
     */
-    public function doPost($req='') {
+    public function doPost($req='')
+    {
         $proj_id = isset($_GET['pid']) ? intval($_GET['pid']) : null;
         if (isset($_POST['proj-name']) && ($_POST['proj-name'] != '')) {
             // プロジェクトの新規作成時
@@ -52,7 +52,8 @@ class IndexServlet extends Servlet {
     /**
     * ファイルアップロード受付メソッド
     */
-    private function upLoadFile($proj_id) {
+    private function upLoadFile($proj_id)
+    {
         // ファイル名についてのその他のバリデーションが必要
         switch ($_FILES['tmpl-file']['error']) {
             case UPLOAD_ERR_OK:
@@ -150,5 +151,3 @@ class IndexServlet extends Servlet {
         pre_dump($new_data);
     }
 }
-
-?>

@@ -1,18 +1,9 @@
 <?php
-/**
-* session check.
-*/
-require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
-
-/**
-*
-*/
-require_once(full_path('controllers/servlet.inc'));
 
 /**
  *
  */
-class SideServlet extends Servlet {
+class MainServlet extends Servlet {
 
     /**
     *
@@ -33,7 +24,7 @@ class SideServlet extends Servlet {
             $REQ_SCOPE['opend_id'] = $current_proj_id;
             $REQ_SCOPE['current_proj_tbl_list'] = $table_list;
         }
-        return $this->foward('view/side_pain.inc', $REQ_SCOPE);
+        return $this->foward('view/main_panel.inc', $REQ_SCOPE);
     }
 
     /**
@@ -56,5 +47,3 @@ class SideServlet extends Servlet {
         // return $this->doGet($req);
     }
 }
-
-?>

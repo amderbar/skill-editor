@@ -1,9 +1,4 @@
 <?php
-/**
- * session check.
- */
-require_once ($_SERVER['DOCUMENT_ROOT'] . '/skill_editor/common.inc');
-
 require_once (full_path( 'models/db_manager.inc' ));
 define( 'ROOT_DB_ID', 0 );
 define( 'ROOT_DB', 'resources/system_admin.db' );

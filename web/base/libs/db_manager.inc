@@ -1,7 +1,6 @@
 <?php
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
-require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/models/data_transfer_objects.inc');
+require_once(full_path('models/data_transfer_objects.inc'));
 
 
 /**

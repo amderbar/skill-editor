@@ -1,13 +1,4 @@
 <?php
-/**
- * session check.
- */
-require_once($_SERVER['DOCUMENT_ROOT'].'/skill_editor/common.inc');
-
-/**
- *
- */
-require_once(full_path('controllers/servlet.inc'));
 
 /**
  *
@@ -180,5 +171,3 @@ class EditorServlet extends Servlet {
     }
 
 }
-
-?>
