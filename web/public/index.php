@@ -15,6 +15,7 @@ define('ENCODE', 'UTF-8');
  *
  */
 require_once(full_path('base/common.inc'));
+require_once(full_path('base/router.inc'));
 foreach ( glob(full_path('app/controllers') . '/{*_servlet.inc}', GLOB_BRACE) as $file ) {
     if( is_file($file) ){
         require_once($file);
@@ -24,79 +25,51 @@ foreach ( glob(full_path('app/controllers') . '/{*_servlet.inc}', GLOB_BRACE) as
 // なんか前処理
 
 // Routing
-$routing_obj = new class(APP_ROOT)
-{
-    private $path_prefix;
-    private $get_routing = array();
-    private $post_routing = array();
-
-    public function __construct(?string $path_prefix = null)
-    {
-      $this->path_prefix = $path_prefix;
-    }
-
-    public function whenGet(string $path, $action) :void
-    {
-        $this->get_routing[$this->getPrefix() . $path] = $action;
-    }
-
-    public function whenPost(string $path, $action) :void
-    {
-        $this->get_routing[$this->getPrefix() . $path] = $action;
-    }
-
-    public function whenAny(string $path, $action) :void
-    {
-        $this->get_routing[$this->getPrefix() . $path] = $action;
-        $this->post_routing[$this->getPrefix() . $path] = $action;
-    }
-
-    public function getPrefix(): string
-    {
-        return $this->path_prefix ?? '';
-    }
-
-    public function getGetAction(string $path)
-    {
-        return $this->get_routing[$path] ?? null;
-    }
-
-    public function getPostAction(string $path)
-    {
-        return $this->post_routing[$path] ?? null;
-    }
-};
+$routing_obj = new Router(APP_ROOT);
 
 /////////////////////////////////////////////////////////////////////////
 // Route Settings
 /////////////////////////////////////////////////////////////////////////
-
+$callback = function (?string $hoge = null) {
+    return 'hollo ' . ($hoge ?? 'unspecified');
+};
 $routing_obj->whenGet('/index.php', ['IndexServlet', 'index']);
 $routing_obj->whenGet('/', 'IndexServlet::index');
-$routing_obj->whenGet('main', null);
+$routing_obj->whenGet('/main', $callback);
+$routing_obj->whenGet('/main/{hoge}', $callback);
+$routing_obj->whenGet('/main/{hoge}/moge/piyo', $callback);
 
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 
-$responce = call_user_func(function ($routing_config, $request_path) :string
+$responce = call_user_func(function (Router $routing_config, string $request_path) :string
 {
-    $path_prefix = $routing_config->getPrefix();
     if ( $_SERVER["REQUEST_METHOD"] === 'GET' ) {
-        $action = $routing_config->getGetAction($request_path);
+        [$action, $uri_params] = $routing_config->getGetAction($request_path);
 
     } else if ( $_SERVER["REQUEST_METHOD"] === 'POST' ) {
-        $action = $routing_config->getPostAction($request_path);
+        [$action, $uri_params] = $routing_config->getPostAction($request_path);
     }
     if ( isset($action) ) {
-        pre_dump(signature($action));
+        // 引数の準備
+        $param_arr = array();
+        foreach (getParameters($action) as $param) {
+            if ($param_class = $param->getClass()) {
+                $param_arr[] = call_user_func(function($class_name){
+                    return new $class_name('hoge');
+                }, $param_class->getName());
 
-        if ( is_callable($action) ) {
-            return $action();
+            } else {
+                $param_arr[] = $uri_params[$param->getName()] ?? null;
+            }
         }
-        if ( is_string($action) ) {
-            [$class, $method] = explode('@', $action);
-            return $action = (new $class())->$method;
+
+        if ( is_array($action) || (is_string($action) && (strpos($action, '::') !== false)) ) {
+            [$class, $method] = is_string($action) ? explode('::', $action) : $action;
+            $action = [new $class(), $method];
         }
+
+        return call_user_func_array($action, $param_arr);
     }
     throw new Exeption();
 

@@ -50,15 +50,15 @@ function fnv132($str) {
 }
 
 /**
- * Returns an indication of the number of arguments accepted by a callable.
+ * Returns arguments accepted by a callable.
  *
  * @param callable $callable
- * @return int|null
+ * @return array
  */
-function signature(callable $callable)
+function getParameters($callable)
 {
     if (is_array($callable) || (is_string($callable) && strpos($callable, '::') !== false)) {
-        list($class, $method) = is_string($callable) ? explode('::', $callable) : $callable;
+        [$class, $method] = is_string($callable) ? explode('::', $callable) : $callable;
         $reflection = (new ReflectionClass($class))->getMethod($method);
 
     } else {
