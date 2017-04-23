@@ -1,8 +1,4 @@
 <?php
-
-require_once(full_path('models/data_transfer_objects.inc'));
-
-
 /**
  *
  *
@@ -523,8 +519,8 @@ abstract class PDOHandlar {
         $key_cols = array();
         $key_vals = array();
         foreach ($condition as $col => $val) {
-            $key_cols[] = $col.'= :'.$col_name;
-            $key_vals[ ':'.$col_name ] = $value;
+            $key_cols[] = $col.'= :'.$col;
+            $key_vals[ ':'.$col ] = $val;
         }
         $sql = 'delete from '.$table.' where '.implode(' and ', $key_cols).';';
 
@@ -572,8 +568,8 @@ abstract class PDOHandlar {
             if ( $col['foreign'] ) {
                 $sql .= ' references '.$col['foreign']['ref'];
 
-                if ( isset( self::$on_delete[ mb_strtolower( $col['foreign']['del'] ) ] ) ) {
-                    $sql .= ' on delete '.self::$on_delete[ mb_strtolower( $col['foreign']['del'] ) ];
+                if ( isset( self::$ON_DELETE[ mb_strtolower( $col['foreign']['del'] ) ] ) ) {
+                    $sql .= ' on delete '.self::$ON_DELETE[ mb_strtolower( $col['foreign']['del'] ) ];
 
                 } else {
                     throw new DBManageExeption( "Inviled SQL keyword :".$col['foreign']['del'], 1 );

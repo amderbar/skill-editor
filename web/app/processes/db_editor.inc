@@ -1,37 +1,4 @@
 <?php
-require_once (full_path( 'models/db_manager.inc' ));
-define( 'ROOT_DB_ID', 0 );
-define( 'ROOT_DB', 'resources/system_admin.db' );
-define( 'SYSTEM_TBL', 's_admin_tbl' );
-define( 'SYSTEM_COL', 's_admin_col' );
-define( 'NUM_SETTINGS', 's_num_settings' );
-define( 'FORM_TO_DATA', [
-        'color' => 'text',
-        'text' => 'text',
-        'textarea' => 'text',
-        'tel' => 'text',
-        'url' => 'text',
-        'email' => 'text',
-        'password' => 'text',
-        'datetime' => 'text',
-        'date' => 'datetime',
-        'month' => 'datetime',
-        'week' => 'datetime',
-        'time' => 'datetime',
-        'datetime-local' => 'datetime',
-        'listext' => 'numeric',
-        'number' => 'numeric',
-        'numlist' => 'numeric',
-        'range' => 'numeric',
-        'select' => 'numeric',
-        'multicheck' => 'numeric',
-        'radio' => 'numeric',
-        'checkbox' => 'boolean',
-        'file' => 'blob',
-        'image' => 'blob',
-        'hidden' => 'blob'
-] );
-
 /**
  *
  * TODO: システムDBを編集するものとユーザーDBを編集するものとでクラスを分けたい
@@ -62,7 +29,7 @@ class DBEditor {
      * @return SQLiteHandler
      */
     public function open(int $proj_id, bool $is_new = false): ?SQLiteHandler {
-        $db_file = ($proj_id) ? sprintf( 'resources/proj%03d.db', $proj_id ) : ROOT_DB;
+        $db_file = ($proj_id) ? sprintf( 'app/resources/proj%03d.db', $proj_id ) : ROOT_DB;
         $db_file = full_path( $db_file, $is_new );
         if (! $db_file) {
             return null;
@@ -144,58 +111,6 @@ class DBEditor {
     }
 
 
-
-    /**
-     * TODO: 列の表示並び順を保存できるようにする
-     *
-     * @param string $proj_name
-     * @return int
-     */
-    public function registerDB(string $proj_name) :int {
-        try {
-            $proj_id = $this->insertData( ROOT_DB_ID, 'projects', [ 'proj_name' => $proj_name ], true );
-            $tmpl_dir = full_path( sprintf( 'resources/templates/proj%03d', $proj_id ), true );
-            if (! file_exists( $tmpl_dir )) {
-                mkdir( $tmpl_dir, 0666 );
-            }
-            $db_con = $this->open( $proj_id, true );
-
-            // system_admin tables
-            $tdo = new TableDefineObject( SYSTEM_TBL );
-            $tdo->appendColumn( 'tbl_name', 'text', [ 'not_null' => true ] );
-            $tdo->appendColumn( 'actual_name', 'text', [ 'uniq' => true, 'not_null' => true ] );
-            $db_con->createTable( $tdo, true );
-
-            $tdo = new TableDefineObject( SYSTEM_COL );
-            $tdo->appendColumn( 'tbl_id', 'integer', [
-                    'foreign' => [ 'ref' => SYSTEM_TBL . '(id)', 'del' => 'cascade' ]
-              ] );
-            $tdo->appendColumn( 'col_name', 'text', [ 'not_null' => true ] );
-            $tdo->appendColumn( 'actual_name', 'text', [ 'not_null' => true ] );
-            $tdo->appendColumn( 'default_val', 'blob');
-            $tdo->appendColumn( 'ref_col', 'integer', [
-                    'foreign' => [ 'ref' => SYSTEM_COL . '(id)', 'del' => 'null' ]
-              ] );
-            $tdo->appendColumn( 'form_type', 'integer', [ 'not_null' => true ] );
-            $tdo->appendColumn( 'multiple', 'boolean', [ 'not_null' => true, 'default' => false ] );
-            $tdo->appendConstraint( 'uniq', [ 'tbl_id', 'actual_name' ] );
-            $db_con->createTable( $tdo, true );
-
-            $tdo = new TableDefineObject( NUM_SETTINGS );
-            $tdo->appendColumn( 'col_id', 'integer', [
-                    'foreign' => [ 'ref' => SYSTEM_COL . '(id)', 'del' => 'cascade' ]
-              ] );
-            $tdo->appendColumn( 'step', 'real' );
-            $tdo->appendColumn( 'max', 'real' );
-            $tdo->appendColumn( 'min', 'real' );
-
-            $db_con->createTable( $tdo, true );
-            return $proj_id;
-        } catch ( PDOException | DBManageExeption $e ) {
-            $this->handleException( $e );
-        }
-    }
-
     /**
      */
     public function deleteDB($proj_id) {
@@ -217,30 +132,6 @@ class DBEditor {
         }
         if ($db_file = full_path( sprintf( 'resources/proj%03d.db', $proj_id ) )) {
             unlink( $db_file );
-        }
-    }
-
-    /**
-     */
-    public function registerTemplate($proj_id, $tmpl_name) {
-        try {
-            $dto = new class( $proj_id, $tmpl_name ) extends DataTransfarObject {
-                function __construct($proj_id, $tmpl_name) {
-                    $this->setParm( 'proj_id', $proj_id );
-                    $this->setParm( 'tmpl_name', $tmpl_name );
-                }
-                public function getInsertSQL() {
-                    return 'INSERT INTO templates(proj_id, tmpl_name) VALUES (:proj_id, :tmpl_name);';
-                }
-            };
-            if ($this->con[ROOT_DB_ID]->insert( $dto )) {
-                $tmpl_id = $this->con[ROOT_DB_ID]->execSQL( 'select last_insert_rowid() AS id' );
-                $tmpl_id = $tmpl_id[0]['id'];
-                return $tmpl_id;
-            }
-            return false;
-        } catch ( PDOException | DBManageExeption $e ) {
-            $this->handleException( $e );
         }
     }
 

@@ -36,7 +36,7 @@ class Router
      */
     public function whenPost(string $path, $action) :void
     {
-        $this->get_routing[$this->getPrefix() . $path] = $action;
+        $this->post_routing[$this->getPrefix() . $path] = $action;
     }
 
     /**
@@ -62,20 +62,14 @@ class Router
     /**
      *
      * @param string $path
+     * @param string $method
      * @return array
      */
-    public function getGetAction(string $path):array
+    public function getAction(string $path, string $method):array
     {
-        return $this->getAction($path, $this->get_routing);
-    }
-
-    /**
-     *
-     * @param string $path
-     */
-    public function getPostAction(string $path)
-    {
-        return $this->getAction($path, $this->post_routing);
+        $routing_arr = ($method === 'GET') ? $this->get_routing
+                        : (($method === 'POST') ? $this->post_routing : []);
+        return $this->searchAction($path, $routing_arr);
     }
 
     /**
@@ -84,12 +78,12 @@ class Router
      * @param array $routing
      * @return array
      */
-    private function getAction (string $path, array $routing):array
+    private function searchAction (string $path, array $routing):array
     {
         foreach ($routing as $key => $action) {
-            preg_match_all(':\{([^/]+)\}:', $key, $keys, PREG_SET_ORDER);
-            $regex = preg_replace(':\\\{[^/]+\\\}:', '([^/]+)', preg_quote($key));
-            if (preg_match(":\A{$regex}/?\Z:", $path, $params)) {
+            preg_match_all(';\{([^/]+)\};', $key, $keys, PREG_SET_ORDER);
+            $regex = preg_replace('/\\\{[^\/]+\\\}/', '([^\/]+)', preg_quote($key, '/'));
+            if (preg_match("/\A{$regex}\/?\Z/", $path, $params)) {
                 unset($params[0]);
                 return [$action, array_combine(array_column($keys, 1), $params)];
             }

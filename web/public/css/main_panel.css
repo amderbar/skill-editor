@@ -14,8 +14,9 @@ nav {
     border-right: 1px solid LightGrey;
     min-width: 200px;
 }
-main {
+section {
     flex-grow: 1;
+    padding: 0px 5px;
 }
 
 ul.side-menu {
@@ -28,7 +29,8 @@ ul.side-menu {
     flex-direction: column;
 }
 ul.side-menu > li {
-    border: 1px solid LightGrey;
+    display: block;
+	border: 1px solid LightGrey;
     padding: 0 0 5px 5px;
 }
 li.with-btns::before {
@@ -44,3 +46,38 @@ li.with-btns::before {
 .side-children > li:hover ul {
     visibility: inherit;
 }
+#toggle-menu {
+    font-size: xx-small;
+    padding: 0;
+}
+.editor-tabs {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-end;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+.editor-tabs li{
+    display: block;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border: 1px LightGrey solid;
+    background-color:  #E8E8E8;
+    min-width: 10%;
+}
+.editor-tabs li.editting {
+    background-color: white;
+    border-bottom: 1px white solid;
+}
+.editor-tabs li a{
+    display: block;
+	box-sizing: border-box;
+	width: 100%;
+    padding: 0px 5px;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.editor-tabs li a:hover{ background-color: aqua; }

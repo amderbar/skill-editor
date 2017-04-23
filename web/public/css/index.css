@@ -1,5 +1,7 @@
 body{
     min-width: 450px;
+    box-sizing: border-box;
+    padding: 3px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

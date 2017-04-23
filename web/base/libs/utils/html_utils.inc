@@ -6,7 +6,7 @@
  * Date: 16/07/12
  * Time: 9:16
  */
-class HTMLHandler {
+class Html {
     /** */
     // list属性、step属性によるバリエーションもある
     public static $FROM_TYPES = array(
@@ -62,7 +62,7 @@ class HTMLHandler {
            return null;
         }
         $tmp = array();
-        foreach ($query as $name => $value) {
+        foreach ($query ?? [] as $name => $value) {
             $tmp[] = self::escape($name).'='.urlencode(self::escape($value));
         }
         $query = implode('&', $tmp);
@@ -113,6 +113,16 @@ class HTMLHandler {
     public static function startForm($url, $query = null, $method = 'POST', $additional = null) {
         $href = self::sanitizeUrl($url, $query);
         return '<form action="'.$href.'" method="'.$method.'" '.self::attr($additional).'>';
+    }
+
+    /**
+     * Helper function for form end tag.
+     *
+     * @return string
+     */
+    public static function endForm() :string
+    {
+        return '</form>';
     }
 
     /**

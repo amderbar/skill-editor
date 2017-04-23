@@ -24,16 +24,26 @@ header {
     align-items: center;
     justify-content: space-between;
 }
-.btns {
+.btns,
+.menu {
     display: flex;
-    margin: 0 0 0 auto;
+    margin: 0;
     padding: 0;
+}
+.btns li,
+.menu > li {
+    display: block;
+}
+.btns {
+    margin: 0 0 0 auto;
     justify-content: flex-end;
 }
-.btns li {
-    display: block;
-    padding: 0px 5px;
+.btn {
+    padding: 0 5px;
+    text-decoration: none;
+    border-radius: 3px;
 }
-.btn {text-decoration: none;}
-.btn:hover{background-color:#aaaaaa;}
-.btn:visited{color:-webkit-link;}
+.btn:hover{ background-color: aqua; }
+.btn:visited{ color: -webkit-link; }
+
+[v-cloak] { display: none; }

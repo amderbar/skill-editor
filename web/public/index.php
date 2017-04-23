@@ -8,6 +8,40 @@ define('APP_ROOT', '/skill_editor');
 define('APP_NAME', 'DB Editor on Browser');
 define('VERSION', 'ver.0.0.0');
 define('ENCODE', 'UTF-8');
+
+define('VIEW_ROOT', 'app/view');
+define('RESOURCE_ROOT', 'app/resources');
+define('ROOT_DB_ID', 0 );
+define('ROOT_DB', RESOURCE_ROOT . '/system_admin.db' );
+define('SYSTEM_TBL', 's_admin_tbl' );
+define('SYSTEM_COL', 's_admin_col' );
+define('NUM_SETTINGS', 's_num_settings' );
+define('FORM_TO_DATA', [
+        'color' => 'text',
+        'text' => 'text',
+        'textarea' => 'text',
+        'tel' => 'text',
+        'url' => 'text',
+        'email' => 'text',
+        'password' => 'text',
+        'datetime' => 'text',
+        'date' => 'datetime',
+        'month' => 'datetime',
+        'week' => 'datetime',
+        'time' => 'datetime',
+        'datetime-local' => 'datetime',
+        'listext' => 'numeric',
+        'number' => 'numeric',
+        'numlist' => 'numeric',
+        'range' => 'numeric',
+        'select' => 'numeric',
+        'multicheck' => 'numeric',
+        'radio' => 'numeric',
+        'checkbox' => 'boolean',
+        'file' => 'blob',
+        'image' => 'blob',
+        'hidden' => 'blob'
+] );
 // mb_internal_encoding(ENCODE);
 // mb_regex_encoding();
 
@@ -15,65 +49,50 @@ define('ENCODE', 'UTF-8');
  *
  */
 require_once(full_path('base/common.inc'));
-require_once(full_path('base/router.inc'));
-foreach ( glob(full_path('app/controllers') . '/{*_servlet.inc}', GLOB_BRACE) as $file ) {
-    if( is_file($file) ){
-        require_once($file);
-    }
-}
 
 // なんか前処理
-
-// Routing
-$routing_obj = new Router(APP_ROOT);
 
 /////////////////////////////////////////////////////////////////////////
 // Route Settings
 /////////////////////////////////////////////////////////////////////////
-$callback = function (?string $hoge = null) {
-    return 'hollo ' . ($hoge ?? 'unspecified');
-};
-$routing_obj->whenGet('/index.php', ['IndexServlet', 'index']);
-$routing_obj->whenGet('/', 'IndexServlet::index');
-$routing_obj->whenGet('/main', $callback);
-$routing_obj->whenGet('/main/{hoge}', $callback);
-$routing_obj->whenGet('/main/{hoge}/moge/piyo', $callback);
+$routing_obj = new Router(APP_ROOT);
+
+$routing_obj->whenGet('/index.php', ['TopServlet', 'index']);
+$routing_obj->whenGet('/', 'TopServlet::index');
+$routing_obj->whenPost('/create', 'TopServlet::createProject');
+$routing_obj->whenPost('/delete', 'TopServlet::deleteProject');
+
+$routing_obj->whenGet('/main', 'MainServlet::index');
 
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 
-$responce = call_user_func(function (Router $routing_config, string $request_path) :string
+$responce = call_user_func(function (array $routing) :string
 {
-    if ( $_SERVER["REQUEST_METHOD"] === 'GET' ) {
-        [$action, $uri_params] = $routing_config->getGetAction($request_path);
-
-    } else if ( $_SERVER["REQUEST_METHOD"] === 'POST' ) {
-        [$action, $uri_params] = $routing_config->getPostAction($request_path);
+    [$action, $uri_params] = $routing;
+    if ( !isset($action) ) {
+        throw new \Exeption();
     }
-    if ( isset($action) ) {
-        // 引数の準備
-        $param_arr = array();
-        foreach (getParameters($action) as $param) {
-            if ($param_class = $param->getClass()) {
-                $param_arr[] = call_user_func(function($class_name){
-                    return new $class_name('hoge');
-                }, $param_class->getName());
+    // 引数の準備
+    $param_arr = array();
+    foreach (getParameters($action) as $param) {
+        if ($param_class = $param->getClass()) {
+            $param_arr[] = call_user_func(function($class_name){
+                return new $class_name();
+            }, $param_class->getName());
 
-            } else {
-                $param_arr[] = $uri_params[$param->getName()] ?? null;
-            }
+        } else {
+            $param_arr[] = $uri_params[$param->getName()] ?? null;
         }
-
-        if ( is_array($action) || (is_string($action) && (strpos($action, '::') !== false)) ) {
-            [$class, $method] = is_string($action) ? explode('::', $action) : $action;
-            $action = [new $class(), $method];
-        }
-
-        return call_user_func_array($action, $param_arr);
     }
-    throw new Exeption();
 
-}, $routing_obj, parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+    if ( is_array($action) || (is_string($action) && (strpos($action, '::') !== false)) ) {
+        [$class, $method] = is_string($action) ? explode('::', $action) : $action;
+        $action = [new $class(), $method];
+    }
+    return call_user_func_array($action, $param_arr) ?? '';
+
+}, $routing_obj->getAction(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), $_SERVER["REQUEST_METHOD"]));
 
 // なんか後処理
 
