@@ -24,6 +24,10 @@ header {
     align-items: center;
     justify-content: space-between;
 }
+span.with-btns {
+    display: inline-flex;
+    width: 100%;
+}
 .btns,
 .menu {
     display: flex;
@@ -47,3 +51,5 @@ header {
 .btn:visited{ color: -webkit-link; }
 
 [v-cloak] { display: none; }
+
+.inline-block { display: inline-block; }

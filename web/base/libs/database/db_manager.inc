@@ -94,7 +94,7 @@ class SQLiteHandler extends PDOHandlar {
      * {@inheritDoc}
      * @see DataBaseHandlar::getDataTypeDictionary()
      */
-    public function getDataTypeDictionary() :array {
+    public static function getDataTypeDictionary() :array {
         return self::$DATA_TYPES;
     }
 
@@ -121,7 +121,7 @@ class SQLiteHandler extends PDOHandlar {
                 }
                 $target_col[ $table ] = $this->getColumnList( $table );
             }
-            $target = implodeAssoc( '.', $target_col );
+            $target = Arr::implodeAssoc( '.', $target_col );
 
             $table = array( $table );
             foreach ( $join_tbls as $tbl_name => $join_condisions ) {
@@ -354,10 +354,10 @@ abstract class PDOHandlar {
         $key_vals = array();
         foreach ( $condition as $col => $val ) {
 
-            $key_cols[] = $col.'= :'.$col;
-            $key_vals[ ':'.$col_name ] = $val;
+            $key_cols[] = $col.' = :'.$col;
+            $key_vals[ ':'.$col ] = $val;
         }
-        $sql = 'select exists( select id from '.$table.'where '.implode(' and ', $key_cols).') as judge;';
+        $sql = 'select exists( select id from '.$table.' where '.implode(' and ', $key_cols).') as judge;';
 
         $identifier = $identifier ?? $this->getLastFocus();
         $stmt = $this->prepareExecute( $identifier, $sql, $key_vals );
@@ -610,7 +610,7 @@ abstract class PDOHandlar {
     /**
      * @return array
      */
-    abstract public function getDataTypeDictionary() :array ;
+    abstract public static function getDataTypeDictionary() :array ;
 
 
 

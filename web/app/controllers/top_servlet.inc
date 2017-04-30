@@ -28,8 +28,9 @@ class TopServlet extends Servlet
      */
     public function createProject(TopRequest $req, TopProcess $process)
     {
-        $process->registerDB($req->input('proj_name'));
+        $pid = $process->registerDB($req->input('proj_name'));
 
+        // TODO:リダイレクト先では作成したDBをテーブル新規作成で開くようにする
         return $this->redirectBack();
     }
 

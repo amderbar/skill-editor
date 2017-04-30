@@ -19,19 +19,4 @@ class MainProcess extends Process
             $this->handleException( $e );
         }
     }
-
-    /**
-     *
-     * @param int $proj_id
-     * @return array
-     */
-    public function listUsrTables(int $proj_id) :array
-    {
-        try {
-            return $this->open($proj_id)->fetchAll( SYSTEM_TBL, ['id', 'tbl_name'], ['id'] );
-
-        } catch ( PDOException | DBManageExeption $e ) {
-            $this->handleException( $e );
-        }
-    }
 }

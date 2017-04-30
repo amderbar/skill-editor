@@ -6,7 +6,8 @@
  * Date: 16/07/12
  * Time: 9:16
  */
-class Html {
+class Html
+{
     /** */
     // list属性、step属性によるバリエーションもある
     public static $FROM_TYPES = array(
@@ -240,7 +241,7 @@ class Html {
         $tag_str .= '"'.self::attr($additional).'>'.PHP_EOL;
         // options
         if (is_array($options)) {
-            if (array_depth($options) > 1) {
+            if (Arr::array_depth($options) > 1) {
                 $tag_str .= self::optgroups($options, $selected);
             } else {
                 $tag_str .= self::options($options, $selected);

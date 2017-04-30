@@ -1,27 +1,30 @@
-#tab-page {
-    height: 100%;
-    width: inherit;
-    overflow: auto;
-    padding: 5px 0 100px 0;
+#table-form {
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	padding-bottom: 10%;
+	box-sizing: border-box;
 }
-
 .data-table {
     margin: 0 auto;
-    border-collapse:collapse;
-       counter-reset: row-num;
+    border-collapse: collapse;
+    counter-reset: row-num;
 }
 .data-table th, .data-table td {
     padding: 3px;
+    border: 1px LightGrey solid;
+}
+.data-table th {
     vertical-align: top;
 }
-.data-table, .data-table th, .data-table td {
-    border: 1px LightGrey solid;
+.data-table td {
+    vertical-align: middle;
 }
 th.id-col::after {
     counter-increment: row-num;
     content: counter(row-num);
 }
-#new-rec {
+.editable {
     cursor: pointer;
 }
 #new-rec th.id-col::after {

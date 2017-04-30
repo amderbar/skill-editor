@@ -13,7 +13,16 @@ class Process {
      */
     public function __construct()
     {
-        $db_con = $this->open( ROOT_DB_ID ) ?? $this->setupSystemDB();
+        $this->open( ROOT_DB_ID ) ?? $this->setupSystemDB();
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function getDataTypeList() :array
+    {
+        return SQLiteHandler::getDataTypeDictionary();
     }
 
     /**
@@ -21,7 +30,7 @@ class Process {
      * @param bool $is_new
      * @return SQLiteHandler
      */
-    public function open(int $proj_id, bool $is_new = false): ?SQLiteHandler
+    protected function open(int $proj_id, bool $is_new = false): ?SQLiteHandler
     {
         $db_file = ($proj_id) ? sprintf( RESOURCE_ROOT . '/proj%03d.db', $proj_id ) : ROOT_DB;
         $db_file = full_path( $db_file, $is_new );
@@ -36,7 +45,7 @@ class Process {
     /**
      * @param int $proj_id
      */
-    public function close(int $proj_id): void
+    protected function close(int $proj_id): void
     {
         $this->con[$proj_id] = null;
         unset( $this->con[$proj_id] );
@@ -94,6 +103,20 @@ class Process {
         return array_shift( $result );
     }
 
+    /**
+     *
+     * @param int $proj_id
+     * @return array
+     */
+    public function listUsrTables(int $proj_id) :array
+    {
+        try {
+            return $this->open($proj_id)->fetchAll( SYSTEM_TBL, ['id', 'tbl_name'], ['id'] );
+
+        } catch ( PDOException | DBManageExeption $e ) {
+            $this->handleException( $e );
+        }
+    }
 
     /**
      *

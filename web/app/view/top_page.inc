@@ -5,6 +5,19 @@
     <link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/common.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/fonts.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=addFilemtime('css/index.css')?>">
+    <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            <?php /*Ctrl + S押下時のデフォルト動作を抑制*/ ?>
+            $(window).keydown(function(e) {
+                if ((e.which == '115' || e.which == '83' ) && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    return false;
+                }
+                return true;
+            });
+        });
+    </script>
     <title><?=APP_NAME?></title>
 </head>
 <body>

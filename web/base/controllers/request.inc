@@ -70,6 +70,16 @@ abstract class Request
     /**
      *
      * @param string $key
+     * @return boolean
+     */
+    public function has(string $key) :bool
+    {
+        return array_key_exists($key, $this->formParam + $this->queryParam);
+    }
+
+    /**
+     *
+     * @param string $key
      * @return mixed
      */
     public function errors() :array

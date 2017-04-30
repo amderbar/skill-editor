@@ -16,9 +16,10 @@ class MainServlet extends Servlet
         $data = array();
         $data['proj_list'] = $process->listDB();
 
-        if ($req->get('pid')) {
-            $data['focus_pid'] = $req->get('pid');
-            $data['tbl_list'] = $process->listUsrTables($req->get('pid'));
+        if ($pid = $req->get('pid')) {
+            $data['focus_pid'] = $pid;
+            $data['tbl_list'] = $process->listUsrTables($pid);
+            $data['focus_tbl'] = $req->get('tab') ?? reset($data['tbl_list'])['id'];
         }
 
         return $this->foward('main_panel.inc', $data);

@@ -64,6 +64,12 @@ $routing_obj->whenPost('/delete', 'TopServlet::deleteProject');
 
 $routing_obj->whenGet('/main', 'MainServlet::index');
 
+$routing_obj->whenGet('/editor/data', 'DataEditorServlet::index');
+$routing_obj->whenGet('/editor/data/{pid}', 'DataEditorServlet::open');
+$routing_obj->whenPost('/editor/data/modify', 'DataEditorServlet::modify');
+
+$routing_obj->whenGet('/editor/table/{pid}', 'TableEditorServlet::open');
+$routing_obj->whenPost('/editor/table/register', 'TableEditorServlet::register');
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 
@@ -71,18 +77,30 @@ $responce = call_user_func(function (array $routing) :string
 {
     [$action, $uri_params] = $routing;
     if ( !isset($action) ) {
+        var_export_log(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
         throw new \Exeption();
     }
     // 引数の準備
     $param_arr = array();
-    foreach (getParameters($action) as $param) {
-        if ($param_class = $param->getClass()) {
+    foreach (getParameters($action) as $reflection_param) {
+        if ($param_class = $reflection_param->getClass()) {
             $param_arr[] = call_user_func(function($class_name){
                 return new $class_name();
             }, $param_class->getName());
 
         } else {
-            $param_arr[] = $uri_params[$param->getName()] ?? null;
+            $param_arr[] = call_user_func(function ($param) use ($uri_params) {
+                switch ($param->getType()) {
+                    case 'int':
+                        $format_param = 'intval';
+                        break;
+
+                    default:
+                        $format_param = function ($val) { return $val; };
+                        break;
+                }
+                return $format_param($uri_params[$param->getName()] ?? null);
+            }, $reflection_param);
         }
     }
 

@@ -1,12 +1,28 @@
 <?php
 
 class Arr {
+
+    /**
+     *
+     * @param array $seed_arr
+     * @param string|int|null $key_col
+     * @param string|int|null $val_col
+     * @return array
+     */
+    public static function combine(array $seed_arr, $key_col, $val_col):array
+    {
+        return array_combine(
+            is_null($key_col) ? array_keys($seed_arr) : array_column($seed_arr, $key_col),
+            is_null($val_col) ? array_keys($seed_arr) : array_column($seed_arr, $val_col)
+        );
+    }
+
     /**
      * @param string $glue
      * @param array $asoc
      * @return array
      */
-    function implodeAssoc(string $glue, array $asoc) :array {
+    public static function implodeAssoc(string $glue, array $asoc) :array {
         $result = array();
         foreach ($asoc as $key => $child_arr) {
             if ( !is_array( $child_arr ) ) {
@@ -23,9 +39,9 @@ class Arr {
      * https://www.softel.co.jp/blogs/tech/archives/58 からコピペした
      * 多次元配列の次元数を調べる関数
      */
-    function array_depth($a, $c = 0) {
+    public static function array_depth($a, $c = 0) {
         return (is_array($a) && count($a))
-        ? max(array_map("array_depth", $a, array_fill(0, count($a), ++$c)))
+        ? max(array_map("Arr::array_depth", $a, array_fill(0, count($a), ++$c)))
         : $c;
     }
 
@@ -33,7 +49,7 @@ class Arr {
      * http://10000-hours.jp/wordpress/2015/09/2015091101/ からコピペした
      * 多次元配列の差分を求める関数
      */
-    function array_diff_assoc_recursive( ) {
+    public static function array_diff_assoc_recursive( ) {
         $args = func_get_args();
         //エラーチェック
         if( empty($args) ) {

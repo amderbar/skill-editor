@@ -3,22 +3,31 @@ body{
     flex-direction: row;
     justify-content: space-between;
 }
-nav, main {
+main {
+    flex-grow: 1;
+    padding-left: 5px;
+    display: flex;
+	align-items: stretch;
+}
+nav, section {
     align-self: stretch;
     padding: 0px;
     display: flex;
-    flex-direction: column;
+    flex-flow: column nowrap;
     overflow: hidden;
+}
+section {
+    flex-grow: 1;
+}
+section + section {
+    margin-left: 5px;
+    padding-left: 5px;
+    border-left: 1px solid LightGrey;
 }
 nav {
     border-right: 1px solid LightGrey;
     min-width: 200px;
 }
-section {
-    flex-grow: 1;
-    padding: 0px 5px;
-}
-
 ul.side-menu {
     align-self: stretch;
     flex-grow: 1;
@@ -32,10 +41,6 @@ ul.side-menu > li {
     display: block;
 	border: 1px solid LightGrey;
     padding: 0 0 5px 5px;
-}
-li.with-btns::before {
-  content: "\26AC";
-  margin-right: 10px;
 }
 .side-children {
     padding-left: 30px;
@@ -56,7 +61,6 @@ li.with-btns::before {
     align-items: flex-end;
     padding: 0;
     margin: 0;
-    width: 100%;
 }
 .editor-tabs li{
     display: block;
@@ -70,6 +74,7 @@ li.with-btns::before {
     background-color: white;
     border-bottom: 1px white solid;
 }
+.editor-tabs li strong,
 .editor-tabs li a{
     display: block;
 	box-sizing: border-box;
@@ -81,3 +86,8 @@ li.with-btns::before {
     text-overflow: ellipsis;
 }
 .editor-tabs li a:hover{ background-color: aqua; }
+.tab-page {
+    flex-grow: 1;
+    overflow: hidden;
+    padding-top: 5px;
+}

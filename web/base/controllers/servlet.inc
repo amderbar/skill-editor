@@ -3,8 +3,8 @@
 /**
  * the super class for servlets.
  */
-abstract class Servlet {
-
+abstract class Servlet
+{
     /**
      *
      * @param string $dest
@@ -48,7 +48,11 @@ abstract class Servlet {
      */
     protected function redirectBack()
     {
-        return $this->redirect(parse_url($_SERVER['HTTP_REFERER'] ?? null, PHP_URL_PATH));
+        return $this->redirect(call_user_func(function (string $url):string
+        {
+            $url = parse_url($url);
+            return ($url['path'] ?? '') . ($url['query'] ?? '' ? '?'.$url['query'] : '');
+        }, $_SERVER['HTTP_REFERER'] ?? ''));
     }
 }
 

@@ -4,7 +4,7 @@
  * @author amderbar
  *
  */
-class MainRequest extends Request
+class DataEditorRequest extends Request
 {
     /**
      *
@@ -14,8 +14,7 @@ class MainRequest extends Request
     public function rules() :array
     {
         return [
-                'pid' => ['integer'],
-                'tbl_id' => ['integer'],
+                'tab' => ['integer'],
         ];
     }
 }
