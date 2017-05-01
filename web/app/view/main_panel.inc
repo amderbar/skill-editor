@@ -50,12 +50,12 @@
                     <ul class="side-children">
                         <?php foreach ( ($tbl_list ?? []) as ['id' => $tbl_id, 'tbl_name' => $tbl_name] ) { ?>
                             <li><span class="with-btns">
-                                    <?=Html::link(
-                                        $tbl_name,
-                                        APP_ROOT . "/editor/data/{$focus_pid}",
-                                        ['tab' => $tbl_id],
-                                        ['target' => 'editor_area', '@click' => "changeFocus({$tbl_id})"])?>
-                                    <ul class="btns"><li class="icon-bin btn" title="テーブルの削除"></li></ul>
+                                <?=Html::link(
+                                    $tbl_name,
+                                    APP_ROOT . "/editor/data/{$focus_pid}",
+                                    ['tab' => $tbl_id],
+                                    ['target' => 'editor_area', '@click' => "changeFocus({$tbl_id})"])?>
+                                <ul class="btns"><li class="icon-bin btn" title="テーブルの削除"></li></ul>
                             </span></li>
                         <?php } ?>
 	                    <li v-if="add_tbl" v-cloak><strong>untitled</strong></li>
@@ -83,7 +83,7 @@
                     <li class="editting" v-if="add_tbl" v-cloak><strong>untitled</strong></li>
                 </ul>
             </header>
-            <iframe class="tab-page" name="editor_area" v-bind:src="editor_focus" scrolling="no" frameborder="no"></iframe>
+            <iframe class="tab-page" name="editor_area" v-if="func" v-bind:src="editor_focus" scrolling="no" frameborder="no"></iframe>
         </section>
     </main>
 
@@ -104,7 +104,7 @@
 
         var vm_main_panel = new Vue({
             el: '#main-panel',
-            created: function (pid) {
+            created: function () {
                 this.$on('add-tbl', function(pid){
                     this.func = 'table/'
                     this.focus_pid = pid;
@@ -112,7 +112,7 @@
                 });
             },
             data: {
-                func: '<?=count($tbl_list ?? []) ? 'data/' : 'table/'?>',
+                func: '<?=isset($focus_pid) ? (!count($tbl_list ?? []) ? 'table/' : 'data/') : ''?>',
                 focus_pid: <?=Html::escape($focus_pid ?? 'null')?>,
                 focus_tbl: <?=Html::escape($focus_tbl ?? 'null')?>
             },

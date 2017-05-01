@@ -5,7 +5,7 @@ session_start();
  * Definition of application constants.
  */
 define('APP_ROOT', '/skill_editor');
-define('APP_NAME', 'DB Editor on Browser');
+define('APP_NAME', 'Skill Editor');
 define('VERSION', 'ver.0.0.0');
 define('ENCODE', 'UTF-8');
 

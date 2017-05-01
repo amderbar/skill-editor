@@ -97,7 +97,7 @@ class DataEditorProcess extends Process
                 if ( isset( $col[ 'ref_col'] ) ) {
                     $ref_tbl_col = $this->getTblColNameFromColid( $proj_id, $col[ 'ref_col'], true );
                     $col_forms[ $actual_name ]['ref'] = array();
-                    $ref_data = $this->con[$proj_id]->fetchAll( $ref_tbl_col['tbl_name'], ['id', $ref_tbl_col['col_name'] ], ['id'] );
+                    $ref_data = $this->open($proj_id)->fetchAll( $ref_tbl_col['tbl_name'], ['id', $ref_tbl_col['col_name'] ], ['id'] );
                     foreach ( $ref_data as $row) {
                         $col_forms[ $actual_name ]['ref'][ $row['id'] ] = $row[ $ref_tbl_col['col_name'] ];
                     }
@@ -112,6 +112,25 @@ class DataEditorProcess extends Process
 
         } catch ( PDOException | DBManageExeption $e ) {
             $this->handleException( $e );
+        }
+    }
+
+    /**
+     *
+     * @param int $proj_id
+     * @param int $tbl_id
+     * @param array $data
+     */
+    public function modifyData(int $proj_id, int $tbl_id, array $data) :void
+    {
+        $tbl_name = $this->tblName( $proj_id, $tbl_id, true );
+        $db_con = $this->open($proj_id);
+        foreach ($data['update'] as $id => $parms) {
+            var_export_log($parms);
+            $db_con->update($tbl_name, $parms, ['id' => $id]);
+        }
+        foreach ($data['insert'] as $parms) {
+            $db_con->insert($tbl_name, $parms);
         }
     }
 }

@@ -483,23 +483,19 @@ abstract class PDOHandlar {
         $key_cols = array();
         $key_vals = array();
         foreach ( $parms as $col_name => $value ) {
-
             $key_cols[] = $col_name.' = :'.$col_name;
             $key_vals[ ':'.$col_name ] = $value;
         }
 
         $cond_cols = array();
         foreach ( $conditions as $col_name => $value ) {
-
             $cond_cols[] = $col_name.' = :'.$col_name;
             $key_vals[ ':'.$col_name ] = $value;
         }
-
-        $sql = 'update '.$dto->getTableName();
-        $sql .= ' set '.implode( ',', $key_cols );
+        $sql = 'update ' . $table . ' set ' . implode( ',', $key_cols );
 
         if ( !empty( $cond_cols ) ) {
-            $sql .= ' where '.implode(' and ', $cond_cols);
+            $sql .= ' where ' . implode(' and ', $cond_cols);
         }
         $identifier = $identifier ?? $this->getLastFocus();
         $stmt = $this->prepareExecute( $identifier, $sql.';', $key_vals );

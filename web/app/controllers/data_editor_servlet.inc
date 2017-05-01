@@ -22,6 +22,7 @@ class DataEditorServlet extends Servlet
     {
         $data = array();
         $data['proj_id'] = $pid;
+        $data['tab_id'] = $req->get('tab');
 
         // TODO: レコードの追加・編集機能の実装
         // TODO: 表示テンプレートの実装
@@ -46,9 +47,32 @@ class DataEditorServlet extends Servlet
     public function modify(DataEditorRequest $req, DataEditorProcess $process)
     {
 
-        var_export_log($req->getAll());
+        $columns = array_column($process->listColumns($req->get('pid'), $req->get('tab')), 'actual_name');
+        $newdata = ['insert' => [], 'update' => []];
+        foreach ($req->get('id') as $sort_num => $row_id) {
+            if ($row_id == 'null') {
+                continue;
+            }
+            $tmp_arr = [];
+            foreach ($columns as $col_name) {
+                if ($col_name == 'id') {
+                    continue;
+                }
+                if ($param = $req->get($col_name)[$sort_num] ?? null) {
+                    $tmp_arr[$col_name] = $param;
+                }
+            }
+            if ($tmp_arr) {
+                if ($row_id === '') {
+                    $newdata['insert'][] = $tmp_arr;
+                } else {
+                    $newdata['update'][$row_id] = $tmp_arr;
+                }
+            }
+        }
+
+        $process->modifyData($req->get('pid'), $req->get('tab'), $newdata);
 
         return $this->redirectBack();
     }
-
 }

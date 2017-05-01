@@ -16,7 +16,7 @@ class MainServlet extends Servlet
         $data = array();
         $data['proj_list'] = $process->listDB();
 
-        if ($pid = $req->get('pid')) {
+        if (($pid = $req->get('pid')) && in_array($pid, array_column($data['proj_list'], 'id'))) {
             $data['focus_pid'] = $pid;
             $data['tbl_list'] = $process->listUsrTables($pid);
             $data['focus_tbl'] = $req->get('tab') ?? reset($data['tbl_list'])['id'];

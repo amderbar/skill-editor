@@ -11,21 +11,26 @@
     counter-reset: row-num;
 }
 .data-table th, .data-table td {
-    padding: 3px;
     border: 1px LightGrey solid;
 }
 .data-table th {
-    vertical-align: top;
+    padding: 3px;
+	vertical-align: top;
 }
 .data-table td {
-    vertical-align: middle;
+    padding: 0;
+	vertical-align: middle;
 }
+.data-table td input,
+.data-table td textarea,
+.data-table td select {
+	font-size: small;
+}
+
+
 th.id-col::after {
     counter-increment: row-num;
     content: counter(row-num);
-}
-.editable {
-    cursor: pointer;
 }
 #new-rec th.id-col::after {
     content: 'null';

@@ -33,6 +33,7 @@
 <body>
     <?=Html::startForm(APP_ROOT . '/editor/data/modify', null, 'POST', ['id' => 'table-form']) ?>
     <?=Html::hidden('pid', $proj_id) ?>
+    <?=Html::hidden('tab', $tab_id) ?>
 
     <?php /*######## 表示テンプレートに置き換え ｺｺｶﾗ ########*/?>
     <table class="data-table">
