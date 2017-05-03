@@ -105,17 +105,20 @@
 <?php /* データテーブルのセルに関するコンポーネント */?>
 <script type="text/x-template" id="data-cell-template">
     <thd v-bind:tag="tag_name" @click="focus">
-            <input class="data-form"
+            <component class="data-form"
+                    :is="component_type"
                     :type="form_type"
                     :name="form_name"
                     :value="cell"
+                    :options="form_options"
                     :readonly="!focused"
-                    :disabled="!modified && !focused && key_name != 'id'"
-                    @change="emitChange($event.target.value)"
-                    @keydown.enter.prev="shiftRow"
-                    @keydown.tab.stop="shiftColumn"
-                    @keydown.esc="blur"
+                    :disabled="!modified && !focused && key_name != 'id' && form_type != 'select'"
+                    @change="emitChange"
+                    @keydown-enter="shiftRow"
+                    @keydown-tab="shiftColumn"
+                    @keydown-esc="blur"
                     @blur="blur">
+            </component>
     </thd>
 </script><script type="text/javascript">
     Vue.component('data-cell', {
@@ -127,7 +130,12 @@
         computed: {
             tag_name: function () { return (this.key_name == 'id') ? 'h' : 'd'; },
             form_type: function () { return this.form_config[this.key_name].type; },
+            form_options: function () { return this.form_config[this.key_name].ref || []; },
             form_name: function () { return this.key_name + '[' + this.row_id + ']'; },
+            component_type: function () {
+                return this.form_type == 'textarea' ? 'text-area'
+                        : this.form_type == 'select' ? 'select-box' : 'input-type';
+            },
             modified: function () { return ((this.modified_form || []).indexOf(this.form_name) >= 0); }
         },
         methods: {
@@ -150,13 +158,13 @@
                 $('.editable').eq(idx + shift_step).click();
             },
             shiftRow: function (event) {
-                var shift_step = event.shiftKey ? -1 : 1;
-                var selector = '[name^="' + this.key_name + '"]';
-                var idx = $(selector).index($(event.target).closest('.editable').find(selector));
-                if(!event.shiftKey && this.row_id == null) {
+                if(!event.shiftKey && event.ctrlKey && this.row_id == null) {
                     this.emitPush(event.target.value);
                     event.target.value = this.cell;
-                } else {
+                } else if (event.shiftKey || event.ctrlKey) {
+                    var shift_step = event.shiftKey ? -1 : 1;
+                    var selector = '[name^="' + this.key_name + '"]';
+                    var idx = $(selector).index($(event.target).closest('.editable').find(selector));
                     Vue.nextTick(function () {
                         $(selector).eq(idx + shift_step).closest('.editable').click();
                     });
@@ -191,6 +199,77 @@
         }}
     });
 
+    var formComponentMixin = {
+        props: ['name', 'value'],
+        methods: {
+            emitChange: function (new_val) {
+                this.$emit('change', new_val);
+            },
+            emitEvent: function (eve_name) {
+                this.$emit(eve_name, event);
+            }
+        }
+    };
+</script>
+
+<?php /* 入力フォーム関するコンポーネント */?>
+<script type="text/x-template" id="input-template">
+    <input :type="type"
+           :name="name"
+           :value="value"
+           @change.trim="emitChange($event.target.value)"
+           @keydown.enter.prev="emitEvent('keydown-enter')"
+           @keydown.tab.stop="emitEvent('keydown-tab')"
+           @keydown.esc="emitEvent('keydown-esc')"
+           @blur="emitEvent('blur')">
+</script><script type="text/javascript">
+    Vue.component('input-type', {
+        template: '#input-template',
+        mixins: [formComponentMixin],
+        props: ['type']
+    });
+</script>
+
+<?php /* テキストエリアに関するコンポーネント */?>
+<script type="text/x-template" id="textarea-template">
+    <textarea :name="name"
+           :value="value"
+           @change.trim="emitChange($event.target.value)"
+           @keydown.enter.prev="emitEvent('keydown-enter')"
+           @keydown.tab.stop="emitEvent('keydown-tab')"
+           @keydown.esc="emitEvent('keydown-esc')"
+           @blur="emitEvent('blur')">
+</script><script type="text/javascript">
+    Vue.component('text-area', {
+        template: '#textarea-template',
+        mixins: [formComponentMixin]
+    });
+</script>
+
+<?php /* セレクトボックスに関するコンポーネント */?>
+<script type="text/x-template" id="select-template">
+    <select :name="name"
+           :value="value"
+           @change="emitChange($event.target.value)"
+           @keydown.enter.prev="emitEvent('keydown-enter')"
+           @keydown.tab.stop="emitEvent('keydown-tab')"
+           @keydown.esc="emitEvent('keydown-esc')"
+           @blur="emitEvent('blur')">
+        <option v-for="(txt, value) in options"
+                :key="value"
+                :value="value">
+            {{ txt }}
+        </option>
+    </select>
+</script><script type="text/javascript">
+    Vue.component('select-box', {
+        template: '#select-template',
+        mixins: [formComponentMixin],
+        props: ['options']
+    });
+</script>
+
+<script type="text/javascript">
     <?php /* 画面全体の動作を司るVueインスタンス */ ?>
     var test = new Vue({
         el: '#table-form',
