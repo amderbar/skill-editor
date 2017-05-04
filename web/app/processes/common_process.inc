@@ -124,7 +124,7 @@ class Process {
     private function setupSystemDB() :SQLiteHandler
     {
         try {
-            $db_con = $this->con[ ROOT_DB_ID ] ?? $this->open( ROOT_DB_ID, true );
+            $db_con = $this->open( ROOT_DB_ID, true );
             // project table
             $tdo = new TableDefineObject( 'projects' );
             $tdo->appendColumn( 'proj_name', 'text', [
@@ -163,8 +163,8 @@ class Process {
                     'not_null' => true
             ] );
             $db_con->createTable( $tdo, true );
-            foreach ( HTMLHandler::$FROM_TYPES as $type => $txt ) {
-                $this->insertData( ROOT_DB_ID, 'form_master', [
+            foreach ( Html::$FROM_TYPES as $type => $txt ) {
+                $db_con->insert('form_master', [
                         'type' => $type
                 ], true );
             }
