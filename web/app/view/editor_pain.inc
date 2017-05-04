@@ -34,6 +34,7 @@
     <?=Html::startForm(APP_ROOT . '/editor/data/modify', null, 'POST', ['id' => 'table-form']) ?>
     <?=Html::hidden('pid', $proj_id) ?>
     <?=Html::hidden('tab', $tab_id) ?>
+    <main>
 
     <?php /*######## 表示テンプレートに置き換え ｺｺｶﾗ ########*/?>
     <table class="data-table">
@@ -58,6 +59,7 @@
         </tbody>
     </table>
     <?php /*######## 表示テンプレートに置き換え ｺｺﾏﾃﾞ ########*/?>
+    </main>
 
     <?=Html::endForm()?>
 </body>
@@ -112,7 +114,7 @@
                     :value="cell"
                     :options="form_options"
                     :readonly="!focused"
-                    :disabled="!modified && !focused && key_name != 'id' && form_type != 'select'"
+                    :disabled="!modified && !focused && key_name != 'id'"
                     @change="emitChange"
                     @keydown-enter="shiftRow"
                     @keydown-tab="shiftColumn"
@@ -205,7 +207,7 @@
             emitChange: function (new_val) {
                 this.$emit('change', new_val);
             },
-            emitEvent: function (eve_name) {
+            emitEvent: function (eve_name, event) {
                 this.$emit(eve_name, event);
             }
         }
@@ -218,10 +220,10 @@
            :name="name"
            :value="value"
            @change.trim="emitChange($event.target.value)"
-           @keydown.enter.prev="emitEvent('keydown-enter')"
-           @keydown.tab.stop="emitEvent('keydown-tab')"
-           @keydown.esc="emitEvent('keydown-esc')"
-           @blur="emitEvent('blur')">
+           @keydown.enter.prev="emitEvent('keydown-enter', $event)"
+           @keydown.tab.stop="emitEvent('keydown-tab', $event)"
+           @keydown.esc="emitEvent('keydown-esc', $event)"
+           @blur="emitEvent('blur', $event)">
 </script><script type="text/javascript">
     Vue.component('input-type', {
         template: '#input-template',
@@ -235,10 +237,10 @@
     <textarea :name="name"
            :value="value"
            @change.trim="emitChange($event.target.value)"
-           @keydown.enter.prev="emitEvent('keydown-enter')"
-           @keydown.tab.stop="emitEvent('keydown-tab')"
-           @keydown.esc="emitEvent('keydown-esc')"
-           @blur="emitEvent('blur')">
+           @keydown.enter.prev="emitEvent('keydown-enter', $event)"
+           @keydown.tab.stop="emitEvent('keydown-tab', $event)"
+           @keydown.esc="emitEvent('keydown-esc', $event)"
+           @blur="emitEvent('blur', $event)">
 </script><script type="text/javascript">
     Vue.component('text-area', {
         template: '#textarea-template',
@@ -251,10 +253,10 @@
     <select :name="name"
            :value="value"
            @change="emitChange($event.target.value)"
-           @keydown.enter.prev="emitEvent('keydown-enter')"
-           @keydown.tab.stop="emitEvent('keydown-tab')"
-           @keydown.esc="emitEvent('keydown-esc')"
-           @blur="emitEvent('blur')">
+           @keydown.enter.prev="emitEvent('keydown-enter', $event)"
+           @keydown.tab.stop="emitEvent('keydown-tab', $event)"
+           @keydown.esc="emitEvent('keydown-esc', $event)"
+           @blur="emitEvent('blur', $event)">
         <option v-for="(txt, value) in options"
                 :key="value"
                 :value="value">
