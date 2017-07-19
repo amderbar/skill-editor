@@ -16,7 +16,7 @@ define('ROOT_DB', RESOURCE_ROOT . '/system_admin.db' );
 define('SYSTEM_TBL', 's_admin_tbl' );
 define('SYSTEM_COL', 's_admin_col' );
 define('NUM_SETTINGS', 's_num_settings' );
-define('FORM_TO_DATA', [
+define('FORM_TO_DB', [
         'color' => 'text',
         'text' => 'text',
         'textarea' => 'text',
@@ -55,14 +55,19 @@ require_once(full_path('base/common.inc'));
 /////////////////////////////////////////////////////////////////////////
 // Route Settings
 /////////////////////////////////////////////////////////////////////////
+// $routing_obj->whenGet|Post|Any('URI Path', 'action class::method')
+// 'URI Path' can include parameters in the format '{param}'.
+// e.g. '/hoge/{param1}/fuga/{param2}'
+// These parameters are stored in the Request object and passed to the action.
+
 $routing_obj = new Router(APP_ROOT);
 
 $routing_obj->whenGet('/index.php', ['TopServlet', 'index']);
 $routing_obj->whenGet('/', 'TopServlet::index');
-$routing_obj->whenPost('/create', 'TopServlet::createProject');
-$routing_obj->whenPost('/delete', 'TopServlet::deleteProject');
 
 $routing_obj->whenGet('/main', 'MainServlet::index');
+$routing_obj->whenPost('/create', 'MainServlet::createProject');
+$routing_obj->whenPost('/delete', 'MainServlet::deleteProject');
 
 $routing_obj->whenGet('/editor/data', 'DataEditorServlet::index');
 $routing_obj->whenGet('/editor/data/{pid}', 'DataEditorServlet::open');
@@ -70,45 +75,24 @@ $routing_obj->whenPost('/editor/data/modify', 'DataEditorServlet::modify');
 
 $routing_obj->whenGet('/editor/table/{pid}', 'TableEditorServlet::open');
 $routing_obj->whenPost('/editor/table/register', 'TableEditorServlet::register');
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
 
-$responce = call_user_func(function (array $routing) :string
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+$responce = call_user_func_array(function ($action, array $uri_params) :string
 {
-    [$action, $uri_params] = $routing;
-    if ( !isset($action) ) {
-        var_export_log(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
-        throw new \Exeption();
-    }
-    // 引数の準備
-    $param_arr = array();
-    foreach (getParameters($action) as $reflection_param) {
-        if ($param_class = $reflection_param->getClass()) {
-            $param_arr[] = call_user_func(function($class_name){
-                return new $class_name();
-            }, $param_class->getName());
+    // 指定されたactionの引数のクラス名を配列化
+    // actionは常にinterface ControllerArgを実装しているものとする
+    $action_arg_class_names = array_map(function(ReflectionParameter $reflection_param) :string {
+            return $reflection_param->getClass()->getName();
+        }, getParameters($action));
 
-        } else {
-            $param_arr[] = call_user_func(function ($param) use ($uri_params) {
-                switch ($param->getType()) {
-                    case 'int':
-                        $format_param = 'intval';
-                        break;
+    // 指定されたactionの引数をインスタンス化
+    $action_args = array_map(function(string $class_name) use ($uri_params) {
+            return new $class_name($uri_params);
+        }, $action_arg_class_names);
 
-                    default:
-                        $format_param = function ($val) { return $val; };
-                        break;
-                }
-                return $format_param($uri_params[$param->getName()] ?? null);
-            }, $reflection_param);
-        }
-    }
-
-    if ( is_array($action) || (is_string($action) && (strpos($action, '::') !== false)) ) {
-        [$class, $method] = is_string($action) ? explode('::', $action) : $action;
-        $action = [new $class(), $method];
-    }
-    return call_user_func_array($action, $param_arr) ?? '';
+    // 指定されたactionを実行
+    return call_user_func_array(getInstanceMethod($action), $action_args) ?? '';
 
 }, $routing_obj->getAction(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), $_SERVER["REQUEST_METHOD"]));
 
@@ -119,6 +103,8 @@ $responce = call_user_func(function (array $routing) :string
 echo $responce;
 exit;
 
+/////////////////////////////////////////////////////////////////////////
+// ライブラリを読み込む際に使う共通関数
 /////////////////////////////////////////////////////////////////////////
 
 /**

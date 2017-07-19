@@ -4,20 +4,24 @@
  * @author amderbar
  *
  */
-abstract class Request
+abstract class Request implements ControllerArg
 {
-    protected $queryParam;
-    protected $formParam;
+    protected $query_param;
+    protected $form_param;
+    protected $cookie_param;
+    protected $uri_param;
     protected $file;
     protected $errors;
 
     /**
      *
      */
-    public function __construct()
+    public function __construct(array $uri_params)
     {
-        $this->queryParam = $_GET;
-        $this->formParam = $_POST;
+        $this->uri_param = $uri_params;
+        $this->query_param = $_GET;
+        $this->form_param = $_POST;
+        $this->coolie_param = $_COOKIE;
         $this->errors = Validater::bulkValidate($this->getAll(), $this->rules());
     }
 
@@ -34,7 +38,7 @@ abstract class Request
      */
     public function getAll() :array
     {
-        return ($this->formParam + $this->queryParam);
+        return ($this->form_param + $this->query_param + $this->coolie_param + $this->uri_param);
     }
 
     /**
@@ -44,7 +48,7 @@ abstract class Request
      */
     public function get(string $key)
     {
-        return $this->formParam[$key] ?? ($this->queryParam[$key] ?? null);
+        return $this->getAll()[$key] ?? null;
     }
 
     /**
@@ -54,7 +58,7 @@ abstract class Request
      */
     public function query(string $key)
     {
-        return $this->queryParam[$key] ?? null;
+        return $this->query_param[$key] ?? null;
     }
 
     /**
@@ -64,7 +68,27 @@ abstract class Request
      */
     public function input(string $key)
     {
-        return $this->formParam[$key] ?? null;
+        return $this->form_param[$key] ?? null;
+    }
+
+    /**
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function cookie(string $key)
+    {
+        return $this->cookie[$key] ?? null;
+    }
+
+    /**
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function uriParam(string $key)
+    {
+        return $this->uri_param[$key] ?? null;
     }
 
     /**
@@ -74,7 +98,7 @@ abstract class Request
      */
     public function has(string $key) :bool
     {
-        return array_key_exists($key, $this->formParam + $this->queryParam);
+        return array_key_exists($key, $this->getAll());
     }
 
     /**

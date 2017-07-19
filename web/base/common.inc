@@ -71,29 +71,46 @@ function var_export_log($var) {
 }
 
 /**
-*
-*/
-function fnv132($str) {
-    return hash('fnv132', $str);
+ * Returns a callable which formatted from instance method format.
+ *
+ * @param string|array $callable
+ * @param callable $formatter
+ * @return mixed
+ */
+function getCallableMethod($callable, callable $formatter)
+{
+    if (is_array($callable) || (is_string($callable) && strpos($callable, '::') !== false)) {
+        [$class, $method] = is_string($callable) ? explode('::', $callable) : $callable;
+        return $formatter($class, $method);
+    }
+    return null;
 }
 
 /**
  * Returns arguments accepted by a callable.
  *
- * @param callable $callable
+ * @param string|array $callable
  * @return array
  */
-function getParameters($callable)
+function getParameters($callable) :array
 {
-    if (is_array($callable) || (is_string($callable) && strpos($callable, '::') !== false)) {
-        [$class, $method] = is_string($callable) ? explode('::', $callable) : $callable;
-        $reflection = (new ReflectionClass($class))->getMethod($method);
+    return (getCallableMethod($callable, function (string $class, string $method) {
+        return (new ReflectionClass($class))->getMethod($method);
+    }) ?? new ReflectionFunction($callable))
+    ->getParameters();
+}
 
-    } else {
-        $reflection = new ReflectionFunction($callable);
-
-    }
-    return $reflection->getParameters();
+/**
+ * Returns callable array for call_user_func(_array).
+ *
+ * @param string|array $callable
+ * @return callable
+ */
+function getInstanceMethod($callable) :callable
+{
+    return getCallableMethod($callable, function (string $class, string $method) {
+        return [new $class(), $method];
+    }) ?? $callable;
 }
 
 /**

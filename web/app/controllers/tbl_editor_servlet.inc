@@ -9,19 +9,18 @@ class TableEditorServlet extends Servlet
      *
      * @return string
      */
-    public function open(int $pid, TableEditorRequest $req, TableEditorProcess $process): string
+    public function open(TableEditorRequest $req, TableEditorProcess $process): string
     {
-        $data = array();
-        $data['proj_id'] = $pid;
+        $data['proj_id'] = $req->uriParam('pid');
+        $data['proj_name'] = $process->projName($data['proj_id']);
 
         $data['data_types'] = $process->getDataTypeList();
 
         // FIXME: hiddenまで入力形式に出てる
         $data['form_types'] = Html::$FROM_TYPES;
-        $data['proj_name'] = $process->projName($pid);
 
         // 列リストデータ
-        $data['tbl_list'] = $process->listUsrTables($pid);
+        $tbl_list = $process->listUsrTables($data['proj_id']);
         $data['col_list'] = array( 'This Table' => [ '0' => 'ID', '-1' => 'Nameless1' ] );
         foreach ( $data['tbl_list'] as ['id' => $tbl_num, 'tbl_name' => $tbl_name] ) {
             $data[ 'col_list' ][ $tbl_name ] = array();

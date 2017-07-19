@@ -88,6 +88,6 @@ class Router
                 return [$action, array_combine(array_column($keys, 1), $params)];
             }
         }
-        return [null, null];
+        return [null, []];
     }
 }

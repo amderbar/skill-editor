@@ -16,4 +16,11 @@ class Str {
         return ltrim(strtolower(preg_replace('/[A-Z]/', '-\0', $str)), '-');
     }
 
+    /**
+    * fnv132アルゴリズムでハッシュを作成
+    */
+    public static function fnv132(string $str) :string
+    {
+        return hash('fnv132', $str);
+    }
 }
