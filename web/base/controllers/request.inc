@@ -6,6 +6,7 @@
  */
 abstract class Request implements ControllerArg
 {
+    protected $user;
     protected $query_param;
     protected $form_param;
     protected $cookie_param;
@@ -18,6 +19,7 @@ abstract class Request implements ControllerArg
      */
     public function __construct(array $uri_params)
     {
+        $this->user = ['name' => $_SERVER['PHP_AUTH_USER'], 'password' => $_SERVER['PHP_AUTH_PW'] ?? null];
         $this->uri_param = $uri_params;
         $this->query_param = $_GET;
         $this->form_param = $_POST;
@@ -89,6 +91,18 @@ abstract class Request implements ControllerArg
     public function uriParam(string $key)
     {
         return $this->uri_param[$key] ?? null;
+    }
+
+    /**
+     *
+     * @return array|string
+     */
+    public function user(string $key = null)
+    {
+        if (isset($key)) {
+            return $this->user[$key] ?? null;
+        }
+        return $this->user ?? null;
     }
 
     /**

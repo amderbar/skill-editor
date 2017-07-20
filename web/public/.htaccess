@@ -1,4 +1,10 @@
 Options Indexes FollowSymLinks
+
+AuthType Digest
+AuthName "skill_editor"
+AuthUserFile users/.digestpass
+Require valid-user
+
 <Files ~ "^\.|\.inc$">
   Deny from all
 </Files>
