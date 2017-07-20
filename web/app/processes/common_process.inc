@@ -13,7 +13,7 @@ class Process {
      */
     public function __construct()
     {
-        $this->open( ROOT_DB_ID ) ?? $this->setupSystemDB();
+        $this->open(ROOT_DB_ID) ?? $this->setupSystemDB();
     }
 
     /**
@@ -124,51 +124,32 @@ class Process {
     private function setupSystemDB() :SQLiteHandler
     {
         try {
-            $db_con = $this->open( ROOT_DB_ID, true );
-            // project table
-            $tdo = new TableDefineObject( 'projects' );
-            $tdo->appendColumn( 'proj_name', 'text', [
-                    'not_null' => true
-            ] );
-            $db_con->createTable( $tdo, true );
-            // templates table
-            $tdo = new TableDefineObject( 'templates' );
-            $tdo->appendColumn( 'proj_id', 'integer', [
-                    'foreign' => [
-                            'ref' => 'projects(id)',
-                            'del' => 'null'
-                    ]
-            ] );
-            $tdo->appendColumn( 'tmpl_name', 'text', [
-                    'not_null' => true
-            ] );
-            $tdo->appendConstraint( 'uniq', [
-                    'proj_id',
-                    'tmpl_name'
-            ] );
-            $db_con->createTable( $tdo, true );
+            $tdos = [];
+
             // users table
-            $tdo = new TableDefineObject( 'users' );
-            $tdo->appendColumn( 'name', 'text', [
-                    'not_null' => true
-            ] );
-            $tdo->appendColumn( 'passwd', 'text', [
-                    'not_null' => true
-            ] );
-            $db_con->createTable( $tdo, true );
-            // form_type master table
-            $tdo = new TableDefineObject( 'form_master' );
-            $tdo->appendColumn( 'type', 'text', [
+            $tdos[] = TableDefineObject::table('users')
+            ->appendColumn('name', 'text', [
                     'uniq' => true,
                     'not_null' => true
-            ] );
-            $db_con->createTable( $tdo, true );
-            foreach ( Html::$FROM_TYPES as $type => $txt ) {
-                $db_con->insert('form_master', [
-                        'type' => $type
-                ], true );
+            ])->appendColumn('passwd', 'text', [
+                    'not_null' => true
+            ]);
+
+            // project table
+            $tdos[] = TableDefineObject::table('projects')
+            ->appendColumn('proj_name', 'text', [
+                    'not_null' => true
+            ])->appendColumn('owner', 'integer', [
+                    'not_null' => true,
+                    'foreign' => ['ref' => 'users(id)', 'del' => 'cascade']
+            ]);
+
+            $db_con = $this->open(ROOT_DB_ID, true);
+            foreach ($tdos as $tdo) {
+                $db_con->createTable($tdo, true);
             }
             return $db_con;
+
         } catch ( PDOException | DBManageExeption $e ) {
             $this->handleException( $e );
         }

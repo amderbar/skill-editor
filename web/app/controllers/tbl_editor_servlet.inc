@@ -36,7 +36,7 @@ class TableEditorServlet extends Servlet
 
         // プレビュー用表示テンプレート
         $data['tbl_tmpls'] = [ 'default' => full_path(RESOURCE_ROOT . '/templates/default_template.php') ];
-        foreach ( $process->getAllTemplates() as $tmpl ) {
+        foreach ($process->getAllTemplates($data['proj_id']) as $tmpl) {
             $data['tbl_tmpls'][ $tmpl[ 'tmpl_name' ] ]
             = full_path( sprintf(RESOURCE_ROOT . '/templates/proj%03d/', $tmpl['proj_id'] ).$tmpl['tmpl_name'] );
         }

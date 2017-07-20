@@ -46,12 +46,12 @@ class TableEditorProcess extends Process
      *
      * @return array
      */
-    public function getAllTemplates() :array
+    public function getAllTemplates(int $proj_id) :array
     {
         try {
-            return $this->open(ROOT_DB_ID)->fetchAll( 'templates' );
-        } catch ( PDOException | DBManageExeption $e ) {
-            $this->handleException( $e );
+            return $this->open($proj_id)->fetchAll('templates');
+        } catch (PDOException | DBManageExeption $e) {
+            $this->handleException($e);
         }
     }
 
@@ -135,6 +135,24 @@ class TableEditorProcess extends Process
 
             // テーブル作成
             $db_con->createTable( $tdo );
+
+            // templates table
+            $tdo = new TableDefineObject('templates');
+            $tdo->appendColumn('proj_id', 'integer', [
+                    'foreign' => [
+                            'ref' => 'projects(id)',
+                            'del' => 'null'
+                    ]
+            ]);
+            $tdo->appendColumn('tmpl_name', 'text', [
+                    'not_null' => true
+            ]);
+            $tdo->appendConstraint('uniq', [
+                    'proj_id',
+                    'tmpl_name'
+            ]);
+            $db_con->createTable($tdo, true);
+
             return [ 'tbl_id' => $tbl_id, 'col_id' => $col_info ];
 
         } catch ( PDOException | DBManageExeption $e ) {

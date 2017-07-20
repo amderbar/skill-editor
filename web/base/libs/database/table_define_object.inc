@@ -1,32 +1,4 @@
 <?php
-
-/**
- *
- */
-abstract class DataTransfarObject {
-    /**  */
-    private $parms = array();
-
-    /**
-     *
-     */
-    abstract function getTableName();
-
-    /**
-     *
-     */
-    public function getParms() {
-        return $this->parms;
-    }
-
-    /**
-     *
-     */
-    public function setParm($parm, $value) {
-        $this->parms[$parm] = $value;
-    }
-}
-
 /**
  *
  */
@@ -38,10 +10,16 @@ class TableDefineObject {
     /** */
     private $constraints = array();
 
+
+    public static function table(string $tbl_name, bool $auto_primery = true) :TableDefineObject
+    {
+        return new self($tbl_name, $auto_primery);
+    }
+
     /**
      *
      */
-    function __construct($tbl_name, $colmuns = null, $auto_primery = true)
+    private function __construct(string $tbl_name, bool $auto_primery)
     {
         $this->tbl_name = $tbl_name;
         if ($auto_primery) {
