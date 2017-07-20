@@ -9,44 +9,14 @@ class TopServlet extends Servlet
     /**
      *
      * @param IndexRequest $req
-     * @return unknown
+     * @return string
      */
-    public function index(TopRequest $req)
+    public function index(TopRequest $req) :string
     {
         $data = array();
         $data['proj_id'] = $req->get('pid');
 
         return $this->foward('top_page.inc', $data);
-    }
-
-    /**
-     * プロジェクトの新規作成
-     *
-     * @param TopRequest $req
-     * @param TopProcess $process
-     * @return unknown
-     */
-    public function createProject(TopRequest $req, TopProcess $process)
-    {
-        $pid = $process->registerDB($req->input('proj_name'));
-
-        // TODO:リダイレクト先では作成したDBをテーブル新規作成で開くようにする
-        return $this->redirectBack();
-    }
-
-    /**
-     * プロジェクトの削除
-     *
-     * @param TopRequest $req
-     * @param TopProcess $process
-     * @return unknown
-     */
-    public function deleteProject(TopRequest $req, TopProcess $process)
-    {
-        // TODO:ここではpidは必須パラメータ。MainServletに移すべきか？
-        $process->deleteDB($req->input('pid'));
-
-        return $this->redirectBack();
     }
 
     /**

@@ -24,4 +24,34 @@ class MainServlet extends Servlet
 
         return $this->foward('main_panel.inc', $data);
     }
+
+    /**
+     * プロジェクトの新規作成
+     *
+     * @param CreateProjRequest $req
+     * @param MainProcess $process
+     * @return unknown
+     */
+    public function createProject(CreateProjRequest $req, MainProcess $process)
+    {
+        $pid = $process->registerDB($req->input('proj_name'), $req->user('name'));
+
+        // TODO:リダイレクト先では作成したDBをテーブル新規作成で開くようにする
+        return $this->redirectBack();
+    }
+
+    /**
+     * プロジェクトの削除
+     *
+     * @param TopRequest $req
+     * @param MainProcess $process
+     * @return unknown
+     */
+    public function deleteProject(TopRequest $req, MainProcess $process)
+    {
+        // TODO:ここではpidは必須パラメータ。MainServletに移すべきか？
+        $process->deleteDB($req->input('pid'), $req->user('name'));
+
+        return $this->redirectBack();
+    }
 }

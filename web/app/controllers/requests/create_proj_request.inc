@@ -1,10 +1,11 @@
 <?php
+
 /**
  *
  * @author amderbar
  *
  */
-class TopRequest extends Request
+class CreateProjRequest extends Request
 {
     /**
      *
@@ -14,7 +15,7 @@ class TopRequest extends Request
     public function rules() :array
     {
         return [
-            'pid' => ['integer']
+            'proj_name' => ['string', 'max(100)', 'min(1)']
         ];
     }
 }
