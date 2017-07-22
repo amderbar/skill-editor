@@ -39,17 +39,40 @@ class TableEditorServlet extends Servlet
         }
 
         // プレビュー用ダミーデータ
-        $data['tbl_data'] = array(
-                'col_name' => array(
-                        'id' => 'No.',
-                        'col' => 'Nameless'
-                ),
-                'data' => array(
-                        ['id' => 1, 'col' => ''],
-                        ['id' => 2, 'col' => ''],
-                        ['id' => null, 'col' => null]
-                )
-        );
+        $dummy_key = 'c' . Str::fnv132(uniqid());
+        $data['tbl_data'] = [
+            'column_config' => [
+                [
+                    'key' => 'id',
+                    'col_name' => 'No.',
+                    'type' => 'hidden',
+                    'default' => '',
+                    'multiple' => false,
+                    'ref_dist' => null,
+                    'step' => 1,
+                    'max' => null,
+                    'min' => null,
+                    'uniq' => true,
+                    'not_null' => true
+                ], [
+                    'key' => $dummy_key,
+                    'col_name' => null,
+                    'type' => 'text',
+                    'default' => '',
+                    'multiple' => false,
+                    'ref_dist' => null,
+                    'step' => 1,
+                    'max' => null,
+                    'min' => null,
+                    'uniq' => false,
+                    'not_null' => false
+                ]
+            ],
+            'data' => [
+                ['id' => 1, $dummy_key => ''],
+                ['id' => 2, $dummy_key => '']
+            ]
+        ];
 
         return $this->foward('new_tbl.inc', $data);
     }
