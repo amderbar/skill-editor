@@ -79,7 +79,10 @@ th.id-col::after {
 }
 
 .icon {width: 1em}
-textarea {width: 100%}
+textarea {
+    display: block;
+    width: 100%;
+}
 .textarea-label {vertical-align: baseline;}
 
 #def-tbl {

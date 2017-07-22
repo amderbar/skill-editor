@@ -10,7 +10,7 @@ class Html
 {
     /** */
     // list属性、step属性によるバリエーションもある
-    public static $FROM_TYPES = array(
+    const FROM_TYPES = array(
             'text' => '一行テキスト',
             'listext' => '入力候補付き一行テキスト',
             'textarea' => '複数行テキスト',
@@ -227,70 +227,57 @@ class Html
     /**
     * select box
     * @param string $element_name
-    * @param string or array $options
-    * @param array $selected selected option(s). NOT label.
+    * @param callable $options_build_callback
+    * @param array $selected selected value(s). NOT label.
     * @param boolean $multiple
-    * @param hash $additional
+    * @param array $additional
     */
-    public static function selectbox($element_name, $options, $selected = null, $multiple = false, $additional = null) {
+    public static function selectbox(
+        string $element_name,
+        callable $options_build_callback,
+        array $selected = null,
+        bool $multiple = false,
+        array $additional = null) :string
+    {
         // start select tag
         $tag_str = '<select name="'.self::escape($element_name);
-        if ($multiple) {
-            $tag_str .= '[]" multiple="multiple';
-        }
-        $tag_str .= '"'.self::attr($additional).'>'.PHP_EOL;
+        $tag_str .= ($multiple) ? '[]" multiple' : '"';
+        $tag_str .= self::attr($additional).'>'.PHP_EOL;
         // options
-        if (is_array($options)) {
-            if (Arr::array_depth($options) > 1) {
-                $tag_str .= self::optgroups($options, $selected);
-            } else {
-                $tag_str .= self::options($options, $selected);
+        $tag_str .= (new class extends Html
+        {
+            private $selected;
+            private $options;
+            public function __construct(array $selected = [])
+            {
+                $this->selected = array_flip($selected);
+                $this->options = [];
             }
-        } else {
-        // string $options is available
-        // but this case should be only when it is made by options() or optgroups() function.
-            $tag_str .= $options;
-        }
+            public function optgroup(string $label, callable $optgrp_builder, array $attr = []) :void
+            {
+                $this->options[] = '<optgroup label="' . self::escape($label).'"'.self::attr($attr).'>';
+                $optgrp_builder($this);
+                $this->options[] = '</optgroup>';
+            }
+            public function option($value, string $label, array $attr = []) :void
+            {
+                $tag_str = '<option value="' . self::escape($value) . '"';
+                $tag_str .= isset($this->selected[$value]) ? ' selected' : '';
+                $tag_str .= self::attr($attr) . '>' . self::escape($label) . '</option>';
+                $this->options[] = $tag_str;
+            }
+            public function toHtml() :string
+            {
+                return implode(PHP_EOL, $this->options);
+            }
+            public function build(callable $callback) :string
+            {
+                $callback($this);
+                return $this->toHtml();
+            }
+        })->build($options_build_callback);
         // end select tag
         $tag_str .= '</select>'.PHP_EOL;
-        return $tag_str;
-    }
-
-    /**
-    * select box options
-    * @param array $options
-    * @param array $selected selected option(s). NOT label.
-    * @param hash $additional
-    */
-    public static function optgroups($optgrps, $selected = null, $additional = null) {
-        $tag_str = '';
-        foreach ($optgrps as $label => $options) {
-            $tag_str .= '<optgroup label="' . self::escape($label).'"'.self::attr($additional).'>'.PHP_EOL;
-            $tag_str .= self::options($options, $selected);
-            $tag_str .= '</optgroup>'.PHP_EOL;
-        }
-        return $tag_str;
-    }
-
-    /**
-    * select box options
-    * @param array $options
-    * @param array $selected selected option(s). NOT label.
-    */
-    private static function options($options, $selected = null) {
-        // set default
-        if (isset($selected)) {
-            $selected = array_flip($selected);
-        }
-        // options
-        $tag_str = '';
-        foreach ($options as $option => $label) {
-            $tag_str .= '<option value="' . self::escape($option) . '"';
-            if (isset($selected[$option])) {
-                $tag_str .= ' selected';
-            }
-            $tag_str .= '>' . self::escape($label) . '</option>'.PHP_EOL;
-        }
         return $tag_str;
     }
 

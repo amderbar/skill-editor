@@ -17,7 +17,7 @@ class TableEditorServlet extends Servlet
         $data['data_types'] = $process->getDataTypeList();
 
         // FIXME: hiddenまで入力形式に出てる
-        $data['form_types'] = Html::$FROM_TYPES;
+        $data['form_types'] = Html::FROM_TYPES;
 
         // 列リストデータ
         $tbl_list = $process->listUsrTables($data['proj_id']);
