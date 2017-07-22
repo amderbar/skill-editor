@@ -88,7 +88,7 @@ textarea {
 #def-tbl {
     counter-reset: col-num;
 }
-.col-h, #add-col{
+.col-h, .col-h label, #add-col{
     cursor: pointer;
 }
 .col-h label::after {

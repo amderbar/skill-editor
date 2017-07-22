@@ -15,30 +15,27 @@ class TableEditorServlet extends Servlet
         $data['proj_name'] = $process->projName($data['proj_id']);
 
         $data['data_types'] = $process->getDataTypeList();
-
         // FIXME: hiddenまで入力形式に出てる
         $data['form_types'] = Html::FROM_TYPES;
 
         // 列リストデータ
         $tbl_list = $process->listUsrTables($data['proj_id']);
-        $data['col_list'] = array( 'This Table' => [ '0' => 'ID', '-1' => 'Nameless1' ] );
-        foreach ( $data['tbl_list'] as ['id' => $tbl_num, 'tbl_name' => $tbl_name] ) {
-            $data[ 'col_list' ][ $tbl_name ] = array();
-            $col_list = $process->listColumns( $pid, $tbl_num );
-            foreach ( $col_list as $colnum ) {
-                if ( $colnum['actual_name'] == 'id' ) {
+        $data['col_list'] = [];
+        foreach ($tbl_list as ['id' => $tbl_num, 'tbl_name' => $tbl_name]) {
+            $data['col_list'][$tbl_num] = ['tbl_name' => $tbl_name, 'colums' => []];
+            foreach ($process->listColumns($pid, $tbl_num) as $colnum) {
+                if ($colnum['actual_name'] == 'id') {
                     continue;
                 }
-                // FIXME: 同名のテーブルがあるとそれらを区別できない
-                $data['col_list'][ $tbl_name ][ $colnum['id'] ] = $colnum['col_name'];
+                $data['col_list'][$tbl_num]['colums'][$colnum['id']] = $colnum['col_name'];
             }
         }
 
         // プレビュー用表示テンプレート
-        $data['tbl_tmpls'] = [ 'default' => full_path(RESOURCE_ROOT . '/templates/default_template.php') ];
+        $data['tbl_tmpls'] = ['default' => full_path(RESOURCE_ROOT . '/templates/default_template.php')];
         foreach ($process->getAllTemplates($data['proj_id']) as $tmpl) {
-            $data['tbl_tmpls'][ $tmpl[ 'tmpl_name' ] ]
-            = full_path( sprintf(RESOURCE_ROOT . '/templates/proj%03d/', $tmpl['proj_id'] ).$tmpl['tmpl_name'] );
+            $data['tbl_tmpls'][$tmpl['tmpl_name']]
+            = full_path(sprintf(RESOURCE_ROOT . '/templates/proj%03d/', $tmpl['proj_id']) . $tmpl['tmpl_name']);
         }
 
         // プレビュー用ダミーデータ

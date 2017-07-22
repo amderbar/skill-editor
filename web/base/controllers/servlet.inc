@@ -16,7 +16,6 @@ abstract class Servlet
         $URL = getMyTopURL();
         if (isset($REQ_SCOPE)) {
             extract($REQ_SCOPE);
-            unset($REQ_SCOPE);
         }
 
         $dest = (strpos($dest,'/') !== 0) ? '/' . $dest : $dest;

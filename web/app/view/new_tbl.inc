@@ -25,19 +25,18 @@
     <title><?=APP_NAME?></title>
 </head>
 <body>
-    <?=Html::startForm(APP_ROOT . "/editor/table/register", null, 'POST', ['id' => 'table-form', 'target' => '_parent']) ?>
-<?php
-    $forms = array ();
-    $forms[ 'tbl_name' ]  = Html::textbox( 'tbl_name', 'untitled', [ 'required' => true, 'autofocus' => true ] );
-    $forms[ 'col_name' ]  = Html::textbox( 'def_cols[1][col_name]', '', [ 'required' => true ] );
-?>
-    <?=Html::hidden( 'pid', $proj_id );?>
     <header>
-        <h1>New Table <?=$forms['tbl_name'];?> @ <?=Html::escape( $proj_name );?></h1>
+        <h1>New Table <?=Html::textbox('tbl_name', 'untitled', [
+                'required' => true,
+                'autofocus' => true,
+                'form' => 'table-form'
+            ]);?> @ <?=Html::escape($proj_name);?></h1>
     </header>
     <h2>Table Data definition</h2>
+    <?=Html::startForm(APP_ROOT . "/editor/table/register", null, 'POST', ['id' => 'table-form', 'target' => '_parent'])?>
     <fieldset name="def-cols">
     <legend>Column definitions</legend>
+    <?=Html::hidden('pid', $proj_id);?>
     <table class="data-table" id="def-tbl">
         <thead>
             <tr>
@@ -52,7 +51,11 @@
             <tr>
                 <th>入力形式</th><td>--</td>
                 <td>
-                    <?=Html::selectbox( 'def_cols[1][form_type]', $form_types );?>
+                    <?=Html::selectbox('def_cols[id][form_type]', function($options_builder) use ($form_types) {
+                        foreach ($form_types as $type => $label) {
+                            $options_builder->option($type, $label);
+                        }
+                    });?>
                     <div name="step" hidden>
                         <label>刻み幅:
                             <?=Html::number( 'def_cols[1][step]', 1, null, [ 'disabled' => true ] );?>
@@ -76,7 +79,15 @@
                     </div>
                     <div name="ref" hidden>
                         <label>選択肢<br>
-                            <?=Html::selectbox( 'def_cols[1][ref_dist]', $col_list, [ 0 ], false, [ 'disabled' => true ] );?>
+                            <?=Html::selectbox('def_cols[id][ref_dist]', function($options_builder) use($col_list) {
+                                foreach ($col_list as ['tbl_name' => $tblname, 'columns' => $colmns]) {
+                                    $options_builder->optgroup($tblname, function($options_builder) use($colmns) {
+                                        foreach ($columns as $col_id => $col_name) {
+                                            $options_builder->option($col_id, $col_name);
+                                        }
+                                    });
+                                }
+                            }, [0]);?>
                         </label>
                     </div>
                 </td>
@@ -100,20 +111,26 @@
         </tbody>
     </table>
     </fieldset>
-    <?=Html::submit( 'save', '作成' );?>
+    <?=Html::submit('save', '作成');?>
+    <?=Html::endForm()?>
 
-    <?php $options = array_keys( $tbl_tmpls );?>
     <h2>Table Desgin Preview : Template
-        <?=Html::selectbox( 'tbl_templs', $options, [ 0 ], false, [ 'id' => 'tbl_templs'] );?>
+        <?=Html::selectbox('tbl_templs', function($options_builder) use($tbl_tmpls) {
+            foreach (array_keys($tbl_tmpls) as $tmpl_name) {
+                $options_builder->option($tmpl_name, $tmpl_name);
+            }
+        }, null, false, [
+            'form' => 'table-form',
+        ]);?>
     </h2>
     <div id="preview">
-    <?php foreach ( $tbl_tmpls as $name => $path ) { ?>
+    <?php /* プレビュー表示用テンプレート部品読み込み */?>
+    <?php foreach ($tbl_tmpls as $tmpl_name => $path) { ?>
         <div id="<?=Html::escape( $name );?>"<?=( $name == $options[ 0 ] ) ? '' : ' hidden';?>>
-            <?php include ( $path );?>
+            <?php View::include($path, ['REQ_SCOPE' => $REQ_SCOPE, 'tmpl_name' => $tmpl_name]); ?>
         </div>
     <?php } ?>
     </div>
-<?=Html::endForm()?>
     <script src="<?=addFilemtime( APP_ROOT . '/js/new_tbl.js' )?>"></script>
 </body>
 </html>
