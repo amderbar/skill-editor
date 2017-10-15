@@ -1,0 +1,20 @@
+{
+    "name": "amderbar/skill-sditor",
+    "type": "project",
+    "require": {
+        "nesbot/carbon": "^1.22"
+    },
+    "autoload": {
+        "psr-4": {
+            "Amderbar\\App\\" : "app/",
+            "Amderbar\\Lib\\" : "lib/"
+        }
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "amderbar",
+            "email": "amderbar@gmail.com"
+        }
+    ]
+}
