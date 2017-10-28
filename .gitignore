@@ -1,0 +1,15 @@
+/backup/
+/node_modules/
+/public/hot
+/public/storage
+/public/fonts/vendor/
+/storage/*
+/vendor/
+/.idea/
+/.vagrant/
+/.vscode/
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+.env

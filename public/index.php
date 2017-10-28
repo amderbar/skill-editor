@@ -17,7 +17,7 @@ define('APP_NAME', 'Skill Editor');
 define('VERSION', 'ver.0.0.0');
 define('ENCODE', 'UTF-8');
 
-define('VIEW_ROOT', 'app/Views');
+define('VIEW_ROOT', 'resources/views');
 define('RESOURCE_ROOT', 'storage');
 define('ROOT_DB_ID', 0);
 define('ROOT_DB', RESOURCE_ROOT . '/system_admin.db');
