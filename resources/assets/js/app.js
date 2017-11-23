@@ -28,6 +28,10 @@ $(function() {
  */
 
 Vue.component('example-component', require('./components/ExampleComponent.vue'));
+Vue.component('new-proj-form', require('./components/main-panel/NewProjFormComponent.vue'));
+Vue.component('side-nav', require('./components/main-panel/SideNavComponent.vue'));
+Vue.component('toggle-button', require('./components/main-panel/ToggleButtonComponent.vue'));
+Vue.component('main-panel', require('./components/main-panel/MainPanelComponent.vue'));
 
 const app = new Vue({
     el: '#app'
