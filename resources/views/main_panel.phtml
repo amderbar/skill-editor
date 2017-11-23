@@ -4,24 +4,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="<?=Html::csrfToken()?>">
     <link rel="stylesheet" type="text/css" href="<?=File::addFilemtime(APP_ROOT . '/css/common.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=File::addFilemtime(APP_ROOT . '/css/fonts.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=File::addFilemtime(APP_ROOT . '/css/main_panel.css')?>">
-    <?php /* TODO:出来上がったら圧縮版を読み込むように変更する */ ?>
-    <script src="https://unpkg.com/vue"></script>
-    <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-    <script type="text/javascript">
-        $(function() {
-            <?php /*Ctrl + S押下時のデフォルト動作を抑制*/ ?>
-            $(window).keydown(function(e) {
-                if ((e.which == '115' || e.which == '83' ) && (e.ctrlKey || e.metaKey)) {
-                    e.preventDefault();
-                    return false;
-                }
-                return true;
-            });
-        });
-    </script>
     <title><?=APP_NAME?></title>
 </head>
 <body>

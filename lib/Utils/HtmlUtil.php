@@ -299,6 +299,16 @@ class HtmlUtil
         $tag_str .= '</datalist>'.PHP_EOL;
         return $tag_str;
     }
+
+    /**
+     * Undocumented function
+     *
+     * @return string
+     */
+    public static function csrfToken() :string
+    {
+        return uniqid();
+    }
 }
 
 ?>

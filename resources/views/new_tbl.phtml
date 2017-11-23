@@ -5,27 +5,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="<?=Html::csrfToken()?>">
     <link rel="stylesheet" type="text/css" href="<?=File::addFilemtime(APP_ROOT . '/css/common.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=File::addFilemtime(APP_ROOT . '/css/fonts.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=File::addFilemtime(APP_ROOT . '/css/editor_area.css')?>">
-    <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-    <?php /* TODO:出来上がったら圧縮版を読み込むように変更する */ ?>
-    <script src="https://unpkg.com/vue"></script>
-    <script type="text/javascript">
-    <!--//<?php/*エディタ部共通のJavaScript*/?>
-        $(function () {
-            /**
-             * フォームの変更を検知して画面遷移時の確認ダイアログを出すようにする
-             */
-            $('#table-form').change(function (){
-                window.onbeforeunload = function (e) {
-                    return 'Are you sure?';
-                };
-            });
-        });
-    //-->
-    </script>
-    <script src="<?=File::addFilemtime(APP_ROOT . '/js/common.js')?>"></script>
     <title><?=APP_NAME?></title>
 </head>
 <body>
