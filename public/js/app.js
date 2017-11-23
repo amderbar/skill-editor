@@ -21470,6 +21470,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: {
@@ -21486,7 +21488,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     methods: {
         submit: function submit() {
-            $('#new-proj-form').submit();
+            var $form = $('#new-proj-form');
+            if ($form[0].checkValidity()) {
+                $form.submit();
+            } else {
+                this.cancel();
+            }
         },
         cancel: function cancel() {
             this.$emit('cancel');
@@ -21515,33 +21522,38 @@ var render = function() {
               })
             : _vm._e(),
           _vm._v(" "),
-          _vm._m(0)
+          _c("label", [
+            _c("h2", [
+              _c("input", {
+                attrs: {
+                  type: "text",
+                  name: "proj_name",
+                  value: "",
+                  id: "new-proj-name",
+                  placeholder: "新しいプロジェクトの名前",
+                  required: ""
+                },
+                on: {
+                  blur: _vm.submit,
+                  keypress: function($event) {
+                    if (
+                      !("button" in $event) &&
+                      _vm._k($event.keyCode, "esc", 27, $event.key)
+                    ) {
+                      return null
+                    }
+                    _vm.cancel($event)
+                  }
+                }
+              })
+            ])
+          ])
         ]
       )
     ])
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("label", [
-      _c("h2", [
-        _c("input", {
-          attrs: {
-            type: "text",
-            name: "proj_name",
-            value: "",
-            id: "new-proj-name",
-            placeholder: "新しいプロジェクトの名前",
-            required: ""
-          }
-        })
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {

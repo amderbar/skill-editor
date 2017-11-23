@@ -10,6 +10,8 @@
                             value=""
                             id="new-proj-name"
                             placeholder="新しいプロジェクトの名前"
+                            @blur="submit"
+                            @keypress.esc="cancel"
                             required
                         >
                     </h2>
@@ -34,7 +36,12 @@
         },
         methods: {
             submit() {
-                $('#new-proj-form').submit();
+                let $form = $('#new-proj-form');
+                if ($form[0].checkValidity()) {
+                    $form.submit();
+                } else {
+                    this.cancel();
+                }
             },
             cancel() {
                 this.$emit('cancel');
