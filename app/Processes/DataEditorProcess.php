@@ -65,7 +65,7 @@ class DataEditorProcess extends EditorProcess
      * @param int $tbl_id
      * @param array $data
      */
-    public function modifyData(int $proj_id, int $tbl_id, array $data) :void
+    public function updateData(int $proj_id, int $tbl_id, array $data) :void
     {
         $tbl_name = $this->tblName( $proj_id, $tbl_id, true );
         $db_con = $this->open($proj_id);

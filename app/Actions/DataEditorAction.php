@@ -52,7 +52,7 @@ class DataEditorAction extends Action
      * @param DataEditorRequest $req
      * @param DataEditorProcess $process
      */
-    public function modify(DataEditorRequest $req, DataEditorProcess $process)
+    public function update(DataEditorRequest $req, DataEditorProcess $process)
     {
 
         $columns = array_column($process->listColumns($req->get('pid'), $req->get('tab')), 'actual_name');
@@ -79,7 +79,7 @@ class DataEditorAction extends Action
             }
         }
 
-        $process->modifyData($req->get('pid'), $req->get('tab'), $newdata);
+        $process->updateData($req->get('pid'), $req->get('tab'), $newdata);
 
         return $this->redirectBack();
     }

@@ -75,7 +75,7 @@ define('FORM_TO_DB', [
 
     $routing_obj->whenGet('/editor/data', 'Amderbar\App\Actions\DataEditorAction::index');
     $routing_obj->whenGet('/editor/data/{pid}', 'Amderbar\App\Actions\DataEditorAction::open');
-    $routing_obj->whenPost('/editor/data/modify', 'Amderbar\App\Actions\DataEditorAction::modify');
+    $routing_obj->whenPost('/editor/data/update', 'Amderbar\App\Actions\DataEditorAction::update');
 
     $routing_obj->whenGet('/editor/table/{pid}', 'Amderbar\App\Actions\TableEditorAction::open');
     $routing_obj->whenPost('/editor/table/register', 'Amderbar\App\Actions\TableEditorAction::register');

@@ -88,22 +88,26 @@ class EditorProcess extends Process
     public function listColumns(int $tbl_id = null) :array
     {
         try {
-            return array_reduce($this->open($this->proj_id)
-                ->query($this->getColumnInfoSql(function () use ($tbl_id) {
-                    return isset($tbl_id) ? 'where tt.tbl_id = ?' : '';
-                }), isset($tbl_id) ? [$tbl_id] : [])
-                ->fetchAll(PDO::FETCH_ASSOC) ?: [], function ($carry, $column) {
-                    if (!isset($carry[$column['tbl_id']])) {
-                        $carry[$column['tbl_id']] = [
-                            'tbl_name' => $column['tbl_name'],
-                            'tbl_actual' => $column['tbl_actual'],
-                            'columns' => []
-                        ];
+            return array_reduce(
+                $this->open($this->proj_id)
+                    ->query($this->getColumnInfoSql(function () use ($tbl_id) {
+                        return isset($tbl_id) ? 'where tt.tbl_id = ?' : '';
+                    }), isset($tbl_id) ? [$tbl_id] : [])
+                    ->fetchAll(PDO::FETCH_ASSOC) ?: []
+                    ,function ($carry, $column) {
+                        if (!isset($carry[$column['tbl_id']])) {
+                            $carry[$column['tbl_id']] = [
+                                'tbl_name' => $column['tbl_name'],
+                                'tbl_actual' => $column['tbl_actual'],
+                                'columns' => []
+                            ];
+                        }
+                        $carry[$column['tbl_id']]['columns'][$column['col_id']]
+                            = Arr::except($column, 'tbl_id', 'tbl_name', 'tbl_actual', 'col_id');
+                        return $carry;
                     }
-                    $carry[$column['tbl_id']]['columns'][$column['col_id']]
-                        = Arr::except($column, 'tbl_id', 'tbl_name', 'tbl_actual', 'col_id');
-                    return $carry;
-                });
+                    ,[]
+                );
         } catch (PDOException | AmbException $e) {
             $this->handleException($e);
         }
