@@ -8,6 +8,7 @@ use Amderbar\App\Processes\TableEditorProcess;
 use Amderbar\Lib\Utils\HtmlUtil as Html;
 use Amderbar\Lib\Utils\StrUtil as Str;
 use Amderbar\Lib\Utils\FileUtil as File;
+use Amderbar\Lib\Utils\DebugUtil as Debug;
 
 /**
  *
@@ -30,7 +31,8 @@ class TableEditorAction extends Action
         $data['col_list'] = $process->listColumns();
 
         // プレビュー用表示テンプレート
-        $data['tbl_tmpls'] = ['default' => File::fullPath(VIEW_ROOT . '/default_template.php')];
+        // $data['tbl_tmpls'] = ['table', 'list', 'cards'];
+        $data['tbl_tmpls'] = ['table'];
         // foreach ($process->getAllTemplates() as $tmpl) {
         //     $data['tbl_tmpls'][$tmpl['tmpl_name']]
         //     = File::fullPath(sprintf(RESOURCE_ROOT . '/templates/proj%03d/', $tmpl['proj_id']) . $tmpl['tmpl_name']);
@@ -39,14 +41,14 @@ class TableEditorAction extends Action
         // プレビュー用ダミーデータ
         $dummy_key = 'c' . Str::fnv132(uniqid());
         $data['tbl_data'] = [
-            'column_config' => [
+            'meta' => [
                 [
                     'key' => 'id',
                     'col_name' => 'No.',
                     'type' => 'hidden',
                     'default' => '',
                     'multiple' => false,
-                    'ref_dist' => null,
+                    'ref_dest' => null,
                     'step' => 1,
                     'max' => null,
                     'min' => null,
@@ -58,7 +60,7 @@ class TableEditorAction extends Action
                     'type' => 'text',
                     'default' => '',
                     'multiple' => false,
-                    'ref_dist' => null,
+                    'ref_dest' => null,
                     'step' => 1,
                     'max' => null,
                     'min' => null,
@@ -72,7 +74,7 @@ class TableEditorAction extends Action
             ]
         ];
 
-        return $this->foward('new_tbl.phtml', $data);
+        return $this->foward('table_editor.phtml', $data);
     }
 
     /**

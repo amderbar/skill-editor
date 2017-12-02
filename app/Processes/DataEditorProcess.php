@@ -25,14 +25,12 @@ class DataEditorProcess extends EditorProcess
     {
         try {
             $db_con = $this->open($this->proj_id);
-            $col_forms = [];
             $col_list = $this->listColumns($tbl_id);
-            foreach ($col_list[$tbl_id]['columns'] as $col) {
-                $actual_name = $col['col_actual'];
-                $col_forms[$actual_name] = $col;
+            $col_forms = array_map(function ($col) use ($db_con) {
+                $col['key'] = $col['col_actual'];
                 if (isset($col['ref_col'])) {
                     $ref_tbl_col = $this->getColumnInfo($col['ref_col']);
-                    $col_forms[$actual_name]['ref_data'] = Arr::combine(
+                    $col['ref_data'] = Arr::combine(
                         $db_con
                             ->query("
                                 select id, {$ref_tbl_col->col_actual}
@@ -43,7 +41,8 @@ class DataEditorProcess extends EditorProcess
                         $ref_tbl_col->col_actual
                     );
                 }
-            }
+                return $col;
+            }, array_values($col_list[$tbl_id]['columns']));
             $list_data = $db_con
                 ->query("
                     select *
@@ -52,7 +51,7 @@ class DataEditorProcess extends EditorProcess
                 ")
                 ->fetchAll();
 
-            return ['column_config' => $col_forms, 'data' => $list_data];
+            return ['meta' => $col_forms, 'data' => $list_data];
 
         } catch ( PDOException | DBManageExeption $e ) {
             $this->handleException( $e );

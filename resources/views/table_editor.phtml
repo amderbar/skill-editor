@@ -1,0 +1,72 @@
+<?php use Amderbar\Lib\Utils\HtmlUtil as Html; ?>
+<?php use Amderbar\Lib\Utils\FileUtil as File; ?>
+<?php use Amderbar\Lib\View; ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="<?=Html::csrfToken()?>">
+    <link rel="stylesheet" type="text/css" href="<?=File::addFilemtime(APP_ROOT . '/css/common.css')?>">
+    <link rel="stylesheet" type="text/css" href="<?=File::addFilemtime(APP_ROOT . '/css/fonts.css')?>">
+    <link rel="stylesheet" type="text/css" href="<?=File::addFilemtime(APP_ROOT . '/css/editor_area.css')?>">
+    <title><?=APP_NAME?></title>
+</head>
+<body>
+    <header>
+        <h1>New Table <?=Html::textbox('tbl_name', 'untitled', [
+                'required' => true,
+                'autofocus' => true,
+                'form' => 'table-form'
+            ]);?> @ <?=Html::escape($proj_name);?></h1>
+    </header>
+    <main id="app">
+        <h2>Table Data definition</h2>
+        <?=Html::startForm(
+            APP_ROOT . "/editor/table/register"
+            , null
+            , 'POST'
+            , ['id' => 'table-form', 'target' => '_parent']
+        )?>
+            <fieldset name="def-cols">
+                <legend>Column definitions</legend>
+                <?=Html::hidden('pid', $proj_id);?>
+                <table-editor ref="tableEditor"
+                    :tbl-meta="<?=Html::escape(json_encode($tbl_data['meta']))?>"
+                    :forgin-columns="<?=Html::escape(json_encode($col_list))?>"
+                    :form-types="<?=Html::escape(json_encode($form_types))?>"
+                    :selected-template="'<?=Html::escape(key($tbl_tmpls))?>'"
+                    @input="setTblMeta"
+                ></table-editor>
+            </fieldset>
+            <?=Html::submit('save', '作成');?>
+        <?=Html::endForm()?>
+
+        <h2>Table Desgin Preview : Template
+            <?=Html::selectbox('tbl_templs', function ($options_builder) use ($tbl_tmpls) {
+                foreach ($tbl_tmpls as $tmpl_id => $tmpl_name) {
+                    $options_builder->option($tmpl_id, $tmpl_name);
+                }
+            }, [], false, [
+                'form' => 'table-form',
+                'id' => 'tbl_templs',
+                'v-model' => 'selected_template'
+            ]);?>
+        </h2>
+        <div id="preview">
+            <?php foreach ($tbl_tmpls as $tmpl_name) { ?>
+                <div v-show="true || selected_template == '<?=Html::escape($tmpl_name);?>'" v-cloak>
+                    <data-editor-<?=$tmpl_name?>
+                        :tbl-meta="tbl_meta"
+                        :tbl-data="<?=Html::escape(json_encode($tbl_data['data']))?>"
+                    ></data-editor-<?=$tmpl_name?>>
+                </div>
+            <?php } ?>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="<?=File::addFilemtime(APP_ROOT . '/js/manifest.js')?>"></script>
+    <script src="<?=File::addFilemtime(APP_ROOT . '/js/vendor.js')?>"></script>
+    <script src="<?=File::addFilemtime(APP_ROOT . '/js/editorApp.js')?>"></script>
+</body>
+</html>

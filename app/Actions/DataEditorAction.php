@@ -19,7 +19,7 @@ class DataEditorAction extends Action
      */
     public function index(): string
     {
-        return $this->foward('editor_pain.inc', []);
+        return $this->foward('data_editor.inc', []);
     }
 
     /**
@@ -34,17 +34,19 @@ class DataEditorAction extends Action
 
         // TODO: レコードの追加・編集機能の実装
         // TODO: 表示テンプレートの実装
-        $tmpl_list = $process->getAllTemplates();
-        $selected_tmpl = key( $tmpl_list ); // とりあえず先頭要素のキーを取得して選択されているものとする
-        $data['tbl_tmpl'] = //( $parm_arr['tbl_list'][$tbl_id] == 'skills_view' ) ?
-        //             File::fullPath( sprintf( APP_ROOT . '/templates/proj%03d/', $proj_id ).$tmpl_list[ $selected_tmpl ] ) :
-        File::fullPath(VIEW_ROOT . '/default_template.php');
+        // プレビュー用表示テンプレート
+        // $data['tbl_tmpls'] = ['table', 'list', 'cards'];
+        $data['tbl_tmpls'] = ['table'];
+        // foreach ($process->getAllTemplates() as $tmpl) {
+        //     $data['tbl_tmpls'][$tmpl['tmpl_name']]
+        //     = File::fullPath(sprintf(RESOURCE_ROOT . '/templates/proj%03d/', $tmpl['proj_id']) . $tmpl['tmpl_name']);
+        // }
 
         // リクエストスコープ相当の配列にデータを格納
         $data['tbl_data'] = $process->listData($req->get('tab') );
-        $data['tbl_data']['default'] = Arr::combine($data['tbl_data']['column_config'], null,'default_val');
+        $data['tbl_data']['default'] = Arr::combine($data['tbl_data']['meta'], null,'default');
 
-        return $this->foward('editor_pain.phtml', $data);
+        return $this->foward('data_editor.phtml', $data);
     }
 
     /**

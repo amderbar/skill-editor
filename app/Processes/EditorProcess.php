@@ -48,9 +48,9 @@ class EditorProcess extends Process
                 , tc.col_id
                 , tc.col_name
                 , tc.actual_name as col_actual
-                , tc.default_val
-                , tc.form_type
-                , tc.ref_col
+                , tc.default_val as "default"
+                , tc.form_type as "type"
+                , tc.ref_col as "ref_dest"
                 , tc.is_primary
                 , tc.multiple
                 , tn.step

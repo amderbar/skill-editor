@@ -1,4 +1,4 @@
-webpackJsonp([1],[
+webpackJsonp([0],[
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -21226,15 +21226,34 @@ module.exports = function spread(callback) {
 /***/ }),
 /* 34 */,
 /* 35 */,
-/* 36 */
+/* 36 */,
+/* 37 */,
+/* 38 */,
+/* 39 */,
+/* 40 */,
+/* 41 */,
+/* 42 */,
+/* 43 */,
+/* 44 */,
+/* 45 */,
+/* 46 */,
+/* 47 */,
+/* 48 */,
+/* 49 */,
+/* 50 */,
+/* 51 */,
+/* 52 */,
+/* 53 */,
+/* 54 */,
+/* 55 */,
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(37);
-module.exports = __webpack_require__(55);
+module.exports = __webpack_require__(57);
 
 
 /***/ }),
-/* 37 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -21266,314 +21285,38 @@ $(function () {
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('example-component', __webpack_require__(40));
-Vue.component('new-proj-form', __webpack_require__(43));
-Vue.component('side-nav', __webpack_require__(46));
-Vue.component('toggle-button', __webpack_require__(49));
-Vue.component('main-panel', __webpack_require__(52));
+Vue.component('table-editor', __webpack_require__(58));
+Vue.component('table-editor-th', __webpack_require__(61));
+Vue.component('data-editor-table', __webpack_require__(64));
+Vue.component('data-editor-form', __webpack_require__(89));
+Vue.component('data-editor-input', __webpack_require__(70));
+Vue.component('data-editor-textarea', __webpack_require__(73));
+Vue.component('data-editor-select', __webpack_require__(76));
 
 var app = new Vue({
-    el: '#app'
-});
-
-/***/ }),
-/* 38 */,
-/* 39 */,
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var normalizeComponent = __webpack_require__(1)
-/* script */
-var __vue_script__ = __webpack_require__(41)
-/* template */
-var __vue_template__ = __webpack_require__(42)
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = null
-/* scopeId */
-var __vue_scopeId__ = null
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources\\assets\\js\\components\\ExampleComponent.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-0ca92eac", Component.options)
-  } else {
-    hotAPI.reload("data-v-0ca92eac", Component.options)
-' + '  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 41 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    mounted: function mounted() {
-        console.log('Component mounted.');
-    }
-});
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _vm._m(0, false, false)
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "container" }, [
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-md-8 col-md-offset-2" }, [
-          _c("div", { staticClass: "panel panel-default" }, [
-            _c("div", { staticClass: "panel-heading" }, [
-              _vm._v("Example Component")
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "panel-body" }, [
-              _vm._v("\n                    hogehoge\n                ")
-            ])
-          ])
-        ])
-      ])
-    ])
-  }
-]
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-0ca92eac", module.exports)
-  }
-}
-
-/***/ }),
-/* 43 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var normalizeComponent = __webpack_require__(1)
-/* script */
-var __vue_script__ = __webpack_require__(44)
-/* template */
-var __vue_template__ = __webpack_require__(45)
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = null
-/* scopeId */
-var __vue_scopeId__ = null
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources\\assets\\js\\components\\main-panel\\NewProjFormComponent.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-5b488bfe", Component.options)
-  } else {
-    hotAPI.reload("data-v-5b488bfe", Component.options)
-' + '  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 44 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    props: {
-        token: String
+    el: '#app',
+    data: {
+        tbl_meta: [],
+        tbl_data: [],
+        selected_template: 0
     },
-    data: function data() {
-        return {
-            proj_name: 'untitled'
-        };
-    },
-    mounted: function mounted() {
-        $(this.$el).find('#new-proj-name').focus();
-    },
-
     methods: {
-        submit: function submit() {
-            var $form = $('#new-proj-form');
-            if ($form[0].checkValidity()) {
-                $form.submit();
-            } else {
-                this.cancel();
-            }
-        },
-        cancel: function cancel() {
-            this.$emit('cancel');
+        setTblMeta: function setTblMeta(new_meta) {
+            this.tbl_meta = new_meta;
         }
     }
 });
 
 /***/ }),
-/* 45 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("li", [
-    _c("div", [
-      _c(
-        "form",
-        { attrs: { action: "create", method: "POST", id: "new-proj-form" } },
-        [
-          _vm.token
-            ? _c("input", {
-                attrs: { name: "_token", type: "hidden" },
-                domProps: { value: _vm.token }
-              })
-            : _vm._e(),
-          _vm._v(" "),
-          _c("label", [
-            _c("h2", [
-              _c("input", {
-                attrs: {
-                  type: "text",
-                  name: "proj_name",
-                  value: "",
-                  id: "new-proj-name",
-                  placeholder: "新しいプロジェクトの名前",
-                  required: ""
-                },
-                on: {
-                  blur: _vm.submit,
-                  keypress: function($event) {
-                    if (
-                      !("button" in $event) &&
-                      _vm._k($event.keyCode, "esc", 27, $event.key)
-                    ) {
-                      return null
-                    }
-                    _vm.cancel($event)
-                  }
-                }
-              })
-            ])
-          ])
-        ]
-      )
-    ])
-  ])
-}
-var staticRenderFns = []
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-5b488bfe", module.exports)
-  }
-}
-
-/***/ }),
-/* 46 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(47)
+var __vue_script__ = __webpack_require__(59)
 /* template */
-var __vue_template__ = __webpack_require__(48)
+var __vue_template__ = __webpack_require__(60)
 /* template functional */
 var __vue_template_functional__ = false
 /* styles */
@@ -21590,7 +21333,7 @@ var Component = normalizeComponent(
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "resources\\assets\\js\\components\\main-panel\\SideNavComponent.vue"
+Component.options.__file = "resources\\assets\\js\\components\\table-editor\\TableEditorTableComponent.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
 
 /* hot reload */
@@ -21600,9 +21343,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-77d77596", Component.options)
+    hotAPI.createRecord("data-v-3f7d91f1", Component.options)
   } else {
-    hotAPI.reload("data-v-77d77596", Component.options)
+    hotAPI.reload("data-v-3f7d91f1", Component.options)
 ' + '  }
   module.hot.dispose(function (data) {
     disposed = true
@@ -21613,7 +21356,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 47 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -21663,207 +21406,897 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    created: function created() {
-        this.$on('show', function () {
-            this.nav_show = true;
-        });
-        this.$on('hide', function () {
-            this.nav_show = false;
-        });
+    mounted: function mounted() {
+        this.$emit('input', this.column_config);
     },
 
     props: {
-        token: String,
-        projList: Array,
-        tblList: Array,
-        focus: Number
+        tblMeta: Array,
+        formTypes: Object,
+        forginColumns: Array
     },
     data: function data() {
         return {
-            nav_show: true,
-            is_show_new_proj_form: false
+            column_config: this.tblMeta
         };
     },
 
     computed: {
-        add_tbl: function add_tbl() {
-            return this.$parent.add_tbl;
+        scaffold: function scaffold() {
+            var new_obj = {};
+            Object.keys(this.tblMeta.slice(-1)[0]).forEach(function (key) {
+                new_obj[key] = null;
+            });
+            new_obj['type'] = this.tblMeta.slice(-1)[0].type;
+            return new_obj;
+        },
+        default_data: function default_data() {
+            var default_data = {};
+            this.column_config.forEach(function (conf) {
+                default_data[conf.key] = conf.default;
+            });
+            return default_data;
+        },
+        isExistRefDest: function isExistRefDest() {
+            return this.forginColumns.map(function (forginTbl) {
+                return forginTbl.length;
+            }).reduce(function (carry, num) {
+                return carry + num;
+            }, 0) > 1 || this.column_config.length > 2;
+        },
+        isNumeric: function isNumeric() {
+            return this.column_config.map(function (conf) {
+                switch (conf.type) {
+                    case 'numlist':
+                    case 'number':
+                    case 'range':
+                        return true;
+                    default:
+                        return false;
+                }
+            });
+        },
+        isMultipleEnable: function isMultipleEnable() {
+            return this.column_config.map(function (conf) {
+                switch (conf.type) {
+                    case 'select':
+                    case 'multicheck':
+                        return true;
+                    default:
+                        return false;
+                }
+            });
+        },
+        isForginEnable: function isForginEnable() {
+            return this.column_config.map(function (conf) {
+                switch (conf.type) {
+                    case 'listext':
+                    case 'numlist':
+                    case 'select':
+                    case 'radio':
+                    case 'multicheck':
+                        return true;
+                    default:
+                        return false;
+                }
+            });
+        },
+        isMustMultiple: function isMustMultiple() {
+            return this.column_config.map(function (conf) {
+                switch (conf.type) {
+                    case 'multicheck':
+                        conf.multiple = true;
+                        return true;
+                    default:
+                        return false;
+                }
+            });
+        },
+        isMustNotNull: function isMustNotNull() {
+            return this.column_config.map(function (conf) {
+                switch (conf.type) {
+                    case 'range':
+                    case 'color':
+                        conf.not_null = true;
+                        return true;
+                    default:
+                        return false;
+                }
+            });
         }
     },
     methods: {
-        addTbl: function addTbl(event) {
-            var proj_id = $(event.target).closest('form').find('input[name="pid"]').val();
-            this.$parent.$emit('add-tbl', proj_id);
+        appendColumn: function appendColumn() {
+            var newKey = function generateNewKey() {
+                var trialKey = 'c' + Math.random().toString(36).slice(-8);
+                return this.column_config.some(function (col) {
+                    return col.key == trialKey;
+                }) ? generateNewKey() : trialKey;
+            }.bind(this)();
+            this.column_config.push($.extend({}, this.scaffold, { key: newKey }));
         },
-        deleteProj: function deleteProj(event) {
-            var $form = $(event.target).closest('form');
-            var proj_name = $form.prev().text();
-            if (confirm('\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u300C' + proj_name + '\u300D\u3092\u524A\u9664\u3057\u3066\u3082\u3088\u308D\u3057\u3044\u3067\u3059\u304B\uFF1F')) {
-                var action = $form.attr('action');
-                $form.attr('action', action + '/delete').submit();
+        dropColumn: function dropColumn(key, event) {
+            var eve_target = event.currentTarget || event.target;
+            var text = $(eve_target).find('label').text();
+            var index = $('.col-h').index(eve_target) + 1;
+            if (confirm('' + text + index + '\u3092\u524A\u9664\u3057\u3066\u3082\u3088\u308D\u3057\u3044\u3067\u3059\u304B\uFF1F')) {
+                this.column_config.splice(key, 1);
             }
-        },
-        changeFocus: function changeFocus(tab_id) {
-            this.$parent.focus_tbl = tab_id;
+        }
+    },
+    watch: {
+        column_config: function column_config() {
+            this.$emit('input', this.column_config);
         }
     }
 });
 
 /***/ }),
-/* 48 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "nav",
-    {
-      directives: [
-        {
-          name: "show",
-          rawName: "v-show",
-          value: _vm.nav_show,
-          expression: "nav_show"
-        }
-      ],
-      attrs: { id: "side_menu" }
-    },
-    [
-      _c("header", { staticClass: "with-btns" }, [
-        _c("h2", [_vm._v("Projects")]),
-        _vm._v(" "),
-        _c("ul", { staticClass: "btns" }, [
-          _c("li", { attrs: { title: "新規作成" } }, [
-            _c("a", {
-              staticClass: "icon-database btn",
-              attrs: { href: "#", id: "new-proj" },
-              on: {
-                click: function($event) {
-                  _vm.is_show_new_proj_form = true
-                }
-              }
-            })
-          ])
-        ])
-      ]),
-      _vm._v(" "),
+  return _c("table", { staticClass: "data-table", attrs: { id: "def-tbl" } }, [
+    _c("thead", [
       _c(
-        "ul",
-        { staticClass: "side-menu", attrs: { id: "proj-list" } },
+        "tr",
         [
-          _vm._l(_vm.projList, function(proj) {
-            return _c("li", { key: proj.proj_id }, [
-              _c("div", { staticClass: "with-btns" }, [
-                _c("h2", [
-                  _c("a", { attrs: { href: "main?pid=" + proj.proj_id } }, [
-                    _vm._v(_vm._s(proj.proj_name))
-                  ])
-                ]),
-                _vm._v(" "),
-                _c(
-                  "form",
-                  { attrs: { action: "/skill_editor", method: "POST" } },
-                  [
-                    _vm.token
-                      ? _c("input", {
-                          attrs: { name: "_token", type: "hidden" },
-                          domProps: { value: _vm.token }
-                        })
-                      : _vm._e(),
-                    _vm._v(" "),
-                    _c("input", {
-                      attrs: { name: "pid", type: "hidden" },
-                      domProps: { value: proj.proj_id }
-                    }),
-                    _vm._v(" "),
-                    _c("ul", { staticClass: "btns" }, [
-                      _c("li", {
-                        staticClass: "icon-folder-plus btn submit",
-                        attrs: { title: "テーブルの追加" },
-                        on: { click: _vm.addTbl }
-                      }),
-                      _vm._v(" "),
-                      _c("li", {
-                        staticClass: "icon-bin btn submit",
-                        attrs: { title: "プロジェクトの削除" },
-                        on: { click: _vm.deleteProj }
-                      })
-                    ])
-                  ]
-                )
-              ]),
-              _vm._v(" "),
-              proj.proj_id == _vm.focus
-                ? _c(
-                    "ul",
-                    { staticClass: "side-children" },
-                    [
-                      _vm._l(_vm.tblList, function(tbl) {
-                        return _c("li", { key: tbl.tbl_id }, [
-                          _c("span", { staticClass: "with-btns" }, [
-                            _c(
-                              "a",
-                              {
-                                attrs: {
-                                  href:
-                                    "editor/data/" +
-                                    proj.proj_id +
-                                    "?tab=" +
-                                    tbl.tbl_id,
-                                  target: "editor_area"
-                                },
-                                on: {
-                                  click: function($event) {
-                                    _vm.changeFocus(tbl.tbl_id)
-                                  }
-                                }
-                              },
-                              [_vm._v(_vm._s(tbl.tbl_name))]
-                            ),
-                            _vm._v(" "),
-                            _vm._m(0, true, false)
-                          ])
-                        ])
-                      }),
-                      _vm._v(" "),
-                      _vm.add_tbl
-                        ? _c("li", {}, [_c("strong", [_vm._v("untitled")])])
-                        : _vm._e()
-                    ],
-                    2
-                  )
-                : _vm._e()
-            ])
-          }),
+          _c("th", { attrs: { id: "add-col" } }, [
+            _c(
+              "button",
+              {
+                attrs: { type: "button", title: "列追加", id: "add-column" },
+                on: { click: _vm.appendColumn }
+              },
+              [_vm._v("+")]
+            )
+          ]),
           _vm._v(" "),
-          _vm.is_show_new_proj_form
-            ? _c("new-proj-form", {
-                on: {
-                  cancel: function($event) {
-                    _vm.is_show_new_proj_form = false
+          _c("th", [_vm._v("No列")]),
+          _vm._v(" "),
+          _vm._l(_vm.column_config, function(col, id) {
+            return col.key != "id"
+              ? _c("table-editor-th", {
+                  key: id,
+                  tag: "th",
+                  attrs: { "is-only": _vm.column_config.length < 3 },
+                  on: {
+                    click: function($event) {
+                      _vm.dropColumn(id, $event)
+                    }
                   }
-                }
-              })
-            : _vm._e()
+                })
+              : _vm._e()
+          })
         ],
         2
       )
-    ]
-  )
+    ]),
+    _vm._v(" "),
+    _c("tbody", [
+      _c(
+        "tr",
+        [
+          _c("th", [_vm._v("列名")]),
+          _vm._v(" "),
+          _c("td", [_vm._v("No.")]),
+          _vm._v(" "),
+          _vm._l(_vm.column_config, function(col, id) {
+            return col.key != "id"
+              ? _c("td", { key: id }, [
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.column_config[id].col_name,
+                        expression: "column_config[id].col_name"
+                      }
+                    ],
+                    attrs: {
+                      type: "text",
+                      name: "def_cols[" + id + "][col_name]",
+                      required: ""
+                    },
+                    domProps: { value: _vm.column_config[id].col_name },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.$set(
+                          _vm.column_config[id],
+                          "col_name",
+                          $event.target.value
+                        )
+                      }
+                    }
+                  })
+                ])
+              : _vm._e()
+          })
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "tr",
+        [
+          _c("th", [_vm._v("入力形式")]),
+          _vm._v(" "),
+          _c("td", [_vm._v("--")]),
+          _vm._v(" "),
+          _vm._l(_vm.column_config, function(col, id) {
+            return col.key != "id"
+              ? _c("td", { key: id }, [
+                  _c(
+                    "select",
+                    {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.column_config[id].type,
+                          expression: "column_config[id].type"
+                        }
+                      ],
+                      attrs: { name: "def_cols[" + id + "][form_type]" },
+                      on: {
+                        change: function($event) {
+                          var $$selectedVal = Array.prototype.filter
+                            .call($event.target.options, function(o) {
+                              return o.selected
+                            })
+                            .map(function(o) {
+                              var val = "_value" in o ? o._value : o.value
+                              return val
+                            })
+                          _vm.$set(
+                            _vm.column_config[id],
+                            "type",
+                            $event.target.multiple
+                              ? $$selectedVal
+                              : $$selectedVal[0]
+                          )
+                        }
+                      }
+                    },
+                    _vm._l(_vm.formTypes, function(label, type) {
+                      return _c(
+                        "option",
+                        { key: type, domProps: { value: type } },
+                        [_vm._v(_vm._s(label))]
+                      )
+                    })
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      directives: [
+                        {
+                          name: "show",
+                          rawName: "v-show",
+                          value: _vm.isNumeric[id],
+                          expression: "isNumeric[id]"
+                        }
+                      ],
+                      attrs: { name: "step" }
+                    },
+                    [
+                      _c("label", [
+                        _vm._v("刻み幅:"),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.column_config[id].step,
+                              expression: "column_config[id].step"
+                            }
+                          ],
+                          attrs: {
+                            type: "number",
+                            value: "1",
+                            disabled: !_vm.isNumeric[id],
+                            name: "def_cols[" + id + "][step]"
+                          },
+                          domProps: { value: _vm.column_config[id].step },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.column_config[id],
+                                "step",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ])
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      directives: [
+                        {
+                          name: "show",
+                          rawName: "v-show",
+                          value: _vm.isNumeric[id],
+                          expression: "isNumeric[id]"
+                        }
+                      ],
+                      attrs: { name: "max" }
+                    },
+                    [
+                      _c("label", [
+                        _vm._v("最大値:"),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.column_config[id].max,
+                              expression: "column_config[id].max"
+                            }
+                          ],
+                          attrs: {
+                            type: "number",
+                            disabled: !_vm.isNumeric[id],
+                            name: "def_cols[" + id + "][max]"
+                          },
+                          domProps: { value: _vm.column_config[id].max },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.column_config[id],
+                                "max",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ])
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      directives: [
+                        {
+                          name: "show",
+                          rawName: "v-show",
+                          value: _vm.isNumeric[id],
+                          expression: "isNumeric[id]"
+                        }
+                      ],
+                      attrs: { name: "min" }
+                    },
+                    [
+                      _c("label", [
+                        _vm._v("最小値:"),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.column_config[id].min,
+                              expression: "column_config[id].min"
+                            }
+                          ],
+                          attrs: {
+                            type: "number",
+                            disabled: !_vm.isNumeric[id],
+                            name: "def_cols[" + id + "][min]"
+                          },
+                          domProps: { value: _vm.column_config[id].min },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.column_config[id],
+                                "min",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ])
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      directives: [
+                        {
+                          name: "show",
+                          rawName: "v-show",
+                          value:
+                            _vm.isMultipleEnable[id] || _vm.isMustMultiple[id],
+                          expression:
+                            "isMultipleEnable[id] || isMustMultiple[id]"
+                        }
+                      ],
+                      attrs: { name: "multi" }
+                    },
+                    [
+                      _c("label", [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.column_config[id].multiple,
+                              expression: "column_config[id].multiple"
+                            }
+                          ],
+                          attrs: {
+                            type: "checkbox",
+                            value: "1",
+                            disabled:
+                              !_vm.isMultipleEnable[id] ||
+                              _vm.isMustMultiple[id],
+                            name: "def_cols[" + id + "][multiple]"
+                          },
+                          domProps: {
+                            checked: Array.isArray(
+                              _vm.column_config[id].multiple
+                            )
+                              ? _vm._i(_vm.column_config[id].multiple, "1") > -1
+                              : _vm.column_config[id].multiple
+                          },
+                          on: {
+                            change: function($event) {
+                              var $$a = _vm.column_config[id].multiple,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = "1",
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 &&
+                                    (_vm.column_config[
+                                      id
+                                    ].multiple = $$a.concat([$$v]))
+                                } else {
+                                  $$i > -1 &&
+                                    (_vm.column_config[id].multiple = $$a
+                                      .slice(0, $$i)
+                                      .concat($$a.slice($$i + 1)))
+                                }
+                              } else {
+                                _vm.$set(_vm.column_config[id], "multiple", $$c)
+                              }
+                            }
+                          }
+                        }),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "show",
+                              rawName: "v-show",
+                              value: _vm.isMustMultiple[id],
+                              expression: "isMustMultiple[id]"
+                            }
+                          ],
+                          attrs: {
+                            type: "hidden",
+                            value: "1",
+                            name: "def_cols[" + id + "][multiple]"
+                          }
+                        }),
+                        _vm._v("複数選択をする")
+                      ])
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      directives: [
+                        {
+                          name: "show",
+                          rawName: "v-show",
+                          value: _vm.isForginEnable[id],
+                          expression: "isForginEnable[id]"
+                        }
+                      ],
+                      attrs: { name: "ref" }
+                    },
+                    [
+                      _c("label", [
+                        _vm._v("選択肢"),
+                        _c("br", {
+                          directives: [
+                            {
+                              name: "show",
+                              rawName: "v-show",
+                              value: _vm.isExistRefDest,
+                              expression: "isExistRefDest"
+                            }
+                          ]
+                        }),
+                        _vm._v(" "),
+                        _vm.isExistRefDest
+                          ? _c(
+                              "select",
+                              {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.column_config[id].ref_dest,
+                                    expression: "column_config[id].ref_dest"
+                                  }
+                                ],
+                                attrs: {
+                                  name: "def_cols[" + id + "][ref_dest]",
+                                  disabled: !_vm.isForginEnable[id]
+                                },
+                                on: {
+                                  change: function($event) {
+                                    var $$selectedVal = Array.prototype.filter
+                                      .call($event.target.options, function(o) {
+                                        return o.selected
+                                      })
+                                      .map(function(o) {
+                                        var val =
+                                          "_value" in o ? o._value : o.value
+                                        return val
+                                      })
+                                    _vm.$set(
+                                      _vm.column_config[id],
+                                      "ref_dest",
+                                      $event.target.multiple
+                                        ? $$selectedVal
+                                        : $$selectedVal[0]
+                                    )
+                                  }
+                                }
+                              },
+                              [
+                                _vm.column_config.length > 2
+                                  ? _c(
+                                      "optgroup",
+                                      { attrs: { label: "This table" } },
+                                      _vm._l(_vm.column_config, function(
+                                        ref,
+                                        jd
+                                      ) {
+                                        return !["id", col.key].includes(
+                                          ref.key
+                                        )
+                                          ? _c(
+                                              "option",
+                                              {
+                                                key: ref.key,
+                                                domProps: { value: -jd }
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(
+                                                    ref.col_name || "列" + jd
+                                                  )
+                                                )
+                                              ]
+                                            )
+                                          : _vm._e()
+                                      })
+                                    )
+                                  : _vm._e()
+                              ]
+                            )
+                          : _vm._e(),
+                        _vm._v(" "),
+                        !_vm.isExistRefDest
+                          ? _c("span", [_vm._v(":候補がありません。")])
+                          : _vm._e()
+                      ])
+                    ]
+                  )
+                ])
+              : _vm._e()
+          })
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "tr",
+        [
+          _c("th", [_vm._v("初期値")]),
+          _vm._v(" "),
+          _c("td", [_vm._v("自動")]),
+          _vm._v(" "),
+          _vm._l(_vm.column_config, function(col, id) {
+            return col.key != "id"
+              ? _c(
+                  "td",
+                  { key: id },
+                  [
+                    _c("data-editor-form", {
+                      key: _vm.column_config[id].key,
+                      attrs: {
+                        type: _vm.column_config[id].type,
+                        name: "def_cols[" + id + "][default]",
+                        options: _vm.column_config[id].ref_data || {}
+                      },
+                      model: {
+                        value: _vm.column_config[id].default,
+                        callback: function($$v) {
+                          _vm.$set(_vm.column_config[id], "default", $$v)
+                        },
+                        expression: "column_config[id].default"
+                      }
+                    })
+                  ],
+                  1
+                )
+              : _vm._e()
+          })
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "tr",
+        [
+          _c("th", [_vm._v("一意")]),
+          _vm._v(" "),
+          _vm._m(0, false, false),
+          _vm._v(" "),
+          _vm._l(_vm.column_config, function(col, id) {
+            return col.key != "id"
+              ? _c("td", { key: id }, [
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.column_config[id].uniq,
+                        expression: "column_config[id].uniq"
+                      }
+                    ],
+                    attrs: {
+                      type: "checkbox",
+                      name: "def_cols[" + id + "][uniq]",
+                      value: "1"
+                    },
+                    domProps: {
+                      checked: Array.isArray(_vm.column_config[id].uniq)
+                        ? _vm._i(_vm.column_config[id].uniq, "1") > -1
+                        : _vm.column_config[id].uniq
+                    },
+                    on: {
+                      change: function($event) {
+                        var $$a = _vm.column_config[id].uniq,
+                          $$el = $event.target,
+                          $$c = $$el.checked ? true : false
+                        if (Array.isArray($$a)) {
+                          var $$v = "1",
+                            $$i = _vm._i($$a, $$v)
+                          if ($$el.checked) {
+                            $$i < 0 &&
+                              (_vm.column_config[id].uniq = $$a.concat([$$v]))
+                          } else {
+                            $$i > -1 &&
+                              (_vm.column_config[id].uniq = $$a
+                                .slice(0, $$i)
+                                .concat($$a.slice($$i + 1)))
+                          }
+                        } else {
+                          _vm.$set(_vm.column_config[id], "uniq", $$c)
+                        }
+                      }
+                    }
+                  })
+                ])
+              : _vm._e()
+          })
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "tr",
+        [
+          _c("th", [_vm._v("非Null")]),
+          _vm._v(" "),
+          _vm._m(1, false, false),
+          _vm._v(" "),
+          _vm._l(_vm.column_config, function(col, id) {
+            return col.key != "id"
+              ? _c("td", { key: id }, [
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.column_config[id].not_null,
+                        expression: "column_config[id].not_null"
+                      }
+                    ],
+                    attrs: {
+                      type: "checkbox",
+                      name: "def_cols[" + id + "][not_null]",
+                      value: "1",
+                      disabled: _vm.isMustNotNull[id]
+                    },
+                    domProps: {
+                      checked: Array.isArray(_vm.column_config[id].not_null)
+                        ? _vm._i(_vm.column_config[id].not_null, "1") > -1
+                        : _vm.column_config[id].not_null
+                    },
+                    on: {
+                      change: function($event) {
+                        var $$a = _vm.column_config[id].not_null,
+                          $$el = $event.target,
+                          $$c = $$el.checked ? true : false
+                        if (Array.isArray($$a)) {
+                          var $$v = "1",
+                            $$i = _vm._i($$a, $$v)
+                          if ($$el.checked) {
+                            $$i < 0 &&
+                              (_vm.column_config[id].not_null = $$a.concat([
+                                $$v
+                              ]))
+                          } else {
+                            $$i > -1 &&
+                              (_vm.column_config[id].not_null = $$a
+                                .slice(0, $$i)
+                                .concat($$a.slice($$i + 1)))
+                          }
+                        } else {
+                          _vm.$set(_vm.column_config[id], "not_null", $$c)
+                        }
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _vm.isMustNotNull[id]
+                    ? _c("input", {
+                        attrs: {
+                          type: "hidden",
+                          name: "def_cols[" + id + "][not_null]",
+                          value: "1"
+                        }
+                      })
+                    : _vm._e()
+                ])
+              : _vm._e()
+          })
+        ],
+        2
+      )
+    ])
+  ])
 }
 var staticRenderFns = [
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("ul", { staticClass: "btns" }, [
-      _c("li", {
-        staticClass: "icon-bin btn",
-        attrs: { title: "テーブルの削除" }
+    return _c("td", [
+      _c("input", {
+        attrs: { type: "checkbox", value: "1", disabled: "", checked: "" }
+      })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", [
+      _c("input", {
+        attrs: { type: "checkbox", value: "1", disabled: "", checked: "" }
       })
     ])
   }
@@ -21873,20 +22306,20 @@ module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-77d77596", module.exports)
+    require("vue-hot-reload-api")      .rerender("data-v-3f7d91f1", module.exports)
   }
 }
 
 /***/ }),
-/* 49 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(50)
+var __vue_script__ = __webpack_require__(62)
 /* template */
-var __vue_template__ = __webpack_require__(51)
+var __vue_template__ = __webpack_require__(63)
 /* template functional */
 var __vue_template_functional__ = false
 /* styles */
@@ -21903,7 +22336,7 @@ var Component = normalizeComponent(
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "resources\\assets\\js\\components\\main-panel\\ToggleButtonComponent.vue"
+Component.options.__file = "resources\\assets\\js\\components\\table-editor\\TableEditorThComponent.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
 
 /* hot reload */
@@ -21913,9 +22346,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-12f211c2", Component.options)
+    hotAPI.createRecord("data-v-15c19d37", Component.options)
   } else {
-    hotAPI.reload("data-v-12f211c2", Component.options)
+    hotAPI.reload("data-v-15c19d37", Component.options)
 ' + '  }
   module.hot.dispose(function (data) {
     disposed = true
@@ -21926,7 +22359,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 50 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -21935,42 +22368,36 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    mounted: function mounted() {
-        this.$emit(this.navDefaultShow ? 'show' : 'hide');
-    },
-
     props: {
-        navDefaultShow: {
-            type: Boolean,
-            default: true
-        }
+        isOnly: Boolean
     },
     data: function data() {
         return {
-            navShow: this.navDefaultShow
+            on_hover: false
         };
     },
 
-    computed: {
-        content: function content() {
-            return this.navShow ? '<<' : '>>';
-        },
-        title: function title() {
-            return 'サイドメニューを' + (this.navShow ? '閉じる' : '開く');
-        }
-    },
     methods: {
-        navToggle: function navToggle() {
-            this.navShow = !this.navShow;
-            this.$emit(this.navShow ? 'show' : 'hide');
+        emitClick: function emitClick(event) {
+            if (!this.isOnly) {
+                this.$emit('click', event);
+            }
         }
     }
 });
 
 /***/ }),
-/* 51 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -21978,12 +22405,42 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c(
-    "button",
+    "th",
     {
-      attrs: { type: "button", title: _vm.title, id: "toggle-menu" },
-      on: { click: _vm.navToggle }
+      staticClass: "col-h",
+      on: {
+        click: function($event) {
+          _vm.emitClick($event)
+        },
+        mouseenter: function($event) {
+          _vm.on_hover = true
+        },
+        mouseleave: function($event) {
+          _vm.on_hover = false
+        }
+      }
     },
-    [_vm._v(_vm._s(_vm.content))]
+    [
+      _vm._t("default"),
+      _vm._v(" "),
+      _c("label", [_vm._v("列")]),
+      _vm._v(" "),
+      _c(
+        "span",
+        {
+          directives: [
+            {
+              name: "show",
+              rawName: "v-show",
+              value: _vm.on_hover && !_vm.isOnly,
+              expression: "on_hover && !isOnly"
+            }
+          ]
+        },
+        [_vm._v("削除")]
+      )
+    ],
+    2
   )
 }
 var staticRenderFns = []
@@ -21992,20 +22449,20 @@ module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-12f211c2", module.exports)
+    require("vue-hot-reload-api")      .rerender("data-v-15c19d37", module.exports)
   }
 }
 
 /***/ }),
-/* 52 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(53)
+var __vue_script__ = __webpack_require__(65)
 /* template */
-var __vue_template__ = __webpack_require__(54)
+var __vue_template__ = __webpack_require__(66)
 /* template functional */
 var __vue_template_functional__ = false
 /* styles */
@@ -22022,7 +22479,7 @@ var Component = normalizeComponent(
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "resources\\assets\\js\\components\\main-panel\\MainPanelComponent.vue"
+Component.options.__file = "resources\\assets\\js\\components\\data-editor\\DataEditorTableComponent.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
 
 /* hot reload */
@@ -22032,9 +22489,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-e2239592", Component.options)
+    hotAPI.createRecord("data-v-72a238c9", Component.options)
   } else {
-    hotAPI.reload("data-v-e2239592", Component.options)
+    hotAPI.reload("data-v-72a238c9", Component.options)
 ' + '  }
   module.hot.dispose(function (data) {
     disposed = true
@@ -22045,11 +22502,41 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 53 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -22074,109 +22561,167 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    created: function created() {
-        this.$on('add-tbl', function (pid) {
-            this.func = 'table';
-            this.focus_pid = pid;
-            this.focus_tbl = null;
-        });
-    },
-    mounted: function mounted() {
-        if (!this.tblList.length) {
-            this.$emit('add-tbl', this.pid);
-        }
-    },
-
     props: {
-        tblList: Array,
-        pid: Number,
-        tbl: Number
+        tblData: Array,
+        tblMeta: Array
     },
     data: function data() {
         return {
-            func: 'data',
-            focus_pid: this.pid,
-            focus_tbl: this.tbl
+            focused: false
         };
     },
 
     computed: {
-        editor_focus: function editor_focus() {
-            var query = '';
-            if (this.focus_pid && this.focus_tbl) {
-                query += '?tab=' + this.focus_tbl;
+        default_data: function default_data() {
+            var default_data = {};
+            this.tblMeta.forEach(function (meta) {
+                default_data[meta.key] = meta.default;
+            }, this);
+            return default_data;
+        },
+        meta_obj: function meta_obj() {
+            var meta_obj = {};
+            this.tblMeta.forEach(function (meta) {
+                meta_obj[meta.key] = meta;
+            });
+            return meta_obj;
+        }
+    },
+    methods: {
+        emitChange: function emitChange(new_val, key_name) {
+            if (this.idx != null) {
+                this.$emit('change', $.extend(this.data, _defineProperty({}, key_name, new_val)), this.idx);
             }
-            return 'editor/' + this.func + '/' + this.focus_pid + query;
+        },
+        emitPush: function emitPush(new_val, key_name) {
+            this.$emit('push', $.extend(this.data, _defineProperty({}, key_name, new_val)));
+        },
+        shiftColumn: function shiftColumn(event) {
+            var shift_step = event.shiftKey ? -1 : 1;
+            var $editable = $('.editable');
+            var idx = $editable.index($(event.target).closest('.editable'));
+            $editable.eq(idx + shift_step).click();
+        },
+        shiftRow: function shiftRow(event) {
+            if (!event.shiftKey && event.ctrlKey && this.idx == null) {
+                this.emitPush(event.target.value);
+                event.target.value = this.cell;
+            } else if (event.shiftKey || event.ctrlKey) {
+                var shift_step = event.shiftKey ? -1 : 1;
+                var $selector = $('[name^="' + this.name + '"]');
+                var idx = $selector.index($(event.target).closest('.editable').find(selector));
+                this.$nextTick(function () {
+                    $selector.eq(idx + shift_step).closest('.editable').click();
+                });
+            }
         }
     }
-
 });
 
 /***/ }),
-/* 54 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("main", { attrs: { id: "main-panel" } }, [
-    _c("section", [
-      _c("header", { attrs: { id: "tab-bar" } }, [
-        _c(
-          "ul",
-          { staticClass: "editor-tabs" },
-          [
-            _vm._l(_vm.tblList, function(tbl) {
-              return _c(
-                "li",
-                {
-                  key: tbl.tbl_id,
-                  class: { editting: _vm.focus_tbl == tbl.tbl_id },
-                  on: {
-                    click: function($event) {
-                      _vm.focus_tbl = tbl.tbl_id
-                    }
-                  }
-                },
-                [
-                  _c(
-                    "a",
-                    {
-                      attrs: {
-                        href:
-                          "editor/data/" + _vm.focus_pid + "?tab=" + tbl.tbl_id,
-                        target: "editor_area"
-                      }
-                    },
-                    [_vm._v(_vm._s(tbl.tbl_name))]
-                  )
+  return _c("table", { staticClass: "data-table" }, [
+    _c("thead", [
+      _c(
+        "tr",
+        _vm._l(_vm.tblMeta, function(meta, id) {
+          return _c("th", { key: meta.key }, [
+            _vm._v(_vm._s(meta.col_name || "列" + id))
+          ])
+        })
+      )
+    ]),
+    _vm._v(" "),
+    _c(
+      "tbody",
+      [
+        _vm._l(_vm.tblData, function(row_data, idx) {
+          return _c(
+            "tr",
+            { key: idx },
+            [
+              _vm._l(_vm.tblMeta, function(meta, id) {
+                return [
+                  meta.key == "id"
+                    ? _c("th", { key: meta.key, staticClass: "id-col" }, [
+                        _c("input", {
+                          attrs: {
+                            type: "hidden",
+                            name: "data[" + idx + "][" + meta.key + "]"
+                          },
+                          domProps: { value: row_data[meta.key] }
+                        })
+                      ])
+                    : _c(
+                        "td",
+                        { key: meta.key },
+                        [
+                          _c("data-editor-form", {
+                            attrs: {
+                              type: meta.type,
+                              name: "data[" + idx + "][" + meta.key + "]",
+                              value:
+                                row_data[meta.key] ||
+                                _vm.default_data[meta.key],
+                              options: meta.ref || {}
+                            }
+                          })
+                        ],
+                        1
+                      )
                 ]
-              )
-            }),
-            _vm._v(" "),
-            _vm.func == "table"
-              ? _c("li", { staticClass: "editting" }, [
-                  _c("strong", [_vm._v("untitled")])
-                ])
-              : _vm._e()
+              })
+            ],
+            2
+          )
+        }),
+        _vm._v(" "),
+        _c(
+          "tr",
+          { attrs: { id: "new-rec" } },
+          [
+            _vm._l(_vm.tblMeta, function(meta, id) {
+              return [
+                meta.key == "id"
+                  ? _c("th", { key: meta.key, staticClass: "id-col" }, [
+                      _c("input", {
+                        attrs: {
+                          type: "hidden",
+                          name: "data[null][" + meta.key + "]"
+                        },
+                        domProps: { value: null }
+                      })
+                    ])
+                  : _c(
+                      "td",
+                      { key: meta.key },
+                      [
+                        _c("data-editor-form", {
+                          key: meta.key,
+                          attrs: {
+                            type: meta.type,
+                            name: "data[null][" + meta.key + "]",
+                            value: _vm.default_data[meta.key],
+                            options: meta.ref || {}
+                          }
+                        })
+                      ],
+                      1
+                    )
+              ]
+            })
           ],
           2
         )
-      ]),
-      _vm._v(" "),
-      !!_vm.focus_pid
-        ? _c("iframe", {
-            staticClass: "tab-page",
-            attrs: {
-              name: "editor_area",
-              src: _vm.editor_focus,
-              scrolling: "no",
-              frameborder: "no"
-            }
-          })
-        : _c("div", [_vm._t("default")], 2)
-    ])
+      ],
+      2
+    )
   ])
 }
 var staticRenderFns = []
@@ -22185,15 +22730,604 @@ module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-e2239592", module.exports)
+    require("vue-hot-reload-api")      .rerender("data-v-72a238c9", module.exports)
   }
 }
 
 /***/ }),
-/* 55 */
-/***/ (function(module, exports) {
+/* 67 */,
+/* 68 */,
+/* 69 */,
+/* 70 */
+/***/ (function(module, exports, __webpack_require__) {
 
-// removed by extract-text-webpack-plugin
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(71)
+/* template */
+var __vue_template__ = __webpack_require__(72)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\data-editor\\DataEditorInputComponent.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-58a51366", Component.options)
+  } else {
+    hotAPI.reload("data-v-58a51366", Component.options)
+' + '  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 71 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: {
+        type: String,
+        name: String,
+        value: null
+    }
+});
+
+/***/ }),
+/* 72 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("input", {
+    attrs: { type: _vm.type, name: _vm.name },
+    domProps: { value: _vm.value },
+    on: {
+      change: function($event) {
+        _vm.$emit("input", $event.target.value)
+      },
+      keydown: [
+        function($event) {
+          if (
+            !("button" in $event) &&
+            _vm._k($event.keyCode, "enter", 13, $event.key)
+          ) {
+            return null
+          }
+          $event.preventDefault()
+          _vm.$emit("keydown-enter", $event)
+        },
+        function($event) {
+          if (
+            !("button" in $event) &&
+            _vm._k($event.keyCode, "tab", 9, $event.key)
+          ) {
+            return null
+          }
+          $event.stopPropagation()
+          _vm.$emit("keydown-tab", $event)
+        },
+        function($event) {
+          if (
+            !("button" in $event) &&
+            _vm._k($event.keyCode, "esc", 27, $event.key)
+          ) {
+            return null
+          }
+          _vm.$emit("keydown-esc", $event)
+        }
+      ],
+      focus: function($event) {
+        _vm.$emit("focus", $event)
+      },
+      blur: function($event) {
+        _vm.$emit("blur", $event)
+      }
+    }
+  })
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-58a51366", module.exports)
+  }
+}
+
+/***/ }),
+/* 73 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(74)
+/* template */
+var __vue_template__ = __webpack_require__(75)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\data-editor\\DataEditorTextareaComponent.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-0896a04e", Component.options)
+  } else {
+    hotAPI.reload("data-v-0896a04e", Component.options)
+' + '  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 74 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: {
+        name: String,
+        value: null
+    }
+});
+
+/***/ }),
+/* 75 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("textarea", {
+    attrs: { name: _vm.name },
+    domProps: { value: _vm.value },
+    on: {
+      change: function($event) {
+        _vm.emitChange($event.target.value)
+      },
+      keydown: [
+        function($event) {
+          if (
+            !("button" in $event) &&
+            _vm._k($event.keyCode, "enter", 13, $event.key)
+          ) {
+            return null
+          }
+          $event.preventDefault()
+          _vm.emitEvent("keydown-enter", $event)
+        },
+        function($event) {
+          if (
+            !("button" in $event) &&
+            _vm._k($event.keyCode, "tab", 9, $event.key)
+          ) {
+            return null
+          }
+          $event.stopPropagation()
+          _vm.emitEvent("keydown-tab", $event)
+        },
+        function($event) {
+          if (
+            !("button" in $event) &&
+            _vm._k($event.keyCode, "esc", 27, $event.key)
+          ) {
+            return null
+          }
+          _vm.emitEvent("keydown-esc", $event)
+        }
+      ],
+      focus: function($event) {
+        _vm.$emit("focus", $event)
+      },
+      blur: function($event) {
+        _vm.emitEvent("blur", $event)
+      }
+    }
+  })
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-0896a04e", module.exports)
+  }
+}
+
+/***/ }),
+/* 76 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(77)
+/* template */
+var __vue_template__ = __webpack_require__(78)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\data-editor\\DataEditorSelectComponent.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-48b17cd7", Component.options)
+  } else {
+    hotAPI.reload("data-v-48b17cd7", Component.options)
+' + '  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 77 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+// import formComponentMixin from './FormComponentMixin.js'
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: {
+        name: String,
+        value: null,
+        options: Object
+    }
+});
+
+/***/ }),
+/* 78 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "select",
+    {
+      attrs: { name: _vm.name },
+      domProps: { value: _vm.value },
+      on: {
+        change: function($event) {
+          _vm.emitChange($event.target.value)
+        },
+        keydown: [
+          function($event) {
+            if (
+              !("button" in $event) &&
+              _vm._k($event.keyCode, "enter", 13, $event.key)
+            ) {
+              return null
+            }
+            $event.preventDefault()
+            _vm.emitEvent("keydown-enter", $event)
+          },
+          function($event) {
+            if (
+              !("button" in $event) &&
+              _vm._k($event.keyCode, "tab", 9, $event.key)
+            ) {
+              return null
+            }
+            $event.stopPropagation()
+            _vm.emitEvent("keydown-tab", $event)
+          },
+          function($event) {
+            if (
+              !("button" in $event) &&
+              _vm._k($event.keyCode, "esc", 27, $event.key)
+            ) {
+              return null
+            }
+            _vm.emitEvent("keydown-esc", $event)
+          }
+        ],
+        focus: function($event) {
+          _vm.$emit("focus", $event)
+        },
+        blur: function($event) {
+          _vm.emitEvent("blur", $event)
+        }
+      }
+    },
+    _vm._l(_vm.options, function(txt, value) {
+      return _c("option", { key: value, domProps: { value: value } }, [
+        _vm._v("\n        " + _vm._s(txt) + "\n    ")
+      ])
+    })
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-48b17cd7", module.exports)
+  }
+}
+
+/***/ }),
+/* 79 */,
+/* 80 */,
+/* 81 */,
+/* 82 */,
+/* 83 */,
+/* 84 */,
+/* 85 */,
+/* 86 */,
+/* 87 */,
+/* 88 */,
+/* 89 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(90)
+/* template */
+var __vue_template__ = __webpack_require__(91)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\data-editor\\DataEditorFormComponent.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {  return key !== "default" && key.substr(0, 2) !== "__"})) {  console.error("named exports are not supported in *.vue files.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-418fc98f", Component.options)
+  } else {
+    hotAPI.reload("data-v-418fc98f", Component.options)
+' + '  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 90 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: {
+        type: String,
+        name: String,
+        value: null,
+        options: Object
+    },
+    data: function data() {
+        return {
+            focused: false,
+            modified: false
+        };
+    },
+
+    computed: {
+        component_type: function component_type() {
+            return this.type == 'textarea' ? 'data-editor-textarea' : this.type == 'select' ? 'data-editor-select' : 'data-editor-input';
+        },
+        is_modified: function is_modified() {
+            return (this.modified || []).includes(this.name);
+        }
+    },
+    methods: {
+        emitInput: function emitInput(new_val) {
+            this.$emit('input', new_val, this.name);
+        },
+        emitPush: function emitPush(new_val) {
+            this.$emit('push', new_val, this.name);
+        }
+    }
+});
+
+/***/ }),
+/* 91 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(_vm.component_type, {
+    tag: "component",
+    staticClass: "data-form",
+    attrs: {
+      type: _vm.type,
+      name: _vm.name,
+      value: _vm.value,
+      options: _vm.options,
+      readonly: !_vm.focused
+    },
+    on: {
+      input: _vm.emitInput,
+      keydown: function($event) {
+        if (
+          !("button" in $event) &&
+          _vm._k($event.keyCode, "esc", 27, $event.key)
+        ) {
+          return null
+        }
+        _vm.focused = false
+      },
+      focus: function($event) {
+        _vm.focused = true
+      },
+      blur: function($event) {
+        _vm.focused = false
+      }
+    }
+  })
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-418fc98f", module.exports)
+  }
+}
 
 /***/ })
-],[36]);
+],[56]);
